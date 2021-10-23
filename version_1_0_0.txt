@@ -1,0 +1,15 @@
+VERSAO 1.0.0
+	>>Usa os frameworks 
+		stefanfrings QtWebApp(1.7.11 28.12.2019)
+	>>Suporte SSL
+	>>Suporte padrões
+		HTTP/HTTPS
+		REST
+	>>Suporte conexões
+		SOCKET
+		WEBSOCKET
+		UDP
+		LOCALSOCKET
+	>>Transacoes
+		Pool de requisições
+	>>Gerenciador de configuracoes

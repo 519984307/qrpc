@@ -1,0 +1,71 @@
+#ifndef QRPC_QRPCINTERFACEMAINTENCE_H
+#define QRPC_QRPCINTERFACEMAINTENCE_H
+
+#include "./qrpc_interface_check.h"
+
+namespace QRpc {
+
+/**
+ * @brief The QRPCInterfaceMaintence class
+ *
+ * GET
+ * http://127.0.0.1:80/serverStats
+ *
+ * POST/PUT
+ * http://127.0.0.1/v1/maintence/serverStart
+ * http://127.0.0.1/v1/maintence/serverStop
+ * http://127.0.0.1/v1/maintence/serverRestart
+ * http://127.0.0.1/v1/maintence/servicesCheck
+ * http://127.0.0.1/v1/maintence/applicationQuit
+ *
+ */
+class QRPCInterfaceMaintence : public QRPCInterfaceCheck
+{
+    Q_OBJECT
+    QRPC_DECLARE_ROUTE(QRPCInterfaceCheck,"v1/maintence")
+public:
+    Q_INVOKABLE explicit QRPCInterfaceMaintence(QObject *parent = nullptr);
+    Q_INVOKABLE ~QRPCInterfaceMaintence();
+
+    /**
+     * @brief serverStart
+     * @return
+     */
+    Q_INVOKABLE virtual QVariant serverStart();
+
+    /**
+     * @brief serverStop
+     * @return
+     */
+    Q_INVOKABLE virtual QVariant serverStop();
+
+    /**
+     * @brief serverRestart
+     * @return
+     */
+    Q_INVOKABLE virtual QVariant serverRestart();
+
+    /**
+     * @brief servicesCheck
+     * @return
+     */
+    Q_INVOKABLE virtual QVariant servicesCheck();
+
+    /**
+     * @brief applicationQuit
+     * @return
+     */
+    Q_INVOKABLE virtual QVariant applicationQuit();
+signals:
+
+};
+
+<<<<<<< HEAD
+//QRPC_SERVER_AUTO_REGISTER(QRPCInterfaceMaintence)
+=======
+QRPC_CONTROLLER_AUTO_REGISTER(QRPCInterfaceMaintence)
+>>>>>>> b6a4115a34d5d9391b87b0c8c4c6ee96b1b3f9cc
+
+} // namespace QRpc
+
+#endif // QRPC_QRPCINTERFACEMAINTENCE_H

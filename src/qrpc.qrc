@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>sslconfiguration/rpc.cert</file>
+        <file>sslconfiguration/rpc.key</file>
+    </qresource>
+</RCC>
