@@ -20,13 +20,13 @@ public:
      * @brief start
      * @return
      */
-    bool start();
+    bool start()override;
 
     /**
      * @brief stop
      * @return
      */
-    bool stop();
+    bool stop()override;
 private:
     void*p=nullptr;
 };

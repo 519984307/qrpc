@@ -47,7 +47,7 @@ namespace QRpc {
         ,Service
     };
 
-    static const QHash<ContentType, QString> ___QRPCContentTypeHeaderTypeToHeader(){
+    static auto ___QRPCContentTypeHeaderTypeToHeader(){
         QHash<ContentType,QString> __return;
         __return.insert(AppNone, "application/x-www-form-urlencoded");
         __return.insert(AppXML, "application/xml");
@@ -74,7 +74,7 @@ namespace QRpc {
 
     const auto QRPCContentTypeHeaderTypeToHeader=___QRPCContentTypeHeaderTypeToHeader();
 
-    static const QHash<QString, ContentType> ___ContentTypeHeaderToHeaderType(){
+    static auto ___ContentTypeHeaderToHeaderType(){
         QHash<QString, ContentType> __return;
         __return.insert("application/x-www-form-urlencoded" , AppNone);
         __return.insert("application/xml" , AppXML);
@@ -101,7 +101,7 @@ namespace QRpc {
 
     const auto ContentTypeHeaderToHeaderType=___ContentTypeHeaderToHeaderType();
 
-    static const QHash<ContentType, QString> ___QRPCContentTypeHeaderToExtension(){
+    static auto ___QRPCContentTypeHeaderToExtension(){
         QHash<ContentType,QString> __return;
         __return.insert(AppXML, "xml");
         __return.insert(AppJson, "json");
@@ -126,7 +126,7 @@ namespace QRpc {
 
     const auto QRPCContentTypeHeaderToExtension=___QRPCContentTypeHeaderToExtension();
 
-    static const QHash<QString, ContentType> ___QRPCContentTypeExtensionToHeader(){
+    static auto ___QRPCContentTypeExtensionToHeader(){
         QHash<QString, ContentType> __return;
         __return.insert("", AppOctetStream);
         __return.insert("xml", AppXML);
@@ -154,7 +154,7 @@ namespace QRpc {
 
     enum QRPCRequestMethod {Head=1, Get=2, Post=4, Put=8, Delete=16, Options=32, MaxMethod=Options};
 
-    static const QHash<int,QString> ___QRPCRequestMethodName(){
+    static auto ___QRPCRequestMethodName(){
         QHash<int, QString> r;
         r.insert(Head, QT_STRINGIFY2(Head));
         r.insert(Get, QT_STRINGIFY2(Get));
@@ -167,7 +167,7 @@ namespace QRpc {
     static const auto QRPCRequestMethodName = ___QRPCRequestMethodName();
     static const auto QRPCRequestMethodNameList = ___QRPCRequestMethodName().values();
 
-    static const QHash<QString,QRPCRequestMethod> ___QRPCRequestMethodType(){
+    static auto ___QRPCRequestMethodType(){
         QHash<QString,QRPCRequestMethod> r;
         r.insert(QT_STRINGIFY2(head), Head);
         r.insert(QT_STRINGIFY2(get), Get);
@@ -187,8 +187,8 @@ namespace QRpc {
     static const auto QRPCRequestMethodType=___QRPCRequestMethodType();
     enum QRPCProtocol {TcpSocket=1, UdpSocket=2, WebSocket=4, Mqtt=8, Amqp=16, Http=32, Https=64, DataBase=128, Kafka=256, LocalSocket=612};
     Q_DECLARE_FLAGS(QRPCProtocols, QRPCProtocol)
-    static const QHash<QString,QRPCProtocol> ___QRPCProtocolType(){
-        QHash<QString,QRPCProtocol> r;
+    static auto ___QRPCProtocolType(){
+        QHash<QString,int> r;
         r.insert(QT_STRINGIFY2(RPC), QRPCProtocol(0));
         r.insert(QT_STRINGIFY2(TcpSocket), TcpSocket);
         r.insert(QT_STRINGIFY2(UdpSocket), UdpSocket);
@@ -215,9 +215,9 @@ namespace QRpc {
         return r;
     }
 
-    static const QHash<QRPCProtocol, QString> ___QRPCProtocolName(){
-        QHash<QRPCProtocol, QString> r;
-        r.insert(QRPCProtocol(0), QT_STRINGIFY2(rpc));
+    static auto ___QRPCProtocolName(){
+        QHash<int, QString> r;
+        r.insert(int(0), QT_STRINGIFY2(rpc));
         r.insert(TcpSocket, QT_STRINGIFY2(tcpsocket));
         r.insert(UdpSocket, QT_STRINGIFY2(udpsocket));
         r.insert(WebSocket, QT_STRINGIFY2(websocket));
@@ -231,8 +231,8 @@ namespace QRpc {
         return r;
     }
 
-    static const QHash<QRPCProtocol, QString> ___QRPCProtocolUrlName(){
-        QHash<QRPCProtocol, QString> r;
+    static auto ___QRPCProtocolUrlName(){
+        QHash<int, QString> r;
         r.insert(QRPCProtocol(0), QT_STRINGIFY2(rpc));
         r.insert(TcpSocket, QT_STRINGIFY2(tcp));
         r.insert(UdpSocket, QT_STRINGIFY2(udp));
@@ -256,15 +256,17 @@ namespace QRpc {
     class QRPCListenProtocol;
 
 
-    static const QHash<int, QString> ___QSslSslProtocolToName(){
+    static auto ___QSslSslProtocolToName(){
         static QHash<int, QString> r;
+#if QT_VERSION <= QT_VERSION_CHECK(5, 15, 0)
         r.insert(QSsl::SslProtocol::SslV3, QT_STRINGIFY2(SslV3));
         r.insert(QSsl::SslProtocol::SslV2, QT_STRINGIFY2(SslV2));
+        r.insert(QSsl::SslProtocol::TlsV1SslV3, QT_STRINGIFY2(TlsV1SslV3));
+#endif
         r.insert(QSsl::SslProtocol::TlsV1_0, QT_STRINGIFY2(TlsV1_0));
         r.insert(QSsl::SslProtocol::TlsV1_1, QT_STRINGIFY2(TlsV1_1));
         r.insert(QSsl::SslProtocol::TlsV1_2, QT_STRINGIFY2(TlsV1_2));
         r.insert(QSsl::SslProtocol::AnyProtocol, QT_STRINGIFY2(AnyProtocol));
-        r.insert(QSsl::SslProtocol::TlsV1SslV3, QT_STRINGIFY2(TlsV1SslV3));
         r.insert(QSsl::SslProtocol::SecureProtocols, QT_STRINGIFY2(SecureProtocols));
         r.insert(QSsl::SslProtocol::TlsV1_0OrLater, QT_STRINGIFY2(TlsV1_0OrLater));
         r.insert(QSsl::SslProtocol::TlsV1_1OrLater, QT_STRINGIFY2(TlsV1_1OrLater));
@@ -282,15 +284,17 @@ namespace QRpc {
     static const auto QSslSslProtocolToName=___QSslSslProtocolToName();
 
 
-    static const QHash<QString, QSsl::SslProtocol> ___QSslProtocolNameToProtocol(){
+    static auto ___QSslProtocolNameToProtocol(){
         static QHash<QString, QSsl::SslProtocol> r;
+#if QT_VERSION <= QT_VERSION_CHECK(5, 15, 0)
         r.insert( QString(QT_STRINGIFY2(SslV3)).toLower(), QSsl::SslProtocol::SslV3);
         r.insert( QString(QT_STRINGIFY2(SslV2)).toLower(), QSsl::SslProtocol::SslV2);
+        r.insert( QString(QT_STRINGIFY2(TlsV1SslV3)).toLower(), QSsl::SslProtocol::TlsV1SslV3);
+#endif
         r.insert( QString(QT_STRINGIFY2(TlsV1_0)).toLower(), QSsl::SslProtocol::TlsV1_0);
         r.insert( QString(QT_STRINGIFY2(TlsV1_1)).toLower(), QSsl::SslProtocol::TlsV1_1);
         r.insert( QString(QT_STRINGIFY2(TlsV1_2)).toLower(), QSsl::SslProtocol::TlsV1_2);
         r.insert( QString(QT_STRINGIFY2(AnyProtocol)).toLower(), QSsl::SslProtocol::AnyProtocol);
-        r.insert( QString(QT_STRINGIFY2(TlsV1SslV3)).toLower(), QSsl::SslProtocol::TlsV1SslV3);
         r.insert( QString(QT_STRINGIFY2(SecureProtocols)).toLower(), QSsl::SslProtocol::SecureProtocols);
         r.insert( QString(QT_STRINGIFY2(TlsV1_0OrLater)).toLower(), QSsl::SslProtocol::TlsV1_0OrLater);
         r.insert( QString(QT_STRINGIFY2(TlsV1_1OrLater)).toLower(), QSsl::SslProtocol::TlsV1_1OrLater);

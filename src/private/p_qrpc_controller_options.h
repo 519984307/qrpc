@@ -107,7 +107,7 @@ public:
                 if(setting!=nullptr)
                     setting->deleteLater();
 
-                auto l=QStringList()<<QT_STRINGIFY2(activityLimit)<<QT_STRINGIFY2(activityInterval);
+                auto l=QStringList{QT_STRINGIFY2(activityLimit),QT_STRINGIFY2(activityInterval)};
                 for(auto&property:l){
                     auto v=vValue.value(property);
                     if(v.isValid() && v.toLongLong()<=0){
@@ -125,9 +125,9 @@ public:
     }
 
     bool v_load(const QVariant &v){
-        if(v.type()==v.List || v.type()==v.StringList)
+        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList)
             return this->load(v.toStringList());
-        else if(v.type()==v.Map || v.type()==v.Hash)
+        else if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash)
             return this->load(v.toHash());
         else
             return this->load(v.toString());
@@ -142,7 +142,7 @@ public:
                 auto metaMethod = metaObject->method(methodIndex);
                 if(metaMethod.parameterCount()==0){
                     auto methodName=QString(metaMethod.name()).toLower().trimmed();
-                    auto staticNames=QStringList()<<"settingsfilename"<<"settings_server"<<"settingsserver";
+                    auto staticNames=QStringList{qsl("settingsfilename"),qsl("settings_server"),qsl("settingsserver")};
                     if(staticNames.contains(methodName)){
                         QVariant invokeReturn;
                         auto argReturn=Q_RETURN_ARG(QVariant, invokeReturn);
@@ -252,14 +252,14 @@ public:
 
         auto arguments=settings.value(qsl("arguments"));
 
-        if(arguments.canConvert(arguments.Map)){
+        if(arguments.typeId()==QMetaType::QVariantHash || arguments.typeId()==QMetaType::QVariantMap){
             QHashIterator<QString, QVariant> i(arguments.toHash());
             while (i.hasNext()) {
                 i.next();
                 p.arguments.insert(i.key().toLower(),i.value());
             }
         }
-        else if(arguments.canConvert(arguments.List)){
+        else if(arguments.typeId()==QMetaType::QVariantList || arguments.typeId()==QMetaType::QStringList){
             for(auto&v:arguments.toList()){
                 auto l=v.toString().split(qsl("="));
                 if(l.isEmpty()){

@@ -130,7 +130,7 @@ public slots:
     }
 public:
     void queueStop(){
-        QMutexLocker locker(&this->lock);
+        QMutexLocker<QMutex> locker(&this->lock);
         auto v=this->listenersQSqlDatabase;
         this->listenersQSqlDatabase.clear();
         Q_V_DATABASE_ITERATOR(v){
@@ -140,7 +140,7 @@ public:
     }
 
     bool isListening(){
-        QMutexLocker locker(&this->lock);
+        QMutexLocker<QMutex> locker(&this->lock);
         Q_V_DATABASE_ITERATOR(this->listenersQSqlDatabase){
             i.next();
             auto __connection=QSqlDatabase::database(i.key());
@@ -172,10 +172,10 @@ public:
 
         QByteArray body;
 
-        static const auto staticUrlNames=QVector<int>()<<QVariant::Url<<QVariant::Map<<QVariant::String << QVariant::ByteArray<<QVariant::Char << QVariant::BitArray;
+        static const auto staticUrlNames=QVector<int>()<<QMetaType::QUrl<<QMetaType::QVariantMap<<QMetaType::QString << QMetaType::QByteArray<<QMetaType::QChar << QMetaType::QBitArray;
         const auto&responseBody=request.responseBody();
         Url rpc_url;
-        if(!staticUrlNames.contains(responseBody.type()))
+        if(!staticUrlNames.contains(responseBody.typeId()))
             body = request.responseBodyBytes();
         else if(!rpc_url.read(responseBody).isValid())
             body = request.responseBodyBytes();

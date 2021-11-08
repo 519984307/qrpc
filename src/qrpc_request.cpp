@@ -4,19 +4,10 @@
 
 namespace QRpc {
 
-
-
 QRPCRequest::QRPCRequest(QObject *parent):QObject(parent)
 {
     this->p = new QRPCRequestPvt(this);
 }
-
-//QRPCRequest::QRPCRequest(const ServiceSetting &setting, QObject *parent):QObject(parent)
-//{
-//    this->p = new QRPCRequestPvt(this);
-//    dPvt();
-//    p.setSettings(setting);
-//}
 
 QRPCRequest::~QRPCRequest()
 {
@@ -73,10 +64,11 @@ bool QRPCRequest::canRequest() const
 {
     if(this->port().toInt()<0)
         return false;
-    else if(this->hostName().isEmpty())
+
+    if(this->hostName().isEmpty())
         return false;
-    else
-        return true;
+
+    return true;
 }
 
 QRPCRequest &QRPCRequest::setSettings(const ServiceSetting &setting)
@@ -123,8 +115,8 @@ QString QRPCRequest::url(const QString &path) const
         spath=spath.replace(qsl("//"),"/");
     if(path.isEmpty())
         return qsl("%1://%2:%3").arg(rq.protocolName(),rq.hostName(),rq.port().toString());
-    else
-        return qsl("%1://%2:%3%4").arg(rq.protocolName(),rq.hostName(),rq.port().toString(),spath);
+
+    return qsl("%1://%2:%3%4").arg(rq.protocolName(),rq.hostName(),rq.port().toString(),spath);
 }
 
 QRPCProtocol QRPCRequest::protocol() const
@@ -262,11 +254,11 @@ QRPCRequest &QRPCRequest::setPort(const QVariant &value)
     dPvt();
 
     QVariant v;
-     if(value.type()==v.StringList || value.type()==v.List){
+     if(value.typeId()==QMetaType::QStringList || value.typeId()==QMetaType::QVariantList){
         auto l=value.toList();
         v=l.isEmpty()?0:l.last().toInt();
     }
-    else if(value.type()==v.Map || value.type()==v.Hash){
+    else if(value.typeId()==QMetaType::QVariantMap || value.typeId()==QMetaType::QVariantHash){
         auto l=value.toHash().values();
         v=l.isEmpty()?0:l.last().toInt();
     }
@@ -546,37 +538,6 @@ QRPCRequest&QRPCRequest::setSslConfiguration(const QSslConfiguration &value)
     return*this;
 }
 
-QSsl::SslProtocol QRPCRequest::sslProtocol() const
-{
-    dPvt();
-    return p.sslConfiguration.protocol();
-}
-
-QRPCRequest&QRPCRequest::setSslProtocol(const QVariant &value)
-{
-    dPvt();
-    auto protocol=p.sslConfiguration.protocol();
-    if(value.toInt()>0 && QSslSslProtocolToName.contains(value.toInt()) )
-        protocol=QSsl::SslProtocol(value.toInt());
-    else if(QSslProtocolNameToProtocol.contains(value.toString().toLower()) )
-        protocol=QSslProtocolNameToProtocol.value(value.toString().toLower());
-    p.sslConfiguration.setProtocol(protocol);
-    return*this;
-}
-
-QString &QRPCRequest::sslCertificate() const
-{
-    dPvt();
-    return p.sslCertificate;
-}
-
-QRPCRequest&QRPCRequest::setSslCertificate(const QString &value)
-{
-    dPvt();
-    p.sslCertificate = value;
-    return*this;
-}
-
 QRPCRequest &QRPCRequest::print()
 {
     for(auto&v:this->printOut())
@@ -620,11 +581,11 @@ void QRPCRequest::Body::setBody(const QVariant &value)
 QString QRPCRequest::Body::toString()const
 {
     dPvt();
-    auto type=p.request_body.type();
-    if(type==QVariant::List || type==QVariant::StringList || type==QVariant::Map || type==QVariant::Hash)
+    auto type=p.request_body.typeId();
+    if(type==QMetaType::QVariantList || type==QMetaType::QStringList || type==QMetaType::QVariantMap || type==QMetaType::QVariantHash)
         return QJsonDocument::fromVariant(p.request_body).toJson();
-    else
-        return p.request_body.toString();
+
+    return p.request_body.toString();
 }
 
 QVariantMap QRPCRequest::Body::toMap() const
@@ -635,21 +596,21 @@ QVariantMap QRPCRequest::Body::toMap() const
 QVariantHash QRPCRequest::Body::toHash()const
 {
     dPvt();
-    auto type=p.request_body.type();
-    if(type==QVariant::List || type==QVariant::StringList || type==QVariant::Map || type==QVariant::Hash)
+    auto type=p.request_body.typeId();
+    if(type==QMetaType::QVariantList || type==QMetaType::QStringList || type==QMetaType::QVariantMap || type==QMetaType::QVariantHash)
         return QJsonDocument::fromVariant(p.request_body).object().toVariantHash();
-    else
-        return QJsonDocument::fromJson(p.request_body.toByteArray()).object().toVariantHash();
+
+    return QJsonDocument::fromJson(p.request_body.toByteArray()).object().toVariantHash();
 }
 
 QVariantList QRPCRequest::Body::toList() const
 {
     dPvt();
-    auto type=p.request_body.type();
-    if(type==QVariant::List || type==QVariant::StringList || type==QVariant::Map || type==QVariant::Hash)
+    auto type=p.request_body.typeId();
+    if(type==QMetaType::QVariantList || type==QMetaType::QStringList || type==QMetaType::QVariantMap || type==QMetaType::QVariantHash)
         return QJsonDocument::fromVariant(p.request_body).array().toVariantList();
-    else
-        return QJsonDocument::fromJson(p.request_body.toByteArray()).array().toVariantList();
+
+    return QJsonDocument::fromJson(p.request_body.toByteArray()).array().toVariantList();
 }
 
 QRPCRequest &QRPCRequest::Body::rq()

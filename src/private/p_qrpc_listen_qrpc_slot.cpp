@@ -98,9 +98,9 @@ public:
 
                             QVariant vArgValue;
                             if(parameterCount==1){
-                                if(parameterType==QVariant::Map)
+                                if(parameterType==QMetaType::QVariantMap)
                                     vArgValue=request.toHash();
-                                else if(parameterType==QVariant::Hash)
+                                else if(parameterType==QMetaType::QVariantHash)
                                     vArgValue=QVariant(request.toHash()).toHash();
                                 else
                                     vArgValue=QVariant::fromValue<QRPCListenRequest*>(&request);

@@ -52,9 +52,9 @@ namespace QRpc {
         VariantUtil vu;
     public:
 
-        QByteArray authorizationBasic() const;
-        QByteArray authorizationBearer() const;
-        QByteArray authorizationService() const;
+        QString authorizationBasic() const;
+        QString authorizationBearer() const;
+        QString authorizationService() const;
 
         Q_INVOKABLE bool isMethodHead() const;
         Q_INVOKABLE bool isMethodGet() const;

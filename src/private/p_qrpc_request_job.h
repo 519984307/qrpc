@@ -22,38 +22,37 @@ class QRPCRequestJob : public QThread
     Q_OBJECT
 public:
     QRPCRequestJobResponse _response;
-    QRPCRequestJobWSS _QRPCRequestJobWSS;
-    QRPCRequestJobTcp _QRPCRequestJobTcp;
-    QRPCRequestJobHttp _QRPCRequestJobHttp;
-    QRPCRequestJobLocalSocket _QRPCRequestJobLocalSocket;
-    QRPCRequestJobDataBase _QRPCRequestJobDataBase;
+    QRPCRequestJobWSS _requestJobWSS;
+    QRPCRequestJobTcp _requestJobTcp;
+    QRPCRequestJobHttp _requestJobHttp;
+    QRPCRequestJobLocalSocket _requestJobLocalSocket;
+    QRPCRequestJobDataBase _requestJobDataBase;
     QRPCRequest::Action action=QRPCRequest::acRequest;
     QString action_fileName;
     QSslConfiguration sslConfiguration;
-    QSslCertificate sslCertificate;
-    QHash<int,QRPCRequestJobProtocol*> __requestJobProtocolMap;
-    //QList<QSslError> sslErrorsExpected;
-    explicit QRPCRequestJob():QThread(nullptr),
+    QHash<int,QRPCRequestJobProtocol*> _requestJobProtocolMap;
+
+    explicit QRPCRequestJob():
+        QThread(nullptr),
         _response(this),
-        _QRPCRequestJobWSS(this),
-        _QRPCRequestJobTcp(this),
-        _QRPCRequestJobHttp(this),
-        _QRPCRequestJobLocalSocket(this),
-        _QRPCRequestJobDataBase(this)
+        _requestJobWSS(this),
+        _requestJobTcp(this),
+        _requestJobHttp(this),
+        _requestJobLocalSocket(this),
+        _requestJobDataBase(this)
     {
         this->moveToThread(this);
         static qlonglong taskCount=0;
-        ++taskCount;
-        this->setObjectName(qsl("QRPCRequestJob%1").arg(taskCount));
+        this->setObjectName(qsl("ReqJob%1").arg(++taskCount));
 
-        __requestJobProtocolMap[QRpc::WebSocket]=&this->_QRPCRequestJobWSS;
-        __requestJobProtocolMap[QRpc::TcpSocket]=&this->_QRPCRequestJobTcp;
-        __requestJobProtocolMap[QRpc::Http]=&this->_QRPCRequestJobHttp;
-        __requestJobProtocolMap[QRpc::Https]=&this->_QRPCRequestJobHttp;
-        __requestJobProtocolMap[QRpc::LocalSocket]=&this->_QRPCRequestJobLocalSocket;
-        __requestJobProtocolMap[QRpc::DataBase]=&this->_QRPCRequestJobDataBase;
+        _requestJobProtocolMap[QRpc::WebSocket]=&this->_requestJobWSS;
+        _requestJobProtocolMap[QRpc::TcpSocket]=&this->_requestJobTcp;
+        _requestJobProtocolMap[QRpc::Http]=&this->_requestJobHttp;
+        _requestJobProtocolMap[QRpc::Https]=&this->_requestJobHttp;
+        _requestJobProtocolMap[QRpc::LocalSocket]=&this->_requestJobLocalSocket;
+        _requestJobProtocolMap[QRpc::DataBase]=&this->_requestJobDataBase;
 
-        QHashIterator<int, QRPCRequestJobProtocol*> i(__requestJobProtocolMap);
+        QHashIterator<int, QRPCRequestJobProtocol*> i(_requestJobProtocolMap);
         while (i.hasNext()){
             i.next();
             QObject::connect(i.value(), &QRPCRequestJobProtocol::callback, this, &QRPCRequestJob::onRunCallback);
@@ -61,7 +60,7 @@ public:
     }
 
     ~QRPCRequestJob(){
-        QHashIterator<int, QRPCRequestJobProtocol*> i(__requestJobProtocolMap);
+        QHashIterator<int, QRPCRequestJobProtocol*> i(_requestJobProtocolMap);
         while (i.hasNext()){
             i.next();
             QObject::disconnect(i.value(), &QRPCRequestJobProtocol::callback, this, &QRPCRequestJob::onRunCallback);
@@ -92,18 +91,9 @@ public:
 
 public slots:
 
-    void onRunJob(const QVariantHash&headers, const QVariant&vUrl, const QString&fileName, QRpc::QRPCRequest*request){
+    void onRunJob(const QSslConfiguration*sslConfiguration, const QVariantHash&headers, const QVariant&vUrl, const QString&fileName, QRpc::QRPCRequest*request){
+        this->sslConfiguration=QSslConfiguration(*sslConfiguration);
         auto url=vUrl.toUrl();
-        const auto&sslCertificate=request->sslCertificate();
-        if(!sslCertificate.isEmpty()){
-            auto cert = QSslCertificate::fromPath(sslCertificate);
-            if(!cert.isEmpty()){
-                auto certificate=cert.first();
-                sslConfiguration=request->sslConfiguration();
-                sslConfiguration.setLocalCertificate(certificate);
-            }
-        }
-
         this->action_fileName=fileName;
         QRPCRequestJobResponse response(headers, url, *request, this);
         this->setResponse(response);
@@ -119,7 +109,7 @@ public slots:
 
         const auto&e=this->response().request_exchange.call();
         const auto iprotocol=e.protocol();
-        auto protocol=this->__requestJobProtocolMap[iprotocol];
+        auto protocol=this->_requestJobProtocolMap[iprotocol];
 
         if(protocol==nullptr){
             this->response().response_qt_status_code = QNetworkReply::ProtocolUnknownError;

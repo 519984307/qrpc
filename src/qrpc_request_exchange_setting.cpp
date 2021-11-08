@@ -224,7 +224,7 @@ void QRPCRequestExchangeSetting::setProtocol(const QVariant &value)
     else if(value.toString().trimmed().isEmpty())
         v=QRPCProtocol::Http;
     else
-        v=QRPCProtocolType.value(value.toString().trimmed());
+        v=QRPCProtocol(QRPCProtocolType.value(value.toString().trimmed()));
 
     v=(v>rpcProtocolMax)?rpcProtocolMax:v;
     v=(v<rpcProtocolMin)?rpcProtocolMin:v;

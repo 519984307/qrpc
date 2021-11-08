@@ -12,24 +12,8 @@ class QRPCRequestJobHttp : public QRPCRequestJobProtocol
 {
     Q_OBJECT
 public:
-
-/*
-    QList<QSslCertificate> cert = QSslCertificate::fromPath(QLatin1String("server-certificate.pem"));
-    QSslError error(QSslError::SelfSignedCertificate, cert.at(0));
-    QList<QSslError> expectedSslErrors;
-    expectedSslErrors.append(error);
-
-    QNetworkReply *reply = manager.get(QNetworkRequest(QUrl("https://server.tld/index.html")));
-    reply->ignoreSslErrors(expectedSslErrors);
-    // here connect signals etc.
-
-    */
-
-
     QTimer*__timeout=nullptr;
-
     QMutex mutexRequestFinished;
-
     QFile fileDownload;
     QFile fileUpload;
     QTemporaryFile fileTemp;
@@ -50,6 +34,8 @@ public:
     }
 
     virtual bool call(QRPCRequestJobResponse*response)override{
+        static const QVector<QString> removeHeaders={{qsl("host")},{qsl("content-length")}};
+        static const QVector<QString> ignoreHeaders={{ContentDispositionName}, {ContentTypeName}, {ContentDispositionName.toLower()}, {ContentTypeName.toLower()}};
 
         if(this->nam==nullptr)
             this->nam = new QNetworkAccessManager(nullptr);
@@ -61,12 +47,11 @@ public:
         const auto&request_url=response->request_url.toUrl();
         this->response=response;
 
-        this->request=QNetworkRequest(QUrl(request_url));
         const auto&requestBody = response->request_body;
+        this->request=QNetworkRequest(QUrl(request_url));
+        this->request.setSslConfiguration(sslConfiguration);
         QHash<QByteArray,QByteArray> request_header_ignored;
         QHash<QByteArray,QByteArray> request_header;
-        static const auto removeHeaders=QStringList()<<qsl("host")<< qsl("content-length");
-        static const auto ignoreHeaders=QStringList()<<ContentDispositionName<<ContentTypeName<<ContentDispositionName.toLower()<<ContentTypeName.toLower();
 
         auto configureHeaders=[this, &request_header, &request_header_ignored, &response](){
 
@@ -79,13 +64,13 @@ public:
                     else{
                         auto v=i.value();
                         QStringList headerValues;
-                        if(v.type()==v.List || v.type()==v.StringList){
+                        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList){
                             auto vList=v.toList();
                             for(auto&r:vList){
                                 headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                             }
                         }
-                        else if(v.type()==v.Map || v.type()==v.Hash){
+                        else if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash){
                             auto vMap=v.toHash();
                             QHashIterator<QString, QVariant> i(vMap);
                             while (i.hasNext()) {
@@ -225,10 +210,6 @@ public:
             return false;
         }
         else{
-            
-            if(!sslConfiguration.isNull())
-                this->reply->setSslConfiguration(sslConfiguration);
-
             response->response_qt_status_code=QNetworkReply::NoError;
             response->response_status_code=0;
 
@@ -274,7 +255,7 @@ private slots:
     };
 
     void onReplyFinish(){
-        QMutexLocker locker(&mutexRequestFinished);
+        QMutexLocker<QMutex> locker(&mutexRequestFinished);
         if(this->reply!=nullptr){
             if(response->response_qt_status_code==QNetworkReply::NoError){
                 if(response->response_qt_status_code!=QNetworkReply::TimeoutError)
@@ -286,7 +267,7 @@ private slots:
     };
     void onReplyTimeout(){
         {
-            QMutexLocker locker(&mutexRequestFinished);
+            QMutexLocker<QMutex> locker(&mutexRequestFinished);
             if(response->response_qt_status_code==QNetworkReply::NoError){
                 response->response_qt_status_code=QNetworkReply::TimeoutError;
 #if Q_RPC_LOG

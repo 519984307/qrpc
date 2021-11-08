@@ -7,110 +7,129 @@
 #include <QTemporaryFile>
 
 namespace QRpc {
-    class QRPCServer;
-    class QRPCListenQRPC;
-    class QRPCListenColletions;
-    class QRPCListenRequestCache;
-    class Q_RPC_EXPORT QRPCListen: public QThread
-    {
-        Q_OBJECT
-        friend class QRPCListenColletions;
-        friend class QRPCListenColletionsPvt;
-    public:
-        Q_INVOKABLE explicit QRPCListen(QObject *parent=nullptr);
-        Q_INVOKABLE virtual ~QRPCListen();
+class QRPCServer;
+class QRPCListenQRPC;
+class QRPCListenColletions;
+class QRPCListenRequestCache;
 
-        /**
-         * @brief uuid
-         * @return
-         */
-        virtual QUuid uuid() const;
+//!
+//! \brief The QRPCListen class
+//!
+class Q_RPC_EXPORT QRPCListen: public QThread
+{
+    Q_OBJECT
+    friend class QRPCListenColletions;
+    friend class QRPCListenColletionsPvt;
+public:
 
-        /**
-         * @brief parent
-         * @return
-         */
-        QObject *parent();
-        void setParent(QObject *parent);
+    //!
+    //! \brief QRPCListen
+    //! \param parent
+    //!
+    Q_INVOKABLE explicit QRPCListen(QObject *parent=nullptr);
 
-        /**
-         * @brief run
-         */
-        void run() override;
+    //!
+    //! \brief ~QRPCListen
+    //!
+    Q_INVOKABLE virtual ~QRPCListen();
 
-        /**
-         * @brief start
-         * @return
-         */
-        virtual bool start();
+    //!
+    //! \brief uuid
+    //! \return
+    //!
+    virtual QUuid uuid() const;
 
-        /**
-         * @brief stop
-         * @return
-         */
-        virtual bool stop();
+    //!
+    //! \brief parent
+    //! \return
+    //!
+    QObject *parent();
+    //!
+    //! \brief setParent
+    //! \param parent
+    //!
+    void setParent(QObject *parent);
 
-        /**
-         * @brief server
-         * @return
-         */
-        virtual QRPCServer*server();
+    //!
+    //! \brief run
+    //!
+    void run() override;
 
-        /**
-         * @brief colletions
-         * @return
-         */
-        virtual QRPCListenColletions*colletions();
+    //!
+    //! \brief start
+    //! \return
+    //!
+    virtual bool start();
 
-        /**
-         * @brief cacheRequest
-         * @return
-         */
-        virtual QRPCListenRequestCache*cacheRequest();
+    //!
+    //! \brief stop
+    //! \return
+    //!
+    virtual bool stop();
 
-        /**
-         * @brief registerListenPool
-         * @param pool
-         */
-        virtual void registerListenPool(QRPCListen*listenPool);
+    //!
+    //! \brief server
+    //! \return
+    //!
+    virtual QRPCServer*server();
 
-        /**
-         * @brief listenPool
-         * @return
-         */
-        virtual QRPCListen&listenPool();
-    signals:
-        /**
-         * @brief rpcRequest
-         * @param body
-         */
-        void rpcRequest(QVariantHash request, const QVariant&uploadedFiles);
+    //!
+    //! \brief colletions
+    //! \return
+    //!
+    virtual QRPCListenColletions*colletions();
 
-        /**
-         * @brief rpcResponse
-         * @param body
-         */
-        void rpcResponse(QUuid uuid, const QVariantHash&request);
+    //!
+    //! \brief cacheRequest
+    //! \return
+    //!
+    virtual QRPCListenRequestCache*cacheRequest();
 
-        /**
-         * @brief rpcCheck
-         * @param listen
-         */
-        void rpcCheck();
-    protected:
-        /**
-         * @brief setServer
-         * @param server
-         */
-        void setServer(QRPCServer*server);
+    //!
+    //! \brief registerListenPool
+    //! \param listenPool
+    //!
+    virtual void registerListenPool(QRPCListen*listenPool);
 
-        /**
-         * @brief setColletions
-         * @param colletions
-         */
-        void setColletions(QRPCListenColletions*colletions);
-    private:
-        void*p=nullptr;
-    };
+    //!
+    //! \brief listenPool
+    //! \return
+    //!
+    virtual QRPCListen&listenPool();
+signals:
+
+    //!
+    //! \brief rpcRequest
+    //! \param request
+    //! \param uploadedFiles
+    //!
+    void rpcRequest(QVariantHash request, const QVariant&uploadedFiles);
+
+    //!
+    //! \brief rpcResponse
+    //! \param uuid
+    //! \param request
+    //!
+    void rpcResponse(QUuid uuid, const QVariantHash&request);
+
+    //!
+    //! \brief rpcCheck
+    //!
+    void rpcCheck();
+protected:
+    //!
+    //! \brief setServer
+    //! \param server
+    //!
+    void setServer(QRPCServer*server);
+
+    //!
+    //! \brief setColletions
+    //! \param colletions
+    //!
+    void setColletions(QRPCListenColletions*colletions);
+private:
+    void*p=nullptr;
+};
 
 }

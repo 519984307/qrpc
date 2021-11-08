@@ -80,9 +80,9 @@ public:
     }
 
     bool v_load(const QVariant&v){
-        if(v.type()==v.List || v.type()==v.StringList)
+        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList)
             return this->load(v.toStringList());
-        else if(v.type()==v.Map || v.type()==v.Hash)
+        else if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash)
             return this->load(v.toHash());
         else
             return this->load(v.toString());

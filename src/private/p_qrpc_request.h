@@ -51,7 +51,7 @@ namespace QRpc {
             }
         }
 
-        auto ext=QStringList()<<qsl("*.*");
+        auto ext=QStringList{qsl("*.*")};
         for(auto&sdir:dir_rm_file){
             QDir scanDir(sdir);
             if(scanDir.exists()){
@@ -109,32 +109,39 @@ public:
 
     QString fileLog;
 
-    QSslConfiguration sslConfiguration=QSslConfiguration::defaultConfiguration();
-    QString sslCertificate;
+    QSslConfiguration sslConfiguration;
 
-    void setSettings(const ServiceSetting &setting)
+    explicit QRPCRequestPvt(QRPCRequest*parent):
+        QObject(parent),
+        exchange(parent),
+        qrpcHeader(parent),
+        qrpcBody(parent),
+        qrpcResponse(parent),
+        qrpcLastError(parent),
+        sslConfiguration(QSslConfiguration::defaultConfiguration())
     {
-        auto&request=*this->parent;
-        auto __header=setting.headers();
-        request.header().setRawHeader(__header);
-        request.setProtocol(setting.protocol());
-        request.setPort(setting.port());
-        request.setDriver(setting.driverName());
-        request.setHostName(setting.hostName());
-        request.setMethod(setting.method());
-        request.setRoute(setting.route());
-    }
-
-    explicit QRPCRequestPvt(QRPCRequest*parent):QObject(parent), exchange(parent), qrpcHeader(parent), qrpcBody(parent), qrpcResponse(parent), qrpcLastError(parent){
         auto currentName=QThread::currentThread()->objectName().trimmed();
         if(currentName.isEmpty())
             currentName=QString::number(qlonglong(QThread::currentThreadId()),16);
-        this->fileLog=qsl("%1/%2.json").arg(static_log_dir, QString::number(qlonglong(QThread::currentThreadId()),16));
+        if(static_log_register)
+            this->fileLog=qsl("%1/%2.json").arg(static_log_dir, QString::number(qlonglong(QThread::currentThreadId()),16));
         this->parent=parent;
         this->qrpcBody.p=this;
     }
 
     virtual ~QRPCRequestPvt(){
+    }
+
+    void setSettings(const ServiceSetting &setting)
+    {
+        auto __header=setting.headers();
+        parent->header().setRawHeader(__header);
+        parent->setProtocol(setting.protocol());
+        parent->setPort(setting.port());
+        parent->setDriver(setting.driverName());
+        parent->setHostName(setting.hostName());
+        parent->setMethod(setting.method());
+        parent->setRoute(setting.route());
     }
 
 
@@ -226,7 +233,7 @@ public:
         job->action=QRPCRequest::acUpload;
         QObject::connect(this, &QRPCRequestPvt::run_job, job, &QRPCRequestJob::onRunJob);
         if(job->start()){
-            emit run_job(this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
+            emit run_job(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
             job->wait();
         }
         this->qrpcResponse.setResponse(&job->response());
@@ -257,7 +264,7 @@ public:
         QMultiHash<QString,QVariant> paramsGet;
         if(method==QRpc::Head || method==QRpc::Get || method==QRpc::Delete || method==QRpc::Options){
             VariantUtil vu;
-            paramsGet=vu.toHash(vBody);
+            paramsGet=vu.toMultiHash(vBody);
             vBody.clear();
             auto paramsGetOriginais = e.parameter();
             if (!paramsGetOriginais.isEmpty()){
@@ -281,7 +288,7 @@ public:
             this->request_url=QUrl(request_url_str);
             if(!paramsGet.isEmpty()){
                 QUrlQuery url_query;
-                Q_V_HASH_ITERATOR(paramsGet){
+                Q_V_MULTI_HASH_ITERATOR(paramsGet){
                     i.next();
                     const auto&k=i.key();
                     const auto v=Util::parseQueryItem(i.value());
@@ -304,7 +311,7 @@ public:
         job->action_fileName = fileName;
         QObject::connect(this, &QRPCRequestPvt::run_job, job, &QRPCRequestJob::onRunJob);
         job->start();
-        emit run_job(this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
+        emit run_job(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
         job->wait();
 
         this->qrpcResponse.setResponse(&job->response());
@@ -331,7 +338,7 @@ public:
         QMultiHash<QString,QVariant> paramsGet;
         if(method==QRpc::Head || method==QRpc::Get || method==QRpc::Delete || method==QRpc::Options){
             VariantUtil vu;
-            paramsGet=vu.toHash(vBody);
+            paramsGet=vu.toMultiHash(vBody);
             vBody.clear();
             auto paramsGetOriginais = e.parameter();
             if (!paramsGetOriginais.isEmpty()){
@@ -355,8 +362,7 @@ public:
             this->request_url=QUrl(request_url_str);
             if(!paramsGet.isEmpty()){
                 QUrlQuery url_query;
-                QHashIterator<QString, QVariant> i(paramsGet);
-                while (i.hasNext()) {
+                Q_V_MULTI_HASH_ITERATOR(paramsGet){
                     i.next();
                     url_query.addQueryItem(i.key(), i.value().toString());
                 }
@@ -383,7 +389,7 @@ public:
 
 
         if(e.protocol()==QRpc::Http || e.protocol()==QRpc::Https){
-            if(vBody.type()==QVariant::List || vBody.type()==QVariant::StringList || vBody.type()==QVariant::Map || vBody.type()==QVariant::Hash){
+            if(vBody.typeId()==QMetaType::QVariantList || vBody.typeId()==QMetaType::QStringList || vBody.typeId()==QMetaType::QVariantMap || vBody.typeId()==QMetaType::QVariantHash){
                 this->request_body = QJsonDocument::fromVariant(vBody).toJson(QJsonDocument::Compact);
             }
             else{
@@ -393,7 +399,7 @@ public:
         else if(e.protocol()==QRpc::DataBase || e.protocol()==QRpc::Kafka || e.protocol()==QRpc::Amqp  || e.protocol()==QRpc::WebSocket || e.protocol()==QRpc::TcpSocket || e.protocol()==QRpc::UdpSocket){
 
 
-            if(vBody.type()==QVariant::List || vBody.type()==QVariant::StringList || vBody.type()==QVariant::Map || vBody.type()==QVariant::Hash){
+            if(vBody.typeId()==QMetaType::QVariantList || vBody.typeId()==QMetaType::QStringList || vBody.typeId()==QMetaType::QVariantMap || vBody.typeId()==QMetaType::QVariantHash){
                 this->request_body = QJsonDocument::fromVariant(vBody).toJson(QJsonDocument::Compact);
             }
             else{
@@ -420,7 +426,7 @@ public:
         job->action=QRPCRequest::acRequest;
         QObject::connect(this, &QRPCRequestPvt::run_job, job, &QRPCRequestJob::onRunJob);
         if(job->start()->isRunning()){
-            emit run_job(this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
+            emit run_job(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
             job->wait();
         }
         this->qrpcResponse.setResponse(&job->response());
@@ -436,7 +442,7 @@ public:
         return this->qrpcResponse;
     }
 signals:
-    void run_job(const QVariantHash&headers, const QVariant&url, const QString&fileName, QRpc::QRPCRequest*request);
+    void run_job(const QSslConfiguration*sslConfig, const QVariantHash&headers, const QVariant&url, const QString&fileName, QRpc::QRPCRequest*request);
 };
 
 }

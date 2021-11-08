@@ -12,13 +12,13 @@ namespace QRpc {
             auto url=qsl("%1:%2/%3").arg(this->hostName()).arg(this->port()).arg(route);
             while(url.contains(qsl("//")))
                 url=url.replace(qsl("//"), qsl("/"));
-            if(this->protocol().canConvert(this->protocol().Map) || this->protocol().canConvert(this->protocol().List)){
+            if(protocol().typeId()==QMetaType::QVariantList || protocol().typeId()==QMetaType::QStringList){
                 auto record=this->protocol().toList();
                 for(const auto&v:record){
                     QString protocol;
-                    if(v.canConvert(v.Int))
-                        protocol=QRPCProtocol(v.toInt());
-                    else if(v.canConvert(v.String))
+                    if(v.typeId()==QMetaType::Int)
+                        protocol=QRPCProtocolName.value(v.toInt());
+                    else if(v.typeId()==QMetaType::QString || v.typeId()==QMetaType::QByteArray)
                         protocol=v.toString().toLower();
                     else
                         continue;

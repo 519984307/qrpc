@@ -13,8 +13,9 @@ public:
     QRPCRequest::Action action=QRPCRequest::acRequest;
     QString action_fileName;
     QSslConfiguration sslConfiguration;
-    Q_INVOKABLE explicit QRPCRequestJobProtocol(QObject*parent):QObject(parent){
-        connect(this, &QRPCRequestJobProtocol::____verify, this, &QRPCRequestJobProtocol::____on_verify);
+
+    Q_INVOKABLE explicit QRPCRequestJobProtocol(QObject*parent):QObject(parent), sslConfiguration(QSslConfiguration::defaultConfiguration()){
+        QObject::connect(this, &QRPCRequestJobProtocol::____verify, this, &QRPCRequestJobProtocol::____on_verify);
     }
 
     Q_INVOKABLE ~QRPCRequestJobProtocol(){

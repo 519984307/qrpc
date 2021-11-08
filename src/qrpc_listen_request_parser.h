@@ -8,6 +8,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCListenRequestParser class
+//!
 class Q_RPC_EXPORT QRPCListenRequestParser : public QObject
 {
     Q_OBJECT
@@ -17,67 +20,61 @@ public:
     Q_INVOKABLE explicit QRPCListenRequestParser(QObject *parent = nullptr);
     Q_INVOKABLE ~QRPCListenRequestParser();
 
-    /**
-     * @brief controller
-     * @return
-     */
+    //!
+    //! \brief controller
+    //! \return
+    //!
     virtual QRPCController &controller();
 protected:
+
+    //!
+    //! \brief setController
+    //! \param value
+    //!
     void setController(QRPCController *value);
 public:
-    /**
-     * @brief request
-     * @return
-     */
+    //!
+    //! \brief request
+    //! \return
+    //!
     virtual QRPCListenRequest &request();
 
-    /**
-     * @brief rq
-     * @return
-     */
+    //!
+    //! \brief rq
+    //! \return
+    //!
     virtual QRPCListenRequest &rq();
 
-    /**
-     * @brief canRoute
-     * @param metaObject
-     * @param route
-     * @return
-     *
-     * test route is valid
-     */
+    //!
+    //! \brief canRoute
+    //! \param metaObject
+    //! \param route
+    //! \return
+    //!test route is valid
     static bool canRoute(const QMetaObject &metaObject, const QString&route);
 
-    /**
-     * @brief routeToMethod
-     * @param metaObject
-     * @param route
-     * @param outMethod
-     * @return
-     *
-     * return method to invoke
-     */
+    //!
+    //! \brief routeToMethod
+    //! \param metaObject
+    //! \param route
+    //! \param outMethod
+    //! \return
+    //!return method to invoke
     static bool routeToMethod(const QMetaObject &metaObject, const QString&route, QMetaMethod&outMethod);
 
-    /**
-     * @brief makeRoute
-     * @param object
-     * @param metaObject
-     */
+    //!
+    //! \brief makeRoute
+    //! \param metaObject
+    //!
     static void makeRoute(const QMetaObject &metaObject);
 
 protected:
-    /**
-     * @brief parser
-     * @param controller
-     * @param method
-     * @param request
-     * @return
-     *
-     * default method to parser request
-     */
+    //!
+    //! \brief parse
+    //! \param metaMethod
+    //! \return
+    //!default method to parser request
     virtual bool parse(const QMetaMethod&metaMethod);
-
-
 
 private:
     void*p=nullptr;

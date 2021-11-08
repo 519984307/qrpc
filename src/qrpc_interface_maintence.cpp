@@ -18,14 +18,14 @@ QVariant QRPCInterfaceMaintence::serverStart()
 {
     this->server()->interfacesStart();
     this->rq().co().setOK();
-    return QVariant();
+    return {};
 }
 
 QVariant QRPCInterfaceMaintence::serverStop()
 {
     this->server()->interfacesStop();
     this->rq().co().setOK();
-    return QVariant();
+    return {};
 }
 
 QVariant QRPCInterfaceMaintence::serverRestart()
@@ -33,7 +33,7 @@ QVariant QRPCInterfaceMaintence::serverRestart()
     this->server()->start();
     this->server()->stop();
     this->rq().co().setOK();
-    return QVariant();
+    return {};
 }
 
 QVariant QRPCInterfaceMaintence::servicesCheck()
@@ -41,7 +41,7 @@ QVariant QRPCInterfaceMaintence::servicesCheck()
     this->server()->start();
     this->server()->stop();
     this->rq().co().setOK();
-    return QVariant();
+    return {};
 }
 
 QVariant QRPCInterfaceMaintence::applicationQuit()
@@ -49,7 +49,7 @@ QVariant QRPCInterfaceMaintence::applicationQuit()
     this->server()->stop();
     qApp->quit();
     this->rq().co().setOK();
-    return QVariant();
+    return {};
 }
 
 } // namespace QRpc

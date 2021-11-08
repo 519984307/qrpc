@@ -67,7 +67,7 @@ public slots:
             auto vMap=request.toHash();
             QRPCListenSlotList*slotMap=nullptr;
             {
-                QMutexLocker locker(&mutexMapLocker);
+                QMutexLocker<QMutex> locker(&mutexMapLocker);
                 slotMap=listenSlotCache.value(request.hash());
                 if(slotMap==nullptr){
                     slotMap=listenSlotCache.value(request.hash());
@@ -91,7 +91,7 @@ public slots:
 
             QRPCListenQRPCSlot*thread=nullptr;
             while(!requestInvoke(thread)){
-                QMutexLocker locker(&mutexMapLocker);
+                QMutexLocker<QMutex> locker(&mutexMapLocker);
                 auto thread=new QRPCListenQRPCSlot(this->listenQRPC);
                 thread->start();
                 slotMap->append(thread);

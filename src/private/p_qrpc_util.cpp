@@ -37,7 +37,7 @@ const QByteArray routeExtract(const QString&routeBase){
 
 const  QString headerFormatName(const QString&name){
     auto sname=name.trimmed();
-    auto separator=QStringList()<<qsl("-");
+    auto separator=QStringList{qsl("-")};
     QStringList newHeaderName;
     for(auto&v:separator){
         auto nameList=sname.split(v);
@@ -55,7 +55,7 @@ const  QString headerFormatName(const QString&name){
 
 const QString parseQueryItem(const QVariant&v){
     QString __return;
-    if(v.type()==v.Uuid)
+    if(v.typeId()==QMetaType::QUuid)
         __return=v.toUuid().toString();
     else
         __return=v.toString();
@@ -87,13 +87,13 @@ const QVariantHash toMapResquest(int method, const QVariant&request_url, const Q
         i.next();
         auto k=i.key();
         auto v=i.value();
-        v = (v.type()==v.List || v.type()==v.StringList)?v.toStringList().join(qsl(";")):v;
+        v = (v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList)?v.toStringList().join(qsl(";")):v;
         headers<<qsl("-H '%1: %2'").arg(k, v.toString());
     }
 
     QString scUrl;
     QString cUrl;
-    if(request_url.type()==request_url.Url){
+    if(request_url.typeId()==QMetaType::QUrl){
         auto url=request_url.toUrl();
         cUrl=url.toString().split(qsl("/")).join(qsl("/"));
     }

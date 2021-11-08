@@ -11,7 +11,7 @@
 #include <QMetaMethod>
 #include <QJsonDocument>
 
-namespace PrivateQOrm {
+namespace PrivateCPP {
 
 typedef QVector<QByteArray> ByteArrayVector;
 typedef QVector<const QMetaObject*> MetaMethodVector;
@@ -31,12 +31,12 @@ namespace QRpc {
 #define dPvt()\
     auto&p =*reinterpret_cast<QRPCControllerPvt*>(this->p)
 
-static auto&staticControllerRoutes=*PrivateQOrm::controllerRoutes;
-static auto&staticControllerRedirect=*PrivateQOrm::controllerRedirect;
-static auto&staticControllerMethods=*PrivateQOrm::controllerMethods;
-static auto&staticRegisterInterfaceMetaObject=*PrivateQOrm::staticRegisterInterfaceMetaObject;
-static auto&staticParserRequestMetaObjects=*PrivateQOrm::staticParserRequestMetaObjects;
-const static auto&staticControllerMethodBlackList=*PrivateQOrm::staticControllerMethodBlackList;
+static auto&staticControllerRoutes=*PrivateCPP::controllerRoutes;
+static auto&staticControllerRedirect=*PrivateCPP::controllerRedirect;
+static auto&staticControllerMethods=*PrivateCPP::controllerMethods;
+static auto&staticRegisterInterfaceMetaObject=*PrivateCPP::staticRegisterInterfaceMetaObject;
+static auto&staticParserRequestMetaObjects=*PrivateCPP::staticParserRequestMetaObjects;
+const static auto&staticControllerMethodBlackList=*PrivateCPP::staticControllerMethodBlackList;
 
 
 static void initQRPCRoutes(){
@@ -46,7 +46,7 @@ static void initQRPCRoutes(){
 
 static void initQRPCController(){
 
-    auto&statiList=PrivateQOrm::staticControllerMethodBlackList;
+    auto&statiList=PrivateCPP::staticControllerMethodBlackList;
     auto mObj=&QRPCController::staticMetaObject;
     for (int i = 0; i < mObj->methodCount(); ++i) {
         auto mMth = mObj->method(i);
@@ -80,62 +80,61 @@ public:
 
         auto className=QByteArray(metaObject->className()).toLower().trimmed();
 
-        if(!staticControllerMethods.contains(className)){
+        if(staticControllerMethods.contains(className))
+            return;
+        static QMutex controllerMethodsMutex;
 
-            static QMutex controllerMethodsMutex;
-
+        auto ctrMethods=staticControllerMethods.value(className);
+        if(ctrMethods.isEmpty()){
+            QMutexLocker<QMutex> locker(&controllerMethodsMutex);
             auto ctrMethods=staticControllerMethods.value(className);
             if(ctrMethods.isEmpty()){
-                QMutexLocker locker(&controllerMethodsMutex);
-                auto ctrMethods=staticControllerMethods.value(className);
-                if(ctrMethods.isEmpty()){
 
-                    auto controller=dynamic_cast<QRPCController*>(makeObject);
-                    if(controller!=nullptr){
-                        if(controller->redirectCheck()){
-                            auto vList=controller->route().toStringList();
-                            staticControllerRedirect.insert(className, vList);
-                        }
+                auto controller=dynamic_cast<QRPCController*>(makeObject);
+                if(controller!=nullptr){
+                    if(controller->redirectCheck()){
+                        auto vList=controller->route().toStringList();
+                        staticControllerRedirect.insert(className, vList);
                     }
+                }
 #if Q_RPC_LOG_SUPER_VERBOSE
-                    sWarning()<<"class register: "<<className;
+                sWarning()<<"class register: "<<className;
 #endif
-                    auto&mObj=metaObject;
-                    for (auto i = 0; i < mObj->methodCount(); ++i) {
-                        auto mMth = mObj->method(i);
-                        auto methodName = mMth.name().toLower();
-                        if(mMth.parameterCount()>0){
+                auto&mObj=metaObject;
+                for (auto i = 0; i < mObj->methodCount(); ++i) {
+                    auto mMth = mObj->method(i);
+                    auto methodName = mMth.name().toLower();
+                    if(mMth.parameterCount()>0){
 #if Q_RPC_LOG_SUPER_VERBOSE
-                            sWarning()<<qsl("Method(%1) ignored").arg(mMth.name().constData());
+                        sWarning()<<qsl("Method(%1) ignored").arg(mMth.name().constData());
 #endif
-                            continue;
-                        }
-                        else if(staticControllerMethodBlackList.contains(methodName)){
+                        continue;
+                    }
+                    else if(staticControllerMethodBlackList.contains(methodName)){
 #if Q_RPC_LOG_SUPER_VERBOSE
-                            sWarning()<<qsl("Method(%1) in blacklist").arg(mMth.name().constData());
+                        sWarning()<<qsl("Method(%1) in blacklist").arg(mMth.name().constData());
 #endif
-                            continue;
-                        }
-                        else if(controller!=nullptr){
-                            const auto vRoute=controller->route();
-                            auto vList=vRoute.canConvert(vRoute.StringList)?vRoute.toStringList():QStringList()<<vRoute.toString();
-                            for(auto&v:vList){
-                                auto route=v.replace(qsl("*"),qsl_null).toLower().toUtf8();
-                                route=qbl("/")+route+qbl("/")+methodName;
-                                while(route.contains(qbl("\"")) || route.contains(qbl("//"))){
-                                    route=QString(route).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/")).toUtf8();
-                                }
-                                if(ctrMethods.contains(route))
-                                    continue;
-                                else{
-                                    ctrMethods.insert(route, mMth);
-                                    staticControllerRoutes.insert(route, mMth);
-                                }
+                        continue;
+                    }
+                    else if(controller!=nullptr){
+                        const auto vRoute=controller->route();
+                        auto vList=vRoute.typeId()==QMetaType::QStringList?vRoute.toStringList():QStringList{vRoute.toString()};
+                        for(auto&v:vList){
+                            auto route=v.replace(qsl("*"),qsl_null).toLower().toUtf8();
+                            route=qbl("/")+route+qbl("/")+methodName;
+                            while(route.contains(qbl("\"")) || route.contains(qbl("//"))){
+                                route=QString(route).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/")).toUtf8();
+                            }
+                            if(ctrMethods.contains(route))
+                                continue;
+                            else{
+                                ctrMethods.insert(route, mMth);
+                                staticControllerRoutes.insert(route, mMth);
                             }
                         }
                     }
-                    staticControllerMethods.insert(className, ctrMethods);
                 }
+                staticControllerMethods.insert(className, ctrMethods);
             }
         }
     }
@@ -152,13 +151,43 @@ QRPCController::~QRPCController()
     dPvt();delete&p;
 }
 
+QVariant QRPCController::route() const
+{
+    return QVariant(qsl("/"));
+}
+
+void QRPCController::makeRoute()
+{
+    return QRPCController::makeRoute(this, this->metaObject());
+}
+
+QString QRPCController::module() const
+{
+    return QString();
+}
+
+QUuid QRPCController::moduleUuid()const
+{
+    return QUuid();
+}
+
+bool QRPCController::redirectCheck() const
+{
+    return false;
+}
+
+QString QRPCController::description() const
+{
+    return QString();
+}
+
 ControllerSetting &QRPCController::controllerSetting()
 {
     dPvt();
     return p.controllerSetting;
 }
 
-bool QRPCController::enabled()
+bool QRPCController::enabled() const
 {
     dPvt();
     return p.enabled;
@@ -174,24 +203,24 @@ bool QRPCController::routeRedirectCheckClass(const QByteArray &className)
 {
     if(staticControllerRedirect.contains(className.toLower()))
         return true;
-    else
-        return false;
+    return false;
 }
 
 bool QRPCController::routeRedirectCheckRoute(const QByteArray &className, const QByteArray &routePath)
 {
     const auto classNameA=className.toLower();
-    QHashIterator<QByteArray, QStringList> i(staticControllerRedirect);
+    QMultiHashIterator<QByteArray, QStringList> i(staticControllerRedirect);
     while (i.hasNext()) {
         i.next();
         const auto classNameB=i.key().toLower();
         const auto&vList=i.value();
         if(!className.isEmpty() && (classNameB!=classNameA))
             continue;
-        else if(!QRPCRequest::startsWith(routePath, vList))
+
+        if(!QRPCRequest::startsWith(routePath, vList))
             continue;
-        else
-            return true;
+
+        return true;
     }
     return false;
 }
@@ -250,8 +279,8 @@ bool QRPCController::canAuthorization()
     auto&rq=this->rq();
     if(rq.isMethodOptions())
         return false;
-    else
-        return true;
+
+    return true;
 }
 
 bool QRPCController::beforeAuthorization()
@@ -420,7 +449,7 @@ QVariantHash QRPCController::routeFlags(const QString &route) const
             return flags.toHash();
         }
     }
-    return QVariantHash();
+    return {};
 }
 
 const QVariantHash QRPCController::routeFlagsMaker(const QString &request_path, const QVariant &flag)
@@ -437,12 +466,13 @@ const QVariantHash QRPCController::routeFlagsMaker(const QString &request_path, 
         __route=lst.join(qsl("/"));
     }
 
-    if(flag.type()==flag.Map || flag.type()==flag.Hash)
+    if(flag.typeId()==QMetaType::QVariantMap || flag.typeId()==QMetaType::QVariantHash)
         return flag.toHash();
-    else if(flag.type()==flag.List || flag.type()==flag.StringList)
-        return QVariantHash();
-    else
-        return QJsonDocument::fromJson(flag.toString().toUtf8()).toVariant().toHash();
+
+    if(flag.typeId()==QMetaType::QVariantList || flag.typeId()==QMetaType::QStringList)
+        return {};
+
+    return QJsonDocument::fromJson(flag.toString().toUtf8()).toVariant().toHash();
 }
 
 const QVector<QByteArray> &QRPCController::methodBlackList()

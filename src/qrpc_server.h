@@ -15,70 +15,69 @@ public:
     Q_INVOKABLE explicit QRPCServer(const QVariant &settings,  QObject *parent=nullptr);
     Q_INVOKABLE virtual ~QRPCServer();
 
-    /**
-     * @brief controllerOptions
-     * @return
-     */
+    //!
+    //! \brief controllerOptions
+    //! \return
+    //!
     virtual ControllerOptions&controllerOptions();
 
-    /**
-     * @brief isRunning
-     * @return
-     */
+    //!
+    //! \brief isFinished
+    //! \return
+    //!
     Q_INVOKABLE virtual bool isFinished() const;
 
-    /**
-     * @brief isRunning
-     * @return
-     */
+    //!
+    //! \brief isRunning
+    //! \return
+    //!
     Q_INVOKABLE virtual bool isRunning() const;
 
-    /**
-     * @brief start
-     * @return
-     */
+    //!
+    //! \brief start
+    //! \return
+    //!
     Q_INVOKABLE virtual bool start();
 
-    /**
-     * @brief stop
-     * @return
-     */
+    //!
+    //! \brief stop
+    //! \return
+    //!
     Q_INVOKABLE virtual bool stop();
 
-    /**
-     * @brief interfacesStart
-     * @return
-     */
+    //!
+    //! \brief interfacesStart
+    //! \return
+    //!
     virtual QRPCServer &interfacesStart();
 
-    /**
-     * @brief interfacesStop
-     * @return
-     */
+    //!
+    //! \brief interfacesStop
+    //! \return
+    //!
     virtual QRPCServer &interfacesStop();
 
-    /**
-     * @brief interfacesRunning
-     * @return
-     */
+    //!
+    //! \brief interfacesRunning
+    //! \return
+    //!
     Q_INVOKABLE virtual bool interfacesRunning();
 
-    /**
-     * @brief controllers
-     * @param metaObject
-     */
+    //!
+    //! \brief controllers
+    //! \return
+    //!
     virtual QList<const QMetaObject *> &controllers();
 
-    /**
-     * @brief parsers
-     * @return
-     */
+    //!
+    //! \brief parsers
+    //! \return
+    //!
     virtual QList<const QMetaObject *> &parsers();
 
-    /**
-     * @brief requestEnabled
-     * @return
-     */
+    //!
+    //! \brief requestEnable
+    //!
     virtual void requestEnable();
 
     /**
@@ -87,31 +86,42 @@ public:
      */
     virtual void requestDisable();
 
-    /**
-     * @brief colletions
-     * @return
-     */
+    //!
+    //! \brief colletions
+    //! \return
+    //!
     virtual QRPCListenColletions&colletions();
 
-    /**
-     * @brief setSettings
-     * @param settings
-     */
+    //!
+    //! \brief settingsFileName
+    //! \return
+    //!
     Q_INVOKABLE virtual QVariant settingsFileName();
+
+    //!
+    //! \brief setSettings
+    //! \param settings
+    //! \return
+    //!
     Q_INVOKABLE virtual bool setSettings(const QVariant &settings) const;
 
-    /**
-     * @brief authorizationRequest
-     * @param request
-     * @return
-     */
+    //!
+    //! \brief authorizationRequest
+    //! \param request
+    //! \return
+    //!
     virtual bool authorizationRequest(const QRPCListenRequest&request) const;
 
-    /**
-     * @brief serverName
-     * @return
-     */
+    //!
+    //! \brief serverName
+    //! \return
+    //!
     Q_INVOKABLE virtual QString serverName() const;
+
+    //!
+    //! \brief setServerName
+    //! \param value
+    //!
     Q_INVOKABLE virtual void setServerName(const QString &value);
 
 private:

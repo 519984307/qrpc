@@ -59,30 +59,33 @@ public:
     }
 
     void setSettings(const QVariantHash&settings, const QVariantHash&defaultSettings){
-        static auto exceptionProperty=QStringList()<<qsl("protocol")<<qsl("protocolname")<<qsl("optionname");
+        static auto exceptionProperty=QStringList{qsl("protocol"),qsl("protocolname"),qsl("optionname")};
         this->settingsHash=settings.isEmpty()?this->settingsHash:settings;
         const QMetaObject* metaObject = dynamic_cast<QRPCListenProtocol*>(this->parent())->metaObject();
         for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
             auto property = metaObject->property(i);
             auto propertyName=QString::fromUtf8(property.name()).toLower();
+
             if(exceptionProperty.contains(propertyName))
                 continue;
-            else{
-                propertyName=QString::fromUtf8(property.name());
-                auto value=this->settingsHash.value(propertyName);
-                if(!value.isValid()){
-                    value=defaultSettings.value(propertyName);
-                }
-                if(!property.write(this->parent(), value)){
-                    if(property.type()==QVariant::Uuid && property.write(this->parent(), value.toUuid()))
-                        continue;
-                    else if((property.type()==QVariant::LongLong || property.type()==QVariant::ULongLong) && property.write(this->parent(), value.toLongLong()))
-                        continue;
-                    else if((property.type()==QVariant::Int || property.type()==QVariant::UInt) && property.write(this->parent(), value.toInt()))
-                        continue;
-                    else if((property.type()==QVariant::Bool) && property.write(this->parent(), value.toBool()))
-                        continue;
-                }
+
+            propertyName=QString::fromUtf8(property.name());
+            auto value=this->settingsHash.value(propertyName);
+            if(!value.isValid()){
+                value=defaultSettings.value(propertyName);
+            }
+            if(!property.write(this->parent(), value)){
+                if(property.typeId()==QMetaType::QUuid && property.write(this->parent(), value.toUuid()))
+                    continue;
+
+                if((property.typeId()==QMetaType::LongLong || property.typeId()==QMetaType::ULongLong) && property.write(this->parent(), value.toLongLong()))
+                    continue;
+
+                if((property.typeId()==QMetaType::Int || property.typeId()==QMetaType::UInt) && property.write(this->parent(), value.toInt()))
+                    continue;
+
+                if((property.typeId()==QMetaType::Bool) && property.write(this->parent(), value.toBool()))
+                    continue;
             }
         }
         this->makeMap();
@@ -374,7 +377,7 @@ void QRPCListenProtocol::setPort(const QVariant &value)
 {
     dPvt();
     QVariantList l;
-    if(value.type()==QVariant::StringList || value.type()==QVariant::List){
+    if(value.typeId()==QMetaType::QStringList || value.typeId()==QMetaType::QVariantList){
         l=value.toList();
     }
     else{

@@ -13,61 +13,61 @@ public:\
 #define QRPC_METHOD_CHECK_GET()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!this->rq().canMethodGet()){\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_METHOD_CHECK_HEADER()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!this->rq().canMethodHead()){\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_METHOD_CHECK_POST()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!this->rq().canMethodPost()){\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_METHOD_CHECK_PUT()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!this->rq().canMethodPut()){\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_METHOD_CHECK_UPLOAD()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!this->rq().isMethodUpload()){\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_METHOD_CHECK_CRUD(vCRUDBody)\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!(this->rq().isMethodGet() || this->rq().isMethodPost() || this->rq().isMethodPut() || this->rq().isMethodDelete())){\
     this->rq().co().setBadGateway();\
-    return QVariant();\
+    return {};\
 }\
 QVariantHash QRPC_V_CRUD({{QStringLiteral("method"), this->rq().requestMethod()}, {QStringLiteral("source"),this->rq().requestParamHash()}});
 
@@ -75,38 +75,38 @@ QVariantHash QRPC_V_CRUD({{QStringLiteral("method"), this->rq().requestMethod()}
 #define QRPC_METHOD_CHECK_POST_PUT()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!(this->rq().canMethodPost() || this->rq().canMethodPut())){\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_METHOD_CHECK_DELETE()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
-    return QVariant();\
+    return {};\
 }\
 else if(!this->rq().canMethodDelete()){\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_RETURN_ERROR()\
     if(this->rq().co().isOK())\
         this->rq().co().setInternalServerError();\
-    return QVariant();
+    return {};
 
 #define QRPC_RETURN()\
 return QVariant()
 
 #define QRPC_RETURN_VARIANT()\
-return QVariant();
+return {};
 
 #define QRPC_RETURN_NOT_FOUND()\
 {\
     this->rq().co().setNotFound();\
-    return QVariant();\
+    return {};\
 }
 
 #define QRPC_V_CRUD\
@@ -183,16 +183,16 @@ return QVariant();
     if(!this->rq().requestParserBodyMap()){\
         if(this->rq().co().isOK())\
             this->rq().co().setBadRequest();\
-        return QVariant();\
+        return {};\
     }
 
 #define QRPC_REDIRECT_VIRIFY()\
 public:\
-    virtual bool redirectCheck(){return true;}
+    virtual bool redirectCheck() const override{return true;}
 
 #define QRPC_REDIRECT_NO_VERIFY()\
 public:\
-    virtual bool redirectCheck(){return false;}
+    virtual bool redirectCheck()const override{return false;}
 
 #define QRPC_CONTROLLER_AUTO_REGISTER(Controller)\
 static auto Controller##MetaObject=QRpc::QRPCController::registerInterface(&Controller::staticMetaObject);\
@@ -202,12 +202,13 @@ static auto ParserObject##MetaObject=QRpc::QRPCController::registerParserRequest
 
 #define QRPC_DECLARE_ROUTE(Controller, v1)\
 public:\
-    Q_INVOKABLE virtual QVariant route()const{\
+    Q_INVOKABLE virtual QVariant route()const override\
+{\
         return QVariant(v1);\
-    }\
-    Q_INVOKABLE virtual void makeRoute(){\
+}\
+    Q_INVOKABLE virtual void makeRoute() override{\
         QRPCController::makeRoute(this, this->metaObject());\
-    }
+}
 
 #define QRPC_METHOD_PROPERTIES(method, properties)\
 public:\
@@ -227,11 +228,11 @@ public:\
 
 #define QRPC_DECLARE_MODULE(vmodule)\
 public:\
-    virtual QString module()const{\
+    virtual QString module()const override{\
         static QString __return(vmodule);\
         return __return;\
     }\
-    virtual QUuid moduleUuid(){\
+    virtual QUuid moduleUuid()const override{\
         VariantUtil vu;\
         static auto __return=vu.toMd5Uuid(vmodule);\
         return __return;\
@@ -239,7 +240,7 @@ public:\
 
 #define QRPC_DECLARE_DESCRIPTION(vdesc)\
 public:\
-    virtual QString description()const{\
+    virtual QString description()const override{\
         static QString __return(vdesc);\
         return __return;\
     }

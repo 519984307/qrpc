@@ -9,6 +9,7 @@
 #include "./private/p_qrpc_http_headers.h"
 #include "./private/p_qrpc_http_response.h"
 #include <QFile>
+#include <QSslConfiguration>
 
 namespace QRpc {
 
@@ -273,21 +274,6 @@ public:
      */
     virtual QSslConfiguration&sslConfiguration();
     virtual QRPCRequest &setSslConfiguration(const QSslConfiguration &value);
-
-
-    /**
-     * @brief sslCertificate
-     * @return
-     */
-    virtual QSsl::SslProtocol sslProtocol()const;
-    virtual QRPCRequest &setSslProtocol(const QVariant &value);
-
-    /**
-     * @brief sslCertificate
-     * @return
-     */
-    virtual QString&sslCertificate()const;
-    virtual QRPCRequest &setSslCertificate(const QString &value);
 
     /**
      * @brief print

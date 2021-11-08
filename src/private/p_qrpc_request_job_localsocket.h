@@ -23,7 +23,7 @@ public:
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response){
+    virtual bool call(QRPCRequestJobResponse*response)override{
         this->response=response;
         if(m_socket!=nullptr)
             delete m_socket;

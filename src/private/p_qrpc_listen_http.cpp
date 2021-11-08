@@ -75,7 +75,7 @@ public:
     }
 
     bool isListening(){
-        QMutexLocker locker(&this->lock);
+        QMutexLocker<QMutex> locker(&this->lock);
         for(auto&h:this->listenersPort){
             if(h->listener->isListening()){
                 return true;
@@ -85,7 +85,7 @@ public:
     }
 
     virtual ~HttpServer3drparty(){
-        QMutexLocker locker(&this->lock);
+        QMutexLocker<QMutex> locker(&this->lock);
         auto aux=this->listenersPort;
         this->listenersPort.clear();
         qDeleteAll(aux);
@@ -108,7 +108,7 @@ public:
         QVariantHash requestParameterMap;
 
         {
-            QHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+            QMultiHashIterator<QByteArray, QByteArray> i(getHeaderMap);
             while (i.hasNext()) {
                 i.next();
                 requestHeaderMap.insert(i.key(), i.value());
@@ -119,7 +119,7 @@ public:
         }
 
         {
-            QHashIterator<QByteArray, QByteArray> i(getParameterMap);
+            QMultiHashIterator<QByteArray, QByteArray> i(getParameterMap);
             while (i.hasNext()) {
                 i.next();
                 requestParameterMap.insert(i.key(), i.value());
@@ -160,10 +160,10 @@ public:
 
         QByteArray body;
 
-        static const auto staticUrlNames=QVector<int>()<<QVariant::Url<<QVariant::Map<<QVariant::String << QVariant::ByteArray<<QVariant::Char << QVariant::BitArray;
+        static const auto staticUrlNames=QVector<int>()<<QMetaType::QUrl<<QMetaType::QVariantMap<<QMetaType::QString << QMetaType::QByteArray<<QMetaType::QChar << QMetaType::QBitArray;
         const auto&responseBody=request.responseBody();
         Url rpc_url;
-        if(!staticUrlNames.contains(responseBody.type()))
+        if(!staticUrlNames.contains(responseBody.typeId()))
             body = request.responseBodyBytes();
         else if(!rpc_url.read(responseBody).isValid())
             body = request.responseBodyBytes();
@@ -191,7 +191,7 @@ public:
             cWarning()<<msgOut;
             {
                 {
-                    QHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+                    QMultiHashIterator<QByteArray, QByteArray> i(getHeaderMap);
                     while (i.hasNext()) {
                         i.next();
                         cWarning()<<qsl("   header - %1 : %2").arg(i.key(), i.value());

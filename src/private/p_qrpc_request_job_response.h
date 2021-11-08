@@ -43,10 +43,6 @@ public:
     Q_INVOKABLE explicit QRPCRequestJobResponse(QObject*parent):QObject(parent){
     }
     explicit QRPCRequestJobResponse(const QVariantHash&request_header, const QVariant&vUrl, QRPCRequest&request, QObject*parent):QObject(parent){
-//        auto request_url=vUrl.toUrl();
-//        while(request_url.contains(qsl("//")))
-//            request_url=request_url.replace(qsl("//"), qsl("/"));
-//        request_url=request_url.replace(qsl(":/"),qsl("://"));
         this->request_url = vUrl;
         this->request_header = request_header;
         this->request_body = request.body().body().toByteArray();
@@ -97,7 +93,7 @@ public:
     }
 
     QVariantHash toVariant(){
-        auto rpclog = QVariantList()<<qvh({{qsl("resquest"), this->toMapResquest()}})<<qvh({ {qsl("response"), this->toMapResponse()} });
+        auto rpclog = QVariantList{qvh{{qsl("resquest"), this->toMapResquest()}},qvh{ {qsl("response"), this->toMapResponse()}}};
         ///*{"openapi", this->toMapOpenAPI()}*,/
         return qvh({{qsl("rpclog"), rpclog}});
     }

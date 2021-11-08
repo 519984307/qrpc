@@ -39,15 +39,15 @@ public:
 
     static QByteArray toMd5(const QVariant&v){
         QByteArray bytes;
-        if(v.type()==QVariant::List || v.type()==QVariant::StringList || v.type()==QVariant::Map || v.type()==QVariant::Hash)
+        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList || v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash)
             bytes=QJsonDocument::fromVariant(v).toJson(QJsonDocument::Compact);
         else
             bytes=v.toByteArray();
-        return QCryptographicHash::hash(v.toByteArray(), QCryptographicHash::Md5).toHex();
+        return QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex();
     }
 
     static QVariant toVar(const QVariant&v){
-        if(v.type()==QVariant::String || v.type()==QVariant::ByteArray)
+        if(v.typeId()==QMetaType::QString || v.typeId()==QMetaType::QByteArray)
             return QJsonDocument::fromJson(v.toByteArray()).toVariant();
         else
             return v;

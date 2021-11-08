@@ -222,7 +222,7 @@ QRPCListenRequestCode &QRPCListenRequestCode::operator=(const QVariant &v)
 {
     QVariant code;
     QVariant phrase;
-    if(v.type()==QVariant::Map || v.type()==QVariant::Hash){
+    if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash){
         auto vv=v.toHash();
         code=vv.value(qsl("code")).toInt();
         phrase=vv.value(qsl("phrase")).toString();
@@ -239,7 +239,7 @@ QRPCListenRequestCode &QRPCListenRequestCode::operator=(const QVariant &v)
 
 QVariant QRPCListenRequestCode::emptyData()
 {
-    return QVariant();
+    return {};
 }
 
 bool QRPCListenRequestCode::isOK()

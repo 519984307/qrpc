@@ -22,19 +22,19 @@ QVariant QRPCInterfaceCheck::ping()
 QVariant QRPCInterfaceCheck::fullCheck()
 {
     this->rq().co().setOK();
-    return QVariant();
+    return {};
 }
 
 QVariant QRPCInterfaceCheck::connectionsCheck()
 {
     this->rq().co().setOK();
-    return QVariant();
+    return {};
 }
 
 QVariant QRPCInterfaceCheck::businessCheck()
 {
     this->rq().co().setNotImplemented();
-    return QVariant();
+    return {};
 }
 
 } // namespace QRpc

@@ -11,7 +11,7 @@ public:
     bool checkResponseHeader(QRPCHttpResponse &response){
 
         const auto&responseHeader=response.header().rawHeader();
-        static auto headersName=QStringList()<<qsl("Date")<<qsl("Server")<<qsl("Access-Control-Allow-Origin")<<qsl("Access-Control-Allow-Methods")<<qsl("Access-Control-Allow-Headers")<<qsl("Access-Control-Max-Age")<<qsl("Vary");
+        static auto headersName=QStringList{qsl("Date"),qsl("Server"),qsl("Access-Control-Allow-Origin"),qsl("Access-Control-Allow-Methods"),qsl("Access-Control-Allow-Headers"),qsl("Access-Control-Max-Age"),qsl("Vary")};
         for(auto&v:headersName){
             if(!responseHeader.contains(v)){
                 sWarning()<<v;

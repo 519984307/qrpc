@@ -38,22 +38,22 @@ public slots:
         service->received(uuid, v);
     }
     void onRequestSuccess(const QUuid &uuid, const QVariant&detail){
-        QMutexLocker locker(&this->mutex);
+        QMutexLocker<QMutex> locker(&this->mutex);
         ++stats.success;
         emit service->request_state(uuid, service->Success, detail);
     }
     void onRequestError(const QUuid &uuid, const QVariant&detail){
-        QMutexLocker locker(&this->mutex);
+        QMutexLocker<QMutex> locker(&this->mutex);
         ++stats.error;
         emit service->request_state(uuid, service->Error, detail);
     }
     void onRequestDiscarted(const QUuid &uuid, const QVariant&detail){
-        QMutexLocker locker(&this->mutex);
+        QMutexLocker<QMutex> locker(&this->mutex);
         ++stats.discated;
         emit service->request_state(uuid, service->Discarted, detail);
     }
     void onRequestCanceled(const QUuid&uuid, const QVariant&detail){
-        QMutexLocker locker(&this->mutex);
+        QMutexLocker<QMutex> locker(&this->mutex);
         ++stats.canceled;
         emit service->request_state(uuid, service->Canceled, detail);
     }
@@ -246,7 +246,7 @@ void ServiceThread::received(const QUuid &uuid, const QVariant &v)
 void ServiceThread::dispatcher(const QUuid &uuid, const QVariant &v)
 {
     dPvt();
-    QMutexLocker locker(&p.mutex);
+    QMutexLocker<QMutex> locker(&p.mutex);
     ++p.stats.queue;
     emit this->request_send(uuid, v);
 }

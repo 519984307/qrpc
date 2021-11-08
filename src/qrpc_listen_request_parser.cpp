@@ -11,6 +11,7 @@
 #include <QByteArray>
 #include <QUuid>
 #include <QMutex>
+#include <QMutexLocker>
 #include <QDebug>
 
 namespace QRpc {
@@ -111,7 +112,7 @@ void QRPCListenRequestParser::makeRoute(const QMetaObject &metaObject)
             auto className=QByteArray(metaObject.className());
             if(!staticMetaObjectRoute->contains(className)){
                 auto route=parser->route();
-                QMutexLocker locker(staticMetaObjectLock);
+                QMutexLocker<QMutex> locker(staticMetaObjectLock);
                 staticMetaObjectRoute->insert(className, route);
                 for(int methodIndex = 0; methodIndex < metaObject.methodCount(); ++methodIndex) {
                     auto method = metaObject.method(methodIndex);

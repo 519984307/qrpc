@@ -26,7 +26,7 @@ public:
     }
 
     void clear(){
-        QMutexLocker locker(&this->lock);
+        QMutexLocker<QMutex> locker(&this->lock);
         auto aux=this->cache;
         this->cache.clear();
         qDeleteAll(aux);
@@ -52,7 +52,7 @@ void QRPCListenRequestCache::clear()
 QRPCListenRequest &QRPCListenRequestCache::toRequest(const QUuid &uuid)
 {
     dPvt();
-    QMutexLocker locker(&p.lock);
+    QMutexLocker<QMutex> locker(&p.lock);
     static QRPCListenRequest ___QRPCListenRequest;
     auto request=p.cache.value(uuid.toString());
     if(request!=nullptr)
@@ -70,7 +70,7 @@ QRPCListenRequest &QRPCListenRequestCache::createRequest()
 QRPCListenRequest &QRPCListenRequestCache::createRequest(const QVariant &vRequest)
 {
     dPvt();
-    QMutexLocker locker(&p.lock);
+    QMutexLocker<QMutex> locker(&p.lock);
     auto request = new QRPCListenRequest(vRequest);
     request->setListenUuid(p.listen()->uuid());
     if(request->isEmpty() || !request->isValid())

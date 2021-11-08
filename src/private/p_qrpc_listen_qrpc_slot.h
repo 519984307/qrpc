@@ -19,7 +19,7 @@ public:
     /**
      * @brief run
      */
-    void run();
+    void run()override;
 
     /**
      * @brief canRequestInvoke

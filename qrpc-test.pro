@@ -18,6 +18,9 @@ QMAKE_CXXFLAGS += -DQRPC_TEST_MODE=\\\"$$QRPC_TEST_MODE\\\"
 LIBS += -lgmock
 LIBS += -lgtest
 
-include($$PWD/qrpc.pri)
+include($$PWD/../qstm/test/qstm-test.pri)
 include($$PWD/test/qrpc-test.pri)
+
+SOURCES += \
+    $$PWD/test/main.cpp
 

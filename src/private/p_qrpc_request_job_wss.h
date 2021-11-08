@@ -27,7 +27,7 @@ public:
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response){
+    virtual bool call(QRPCRequestJobResponse*response)override{
 
         this->response=response;
 

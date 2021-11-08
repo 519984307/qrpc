@@ -38,8 +38,8 @@ public:
         const auto&request_url=response->request_url;
         this->response=response;
 
-        static const auto removeHeaders=QStringList()<<qsl("host")<< qsl("content-length");
-        static const auto ignoreHeaders=QStringList()<<ContentDispositionName<<ContentTypeName<<ContentDispositionName.toLower()<<ContentTypeName.toLower();
+        static const auto removeHeaders=QStringList{qsl("host"),qsl("content-length")};
+        static const auto ignoreHeaders=QStringList{ContentDispositionName,ContentTypeName,ContentDispositionName.toLower(),ContentTypeName.toLower()};
         this->listen_request.clear();
         this->listen_request.makeUuid();
 
@@ -60,13 +60,13 @@ public:
                     else{
                         auto v=i.value();
                         QStringList headerValues;
-                        if(v.type()==v.List || v.type()==v.StringList){
+                        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList){
                             auto vList=v.toList();
                             for(auto&r:vList){
                                 headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                             }
                         }
-                        else if(v.type()==v.Map || v.type()==v.Hash){
+                        else if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash){
                             auto vMap=v.toHash();
                             QHashIterator<QString, QVariant> i(vMap);
                             while (i.hasNext()) {
@@ -184,7 +184,7 @@ public:
         return outConnection.isOpen();
     }
 
-    virtual bool call(QRPCRequestJobResponse*response){
+    virtual bool call(QRPCRequestJobResponse*response)override{
         this->response=response;
         auto&request=this->requestMake(response);
         QSqlDatabase __connection;

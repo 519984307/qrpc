@@ -140,7 +140,7 @@ void HttpConnectionHandlerPool::loadSslConfig()
             sslConfiguration->setLocalCertificate(certificate);
             sslConfiguration->setPrivateKey(sslKey);
             sslConfiguration->setPeerVerifyMode(QSslSocket::VerifyNone);
-            sslConfiguration->setProtocol(QSsl::TlsV1SslV3);
+            sslConfiguration->setProtocol(QSsl::TlsV1_3);
 
             XDebug1("HttpConnectionHandlerPool: SSL settings loaded");
      #endif

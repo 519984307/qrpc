@@ -28,7 +28,7 @@ QString LastError::text() const
 
 bool LastError::isValid() const
 {
-    return nativeErrorCode()>0 || !text().isEmpty();
+    return !nativeErrorCode().trimmed().isEmpty() || !text().isEmpty();
 }
 
 void LastError::clear()
