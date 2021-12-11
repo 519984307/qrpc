@@ -7,12 +7,30 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCServer class
+//!
 class Q_RPC_EXPORT QRPCServer: public QObject
 {
     Q_OBJECT
 public:
+
+    //!
+    //! \brief QRPCServer
+    //! \param parent
+    //!
     Q_INVOKABLE explicit QRPCServer(QObject *parent=nullptr);
+
+    //!
+    //! \brief QRPCServer
+    //! \param settings
+    //! \param parent
+    //!
     Q_INVOKABLE explicit QRPCServer(const QVariant &settings,  QObject *parent=nullptr);
+
+    //!
+    //! \brief ~QRPCServer
+    //!
     Q_INVOKABLE virtual ~QRPCServer();
 
     //!

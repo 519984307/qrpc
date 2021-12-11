@@ -58,44 +58,44 @@ public slots:
         if(!request.fromHash(vRequest)){
             if(request.co().isOK())
                 request.co().setBadRequest();
+            return;
         }
-        else if((server!=nullptr) && (!server->authorizationRequest(request))){
+
+        if((server!=nullptr) && (!server->authorizationRequest(request))){
             if(request.co().isOK())
                 request.co().setUnauthorized();
+            return;
         }
-        else{
-            auto vMap=request.toHash();
-            QRPCListenSlotList*slotMap=nullptr;
-            {
-                QMutexLocker<QMutex> locker(&mutexMapLocker);
-                slotMap=listenSlotCache.value(request.hash());
-                if(slotMap==nullptr){
-                    slotMap=listenSlotCache.value(request.hash());
-                    if(slotMap==nullptr){
-                        slotMap = new QRPCListenSlotList();
-                        listenSlotCache.insert(request.hash(), slotMap);
-                    }
+
+        auto vMap=request.toHash();
+        QRPCListenSlotList*listenSlotList=nullptr;
+        {//locker
+            QMutexLOCKER locker(&mutexMapLocker);
+            auto md5=request.hash();
+            listenSlotList=this->listenSlotCache.value(md5);
+            if(listenSlotList==nullptr){
+                listenSlotList = new QRPCListenSlotList();
+                this->listenSlotCache[md5]=listenSlotList;
+            }
+        }
+
+        auto requestInvoke=[&listenSlotList, &vMap, &uploadedFiles](QRPCListenQRPCSlot*&thread){
+            thread=nullptr;
+            for(auto&v:*listenSlotList){
+                if(v->canRequestInvoke(vMap, uploadedFiles)){
+                    thread=v;
+                    return true;
                 }
             }
+            return false;
+        };
 
-            auto requestInvoke=[&slotMap, &vMap, &uploadedFiles](QRPCListenQRPCSlot*&thread){
-                thread=nullptr;
-                for(auto&v:*slotMap){
-                    if(v->canRequestInvoke(vMap, uploadedFiles)){
-                        thread=v;
-                        return true;
-                    }
-                }
-                return false;
-            };
-
-            QRPCListenQRPCSlot*thread=nullptr;
-            while(!requestInvoke(thread)){
-                QMutexLocker<QMutex> locker(&mutexMapLocker);
-                auto thread=new QRPCListenQRPCSlot(this->listenQRPC);
-                thread->start();
-                slotMap->append(thread);
-            }
+        QRPCListenQRPCSlot*thread=nullptr;
+        while(!requestInvoke(thread)){
+            QMutexLOCKER locker(&mutexMapLocker);
+            auto thread=new QRPCListenQRPCSlot(this->listenQRPC);
+            thread->start();
+            listenSlotList->append(thread);
         }
 
     }
@@ -143,10 +143,10 @@ void QRPCListenQRPC::run()
                     p.parsers.insert(name,mObj);
                 delete object;
                 object=nullptr;
-                continue;
             }
         }
     }
+
 
     {
         p.controller.clear();
@@ -161,12 +161,12 @@ void QRPCListenQRPC::run()
                 }
                 delete object;
                 object=nullptr;
-                continue;
             }
         }
     }
 
     QRPCListen::run();
+
 
     {//free thread
         auto listenSlotCacheAux=p.listenSlotCache.values();

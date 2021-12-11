@@ -1,6 +1,7 @@
 #include "./qrpc_listen_protocol.h"
 #include "./qrpc_listen_colletion.h"
 #include "./qrpc_listen.h"
+#include "./qstm_types.h"
 #include <QThreadPool>
 #include <QSettings>
 #include <QMetaProperty>
@@ -75,16 +76,16 @@ public:
                 value=defaultSettings.value(propertyName);
             }
             if(!property.write(this->parent(), value)){
-                if(property.typeId()==QMetaType::QUuid && property.write(this->parent(), value.toUuid()))
+                if(qTypeId(property)==QMetaType_QUuid && property.write(this->parent(), value.toUuid()))
                     continue;
 
-                if((property.typeId()==QMetaType::LongLong || property.typeId()==QMetaType::ULongLong) && property.write(this->parent(), value.toLongLong()))
+                if((qTypeId(property)==QMetaType_LongLong || qTypeId(property)==QMetaType_ULongLong) && property.write(this->parent(), value.toLongLong()))
                     continue;
 
-                if((property.typeId()==QMetaType::Int || property.typeId()==QMetaType::UInt) && property.write(this->parent(), value.toInt()))
+                if((qTypeId(property)==QMetaType_Int || qTypeId(property)==QMetaType_UInt) && property.write(this->parent(), value.toInt()))
                     continue;
 
-                if((property.typeId()==QMetaType::Bool) && property.write(this->parent(), value.toBool()))
+                if((qTypeId(property)==QMetaType_Bool) && property.write(this->parent(), value.toBool()))
                     continue;
             }
         }
@@ -377,7 +378,7 @@ void QRPCListenProtocol::setPort(const QVariant &value)
 {
     dPvt();
     QVariantList l;
-    if(value.typeId()==QMetaType::QStringList || value.typeId()==QMetaType::QVariantList){
+    if(qTypeId(value)==QMetaType_QStringList || qTypeId(value)==QMetaType_QVariantList){
         l=value.toList();
     }
     else{

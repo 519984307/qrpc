@@ -99,7 +99,7 @@ public:
      * @return
      */
     int code();
-    int code(QVariant code);
+    int code(const QVariant &code);
 
     /**
      * @brief setCode

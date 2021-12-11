@@ -75,7 +75,7 @@ public:
     }
 
     bool isListening(){
-        QMutexLocker<QMutex> locker(&this->lock);
+        QMutexLOCKER locker(&this->lock);
         for(auto&h:this->listenersPort){
             if(h->listener->isListening()){
                 return true;
@@ -85,7 +85,7 @@ public:
     }
 
     virtual ~HttpServer3drparty(){
-        QMutexLocker<QMutex> locker(&this->lock);
+        QMutexLOCKER locker(&this->lock);
         auto aux=this->listenersPort;
         this->listenersPort.clear();
         qDeleteAll(aux);
@@ -108,10 +108,15 @@ public:
         QVariantHash requestParameterMap;
 
         {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            QHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+#else
             QMultiHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+#endif
+
             while (i.hasNext()) {
                 i.next();
-                requestHeaderMap.insert(i.key(), i.value());
+                requestHeaderMap[i.key()]=i.value();
 #if Q_RPC_LOG_SUPER_VERBOSE
                 sInfo()<<"   header - "+i.key()+":"+i.value();
 #endif
@@ -119,10 +124,14 @@ public:
         }
 
         {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            QHashIterator<QByteArray, QByteArray> i(getParameterMap);
+#else
             QMultiHashIterator<QByteArray, QByteArray> i(getParameterMap);
+#endif
             while (i.hasNext()) {
                 i.next();
-                requestParameterMap.insert(i.key(), i.value());
+                requestParameterMap[i.key()]=i.value();
 #if Q_RPC_LOG_SUPER_VERBOSE
                 sInfo()<<"   parameter - "+i.key()+":"+i.value();
 #endif
@@ -132,8 +141,8 @@ public:
         auto listen=this->listen();
         auto&request=listen->cacheRequest()->createRequest();
         auto requestPath=QString(req.getPath());
-        auto requestBody=QString(req.getBody());
-        auto requestMethod=QString(req.getMethod());
+        auto requestBody=QString(req.getBody()).trimmed();
+        auto requestMethod=QString(req.getMethod()).toLower();
 
         request.setRequestProtocol(QRpc::Http);
         request.setRequestPath(requestPath.toUtf8());
@@ -141,6 +150,7 @@ public:
         request.setRequestParameter(requestParameterMap);
         request.setRequestMethod(requestMethod);
         request.setRequestBody(requestBody);
+
 
         auto vMap=request.toHash();
         QStringList uploadedFiles;
@@ -160,10 +170,10 @@ public:
 
         QByteArray body;
 
-        static const auto staticUrlNames=QVector<int>()<<QMetaType::QUrl<<QMetaType::QVariantMap<<QMetaType::QString << QMetaType::QByteArray<<QMetaType::QChar << QMetaType::QBitArray;
+        static const auto staticUrlNames=QVector<int>()<<QMetaType_QUrl<<QMetaType_QVariantMap<<QMetaType_QString << QMetaType_QByteArray<<QMetaType_QChar << QMetaType_QBitArray;
         const auto&responseBody=request.responseBody();
         Url rpc_url;
-        if(!staticUrlNames.contains(responseBody.typeId()))
+        if(!staticUrlNames.contains(qTypeId(responseBody)))
             body = request.responseBodyBytes();
         else if(!rpc_url.read(responseBody).isValid())
             body = request.responseBodyBytes();
@@ -191,7 +201,11 @@ public:
             cWarning()<<msgOut;
             {
                 {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                    QHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+#else
                     QMultiHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+#endif
                     while (i.hasNext()) {
                         i.next();
                         cWarning()<<qsl("   header - %1 : %2").arg(i.key(), i.value());

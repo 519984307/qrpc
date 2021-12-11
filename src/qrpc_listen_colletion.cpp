@@ -82,7 +82,7 @@ public:
     }
 
     bool makeOption(int protocol, const QMetaObject&metaObject){
-        QMutexLocker<QMutex> locker(&this->lockMake);
+        QMutexLOCKER locker(&this->lockMake);
         if(this->listenProtocol.contains(protocol))
             return true;
         else{
@@ -253,7 +253,7 @@ bool QRPCListenColletions::start()
     if(p.lockRunning.tryLock(1000)){
         p.lockWaitRun.lock();
         QThread::start();
-        QMutexLocker<QMutex> locker(&p.lockWaitRun);
+        QMutexLOCKER locker(&p.lockWaitRun);
         __return=this->isRunning();
     }
     return __return;
@@ -268,10 +268,10 @@ bool QRPCListenColletions::quit()
 {
     dPvt();
     p.lockWaitQuit.lock();
-    QMutexLocker<QMutex> lockerRun(&p.lockWaitRun);//evitar crash antes da inicializacao de todos os listainers
+    QMutexLOCKER lockerRun(&p.lockWaitRun);//evitar crash antes da inicializacao de todos os listainers
     p.listenQuit();
     QThread::quit();
-    QMutexLocker<QMutex> lockerQuit(&p.lockWaitQuit);
+    QMutexLOCKER lockerQuit(&p.lockWaitQuit);
     QThread::wait();
     return true;
 }

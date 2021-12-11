@@ -125,12 +125,12 @@ public:
     }
 
     bool v_load(const QVariant &v){
-        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList)
+        if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList)
             return this->load(v.toStringList());
-        else if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash)
+        if(qTypeId(v)==QMetaType_QVariantMap || qTypeId(v)==QMetaType_QVariantHash)
             return this->load(v.toHash());
-        else
-            return this->load(v.toString());
+
+        return this->load(v.toString());
     }
 
     bool load(QObject *settingsObject)
@@ -162,37 +162,43 @@ public:
         auto&p=*this;
         for(auto&fileName:settingsFileName){
             QFile file(fileName);
-            if(fileName.isEmpty())
+            if(fileName.isEmpty()){
                 continue;
-            else if(!file.exists())
+            }
+
+            if(!file.exists()){
 #if Q_RPC_LOG
                 sWarning()<<qsl("file not exists %1").arg(file.fileName());
 #endif
-            else if(!file.open(QFile::ReadOnly))
+                continue;
+            }
+
+            if(!file.open(QFile::ReadOnly)){
 #if Q_RPC_LOG
                 sWarning()<<qsl("%1, %2").arg(file.fileName(), file.errorString());
 #endif
+                continue;
+            }
+
+            auto bytes=file.readAll();
+            file.close();
+            QJsonParseError*error=nullptr;
+            auto doc=QJsonDocument::fromJson(bytes, error);
+            if(error!=nullptr)
+#if Q_RPC_LOG
+                sWarning()<<qsl("%1, %2").arg(file.fileName(), error->errorString());
+#endif
+            else if(doc.object().isEmpty())
+#if Q_RPC_LOG
+                sWarning()<<qsl("object is empty, %1").arg(file.fileName());
+#endif
             else{
-                auto bytes=file.readAll();
-                file.close();
-                QJsonParseError*error=nullptr;
-                auto doc=QJsonDocument::fromJson(bytes, error);
-                if(error!=nullptr)
-#if Q_RPC_LOG
-                    sWarning()<<qsl("%1, %2").arg(file.fileName(), error->errorString());
-#endif
-                else if(doc.object().isEmpty())
-#if Q_RPC_LOG
-                    sWarning()<<qsl("object is empty, %1").arg(file.fileName());
-#endif
-                else{
-                    auto map=doc.object().toVariantHash();
-                    if(!map.isEmpty())
-                        vList<<map;
-                }
+                auto map=doc.object().toVariantHash();
+                if(!map.isEmpty())
+                    vList<<map;
             }
         }
-        VariantUtil vu;
+        Q_DECLARE_VU;
         auto vMap=vu.vMerge(vList).toHash();
         if(p.load(vMap))
             this->settingsFileName=settingsFileName;
@@ -252,37 +258,36 @@ public:
 
         auto arguments=settings.value(qsl("arguments"));
 
-        if(arguments.typeId()==QMetaType::QVariantHash || arguments.typeId()==QMetaType::QVariantMap){
-            QHashIterator<QString, QVariant> i(arguments.toHash());
-            while (i.hasNext()) {
+        if(qTypeId(arguments)==QMetaType_QVariantHash || qTypeId(arguments)==QMetaType_QVariantMap){
+            Q_V_HASH_ITERATOR (arguments.toHash()){
                 i.next();
-                p.arguments.insert(i.key().toLower(),i.value());
+                p.arguments[i.key().toLower()]=i.value();
             }
         }
-        else if(arguments.typeId()==QMetaType::QVariantList || arguments.typeId()==QMetaType::QStringList){
+        else if(qTypeId(arguments)==QMetaType_QVariantList || qTypeId(arguments)==QMetaType_QStringList){
             for(auto&v:arguments.toList()){
                 auto l=v.toString().split(qsl("="));
                 if(l.isEmpty()){
                     continue;
                 }
-                else if(l.size()==1){
+
+                if(l.size()==1){
                     auto key=l.first();
                     auto value=l.last();
-                    p.arguments.insert(key,value);
+                    p.arguments[key]=value;
                 }
                 else{
                     auto key=l.first().toLower();
                     auto value=l.last();
-                    p.arguments.insert(key,value);
+                    p.arguments[key]=value;
                 }
             }
         }
 
-        QVariantHash defaultVariables({{qsl("hostName") , qsl("SERVICE_HOST")}});
+        QVariantHash defaultVariables{{qsl("hostName") , qsl("SERVICE_HOST")}};
         QVariantHash defaultValues;
         if(!defaultVariables.isEmpty()){
-            QHashIterator<QString, QVariant> i(defaultVariables);
-            while (i.hasNext()) {
+            Q_V_HASH_ITERATOR (defaultVariables){
                 i.next();
                 auto env = i.value().toByteArray();
                 auto v = QByteArray(getenv(env)).trimmed();
@@ -301,15 +306,13 @@ public:
             this->insert(settings);
         }
         else{
-            QHashIterator<QString, QVariant> i(settings);
-            while (i.hasNext()) {
+            Q_V_HASH_ITERATOR (settings){
                 i.next();
                 auto value=i.value().toHash();
                 value.insert(qsl("name"), i.key().trimmed());
 
                 {
-                    QHashIterator<QString, QVariant> i(defaultValues);
-                    while (i.hasNext()) {
+                    Q_V_HASH_ITERATOR (defaultValues){
                         i.next();
                         if(!value.contains(i.key()))
                             value.insert(i.key(), i.value());
@@ -317,8 +320,7 @@ public:
                 }
 
                 {
-                    QHashIterator<QString, QVariant> i(defaultSetting);
-                    while (i.hasNext()) {
+                    Q_V_HASH_ITERATOR (defaultSetting){
                         i.next();
                         if(!value.contains(i.key()))
                             value.insert(i.key(), i.value());

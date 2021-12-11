@@ -41,10 +41,9 @@ namespace QRpc {
 
     public:
         Q_INVOKABLE explicit QRPCListenRequest(QObject *parent=nullptr);
-        //Q_INVOKABLE explicit QRPCListenRequest(const QRPCListenRequest &request, QObject *parent=nullptr);
-        Q_INVOKABLE explicit QRPCListenRequest(const QVariant &requestBody, QObject *parent=nullptr);
+        explicit QRPCListenRequest(const QVariant &requestBody, QObject *parent=nullptr);
         explicit QRPCListenRequest(const QVariant &requestBody, const ControllerSetting &setting, QObject *parent=nullptr);
-        Q_INVOKABLE virtual ~QRPCListenRequest();
+        virtual ~QRPCListenRequest();
     public:
         /**
          * @brief vu

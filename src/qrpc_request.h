@@ -202,7 +202,7 @@ public:
      * @brief response
      * @return
      */
-    virtual QRPCHttpResponse&response();
+    virtual QRPCHttpResponse &response();
 
     /**
      * @brief lastError
@@ -267,6 +267,12 @@ public:
      * @return
      */
     virtual QString toString() const;
+
+    //!
+    //! \brief toResponse
+    //! \return
+    //!
+    virtual QVariantHash toResponse() const;
 
     /**
      * @brief sslConfiguration

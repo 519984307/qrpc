@@ -34,7 +34,6 @@ public:
         QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this, &QRPCRequestJobLocalSocket::onReplyError);
 #endif
         QObject::connect(m_socket, &QTcpSocket::connected, this, &QRPCRequestJobLocalSocket::onConnected);
-        QObject::connect(m_socket, &QTcpSocket::disconnected, this, &QRPCRequestJobLocalSocket::onClosed);
         QObject::connect(m_socket, &QTcpSocket::readChannelFinished, this, &QRPCRequestJobLocalSocket::onFinish);
         QUrl url(this->response->request_url.toUrl());
         const QString hostName=url.host(QUrl::FullyDecoded);
@@ -73,10 +72,6 @@ private slots:
         this->onFinish();
     };
 
-    void onClosed(){
-        //emit this->callback(QVariant());
-    };
-
     void onReplyError(QAbstractSocket::SocketError e){
         Q_UNUSED(e)
         if(e!=QAbstractSocket::SocketError::RemoteHostClosedError){
@@ -86,15 +81,6 @@ private slots:
         }
     };
 
-//    void onReplyTimeout(){
-//        response->response_qt_status_code=QNetworkReply::TimeoutError;
-//        emit this->callback(QVariant());
-//    };
-
-//    void onReplyPong(quint64 elapsedTime, const QByteArray &payload){
-//        Q_UNUSED(elapsedTime)
-//        Q_UNUSED(payload)
-//    }
     void onFinish(){
         QRPCListenRequest request(this->buffer);
         if(!request.isValid()){

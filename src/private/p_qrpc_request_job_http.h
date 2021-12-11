@@ -64,13 +64,13 @@ public:
                     else{
                         auto v=i.value();
                         QStringList headerValues;
-                        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList){
+                        if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList){
                             auto vList=v.toList();
                             for(auto&r:vList){
                                 headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                             }
                         }
-                        else if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash){
+                        else if(qTypeId(v)==QMetaType_QVariantHash || qTypeId(v)==QMetaType_QVariantMap){
                             auto vMap=v.toHash();
                             QHashIterator<QString, QVariant> i(vMap);
                             while (i.hasNext()) {
@@ -255,7 +255,7 @@ private slots:
     };
 
     void onReplyFinish(){
-        QMutexLocker<QMutex> locker(&mutexRequestFinished);
+        QMutexLOCKER locker(&mutexRequestFinished);
         if(this->reply!=nullptr){
             if(response->response_qt_status_code==QNetworkReply::NoError){
                 if(response->response_qt_status_code!=QNetworkReply::TimeoutError)
@@ -267,7 +267,7 @@ private slots:
     };
     void onReplyTimeout(){
         {
-            QMutexLocker<QMutex> locker(&mutexRequestFinished);
+            QMutexLOCKER locker(&mutexRequestFinished);
             if(response->response_qt_status_code==QNetworkReply::NoError){
                 response->response_qt_status_code=QNetworkReply::TimeoutError;
 #if Q_RPC_LOG

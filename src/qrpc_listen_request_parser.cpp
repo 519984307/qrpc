@@ -112,17 +112,20 @@ void QRPCListenRequestParser::makeRoute(const QMetaObject &metaObject)
             auto className=QByteArray(metaObject.className());
             if(!staticMetaObjectRoute->contains(className)){
                 auto route=parser->route();
-                QMutexLocker<QMutex> locker(staticMetaObjectLock);
+                QMutexLOCKER locker(staticMetaObjectLock);
                 staticMetaObjectRoute->insert(className, route);
                 for(int methodIndex = 0; methodIndex < metaObject.methodCount(); ++methodIndex) {
                     auto method = metaObject.method(methodIndex);
-                    if(method.returnType()!=QMetaType::Bool)
+                    if(method.returnType()!=QMetaType_Bool)
                         continue;
-                    else if(method.parameterCount()>0)
+
+                    if(method.parameterCount()>0)
                         continue;
-                    else if(ignoreNames.contains(method.name()))
+
+                    if(ignoreNames.contains(method.name()))
                         continue;
-                    else{
+
+                    {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
                         staticMetaObjectMetaMethod->insert(className, method);
 #else

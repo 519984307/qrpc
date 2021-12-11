@@ -1,5 +1,5 @@
 #include "./qrpc_token_pool.h"
-#include <QMutex>
+#include "./qstm_types.h"
 #include <QTimer>
 
 namespace QRpc {
@@ -43,7 +43,7 @@ QRpc::TokenPool::~TokenPool()
 QVariantHash TokenPool::token(const QByteArray &md5) const
 {
     dPvt();
-    QMutexLocker<QMutex> locker(&p.mutex);
+    QMutexLOCKER locker(&p.mutex);
     return p.tokenMap.value(md5);
 }
 
@@ -72,21 +72,21 @@ void TokenPool::tokenCheck(const QByteArray &md5, TokenPoolCallBack callback)
 void TokenPool::tokenInsert(const QByteArray &md5, QVariantHash &tokenPayload)
 {
     dPvt();
-    QMutexLocker<QMutex> locker(&p.mutex);
+    QMutexLOCKER locker(&p.mutex);
     p.tokenMap.insert(md5,tokenPayload);
 }
 
 void TokenPool::tokenRemove(const QByteArray &md5)
 {
     dPvt();
-    QMutexLocker<QMutex> locker(&p.mutex);
+    QMutexLOCKER locker(&p.mutex);
     p.tokenMap.remove(md5);
 }
 
 void TokenPool::tokenClear()
 {
     dPvt();
-    QMutexLocker<QMutex> locker(&p.mutex);
+    QMutexLOCKER locker(&p.mutex);
     p.tokenMap.clear();
 }
 

@@ -3,7 +3,7 @@
 
 namespace QRpc {
 
-QRPCInterfaceRecord::QRPCInterfaceRecord(QObject *parent) : QRpc::QRPCInterfaceCheck(parent)
+QRPCInterfaceRecord::QRPCInterfaceRecord(QObject *parent) : QRpc::QRPCController(parent)
 {
 
 }

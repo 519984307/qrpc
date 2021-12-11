@@ -14,6 +14,10 @@ typedef QMultiHash<QByteArray, QMetaMethod> QRPCControllerMethods;
 class QRPCListenRequest;
 class QRPCListenRequestParser;
 class QRPCServer;
+
+//!
+//! \brief The QRPCController class
+//!
 class Q_RPC_EXPORT QRPCController: public QObject
 {
     Q_OBJECT
@@ -193,7 +197,7 @@ public:
     //! \param metaObject
     //! \return
     //!
-    static int registerInterface(const QMetaObject *metaObject);
+    static int registerInterface(const QMetaObject &metaObject);
 
     //!
     //! \brief registerParserRequest

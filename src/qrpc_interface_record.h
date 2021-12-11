@@ -16,9 +16,10 @@ namespace QRpc {
  * http://localhost/RequestPath/businessCheck
  *
  */
-class QRPCInterfaceRecord : public QRpc::QRPCInterfaceCheck
+class QRPCInterfaceRecord : public QRpc::QRPCController
 {
     Q_OBJECT
+    Q_RPC_DECLARE_INTERFACE_METHOD_CHECK()
 public:
     Q_INVOKABLE explicit QRPCInterfaceRecord(QObject *parent = nullptr);
     Q_INVOKABLE ~QRPCInterfaceRecord();

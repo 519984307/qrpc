@@ -60,13 +60,13 @@ QRPCRequestExchangeSetting &QRPCRequestExchange::back()
 QVariantMap QRPCRequestExchange::toMap() const
 {
     dPvt();
-    return QVariantMap({{qsl("call"),p.call.toHash()}, {qsl("back"),p.back.toHash()}});
+    return QVariantMap{{qsl("call"),p.call.toHash()}, {qsl("back"),p.back.toHash()}};
 }
 
 QVariantHash QRPCRequestExchange::toHash() const
 {
     dPvt();
-    return QVariantHash({{qsl("call"),p.call.toHash()}, {qsl("back"),p.back.toHash()}});
+    return QVariantHash{{qsl("call"),p.call.toHash()}, {qsl("back"),p.back.toHash()}};
 }
 
 QRPCRequestExchange &QRPCRequestExchange::print(const QString &output)

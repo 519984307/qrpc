@@ -55,18 +55,20 @@ public:
                     const auto k=i.key().toLower();
                     if(removeHeaders.contains(k))
                         continue;
-                    else if(ignoreHeaders.contains(k))
+
+                    if(ignoreHeaders.contains(k))
                         continue;
-                    else{
+
+                    {
                         auto v=i.value();
                         QStringList headerValues;
-                        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList){
+                        if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList){
                             auto vList=v.toList();
                             for(auto&r:vList){
                                 headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                             }
                         }
-                        else if(v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash){
+                        else if(qTypeId(v)==QMetaType_QVariantHash || qTypeId(v)==QMetaType_QVariantMap){
                             auto vMap=v.toHash();
                             QHashIterator<QString, QVariant> i(vMap);
                             while (i.hasNext()) {
@@ -192,11 +194,13 @@ public:
             this->onBrokerError(qsl("invalid database connection"));
             return false;
         }
-        else if(!__connection.isValid() || !__connection.isOpen()){
+
+        if(!__connection.isValid() || !__connection.isOpen()){
             this->onBrokerError(qsl("invalid database connection"));
             return false;
         }
-        else{
+
+        {
             bool __return=false;
             auto request_url=response->request_url;
             auto requestBody=request.toJson();

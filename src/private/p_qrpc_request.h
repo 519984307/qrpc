@@ -288,7 +288,12 @@ public:
             this->request_url=QUrl(request_url_str);
             if(!paramsGet.isEmpty()){
                 QUrlQuery url_query;
-                Q_V_MULTI_HASH_ITERATOR(paramsGet){
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                QHashIterator<QString, QVariant> i(paramsGet);
+#else
+                QMultiHashIterator<QString, QVariant> i(paramsGet);
+#endif
+                while (i.hasNext()){
                     i.next();
                     const auto&k=i.key();
                     const auto v=Util::parseQueryItem(i.value());
@@ -362,7 +367,12 @@ public:
             this->request_url=QUrl(request_url_str);
             if(!paramsGet.isEmpty()){
                 QUrlQuery url_query;
-                Q_V_MULTI_HASH_ITERATOR(paramsGet){
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                QHashIterator<QString, QVariant> i(paramsGet);
+#else
+                QMultiHashIterator<QString, QVariant> i(paramsGet);
+#endif
+                while (i.hasNext()) {
                     i.next();
                     url_query.addQueryItem(i.key(), i.value().toString());
                 }
@@ -389,7 +399,7 @@ public:
 
 
         if(e.protocol()==QRpc::Http || e.protocol()==QRpc::Https){
-            if(vBody.typeId()==QMetaType::QVariantList || vBody.typeId()==QMetaType::QStringList || vBody.typeId()==QMetaType::QVariantMap || vBody.typeId()==QMetaType::QVariantHash){
+            if(qTypeId(vBody)==QMetaType_QVariantList || qTypeId(vBody)==QMetaType_QStringList || qTypeId(vBody)==QMetaType_QVariantHash || qTypeId(vBody)==QMetaType_QVariantMap){
                 this->request_body = QJsonDocument::fromVariant(vBody).toJson(QJsonDocument::Compact);
             }
             else{
@@ -399,7 +409,7 @@ public:
         else if(e.protocol()==QRpc::DataBase || e.protocol()==QRpc::Kafka || e.protocol()==QRpc::Amqp  || e.protocol()==QRpc::WebSocket || e.protocol()==QRpc::TcpSocket || e.protocol()==QRpc::UdpSocket){
 
 
-            if(vBody.typeId()==QMetaType::QVariantList || vBody.typeId()==QMetaType::QStringList || vBody.typeId()==QMetaType::QVariantMap || vBody.typeId()==QMetaType::QVariantHash){
+            if(qTypeId(vBody)==QMetaType_QVariantList || qTypeId(vBody)==QMetaType_QStringList || qTypeId(vBody)==QMetaType_QVariantMap || qTypeId(vBody)==QMetaType_QVariantHash){
                 this->request_body = QJsonDocument::fromVariant(vBody).toJson(QJsonDocument::Compact);
             }
             else{

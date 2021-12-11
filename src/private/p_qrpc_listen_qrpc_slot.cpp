@@ -34,212 +34,192 @@ public:
 
     void invokeController(QRPCListenRequest&request){
         request.co().setMethodNotAllowed();
-        //auto requestHash=request.hash();
         QMetaMethod metaMethod;
         auto requestPath=request.requestPath().toLower();
-        //if(!QRPCController::routeExists(requestPath) && !QRPCController::routeRedirectCheckRoute("",requestPath)){
-        //    request.co().setNotFound();
-        //}
-        //else
-        {
-            for(auto&mObjController:this->listenQRPCControllers){
-                auto className=mObjController->className();
-                auto routeMethods = QRPCController::routeMethods(className);
-                if(!routeMethods.contains(requestPath)){//se nao contiver a rota
-                    auto routeRedirect = QRPCController::routeRedirectCheckRoute(className, requestPath);
-                    if(!routeRedirect){
-#if Q_RPC_LOG_SUPER_VERBOSE
-                        sWarning()<<"Interface className ignored "<<className;
-#endif
-                        continue;
-                    }
-                }
 
-                QScopedPointer<QObject> sObj(mObjController->newInstance(Q_ARG(QObject*, this )));
-                if(sObj.data()==nullptr){
-#if Q_RPC_LOG
-                    sWarning()<<qsl("Interface not valid ")<<className;
-#endif
+        for(auto&mObjController:this->listenQRPCControllers){
+            auto className=mObjController->className();
+            auto routeMethods = QRPCController::routeMethods(className);
+            if(!routeMethods.contains(requestPath)){//se nao contiver a rota
+                auto routeRedirect = QRPCController::routeRedirectCheckRoute(className, requestPath);
+                if(!routeRedirect){
+    #if Q_RPC_LOG_SUPER_VERBOSE
+                    sWarning()<<"Interface className ignored "<<className;
+    #endif
                     continue;
                 }
-                else{
-                    QObject*object=sObj.data();
-                    auto controller=dynamic_cast<QRPCController*>(object);
+            }
 
-                    if(controller!=nullptr){
-                        controller->setRequest(request);
-                        controller->setServer(this->listenQRPC->server());
-                    }
+            QScopedPointer<QObject> sObj(mObjController->newInstance(Q_ARG(QObject*, this )));
+            if(sObj.data()==nullptr){
+    #if Q_RPC_LOG
+                sWarning()<<qsl("Interface not valid ")<<className;
+    #endif
+                continue;
+            }
 
-                    request.co().setOK();
+            QObject*objectController=sObj.data();
+            auto controller=dynamic_cast<QRPCController*>(objectController);
 
-                    if((controller!=nullptr) && (controller->requestRedirect())){
-                        break;
-                    }
-                    else if(!request.co().isOK()){
-                        break;
-                    }
-                    else{
-                        metaMethod = routeMethods.value(requestPath);
-                        if(!controller->routeRedirectMethod(className, requestPath, metaMethod)){
-                            if(request.co().isOK())
-                                request.co().setNotFound();
-                        }
-                        else if(!metaMethod.isValid()){
-                            if(request.co().isOK())
-                                request.co().setNotFound();
-                        }
-                        else{
-                            QVariant returnVariant;
-                            auto argReturn=Q_RETURN_ARG(QVariant, returnVariant);
-                            auto parameterType=metaMethod.parameterType(0);
-                            auto parameterCount=metaMethod.parameterCount();
-                            auto returnType=metaMethod.returnType();
+            if(controller==nullptr)
+                continue;
 
-                            QVariant vArgValue;
-                            if(parameterCount==1){
-                                if(parameterType==QMetaType::QVariantMap)
-                                    vArgValue=request.toHash();
-                                else if(parameterType==QMetaType::QVariantHash)
-                                    vArgValue=QVariant(request.toHash()).toHash();
-                                else
-                                    vArgValue=QVariant::fromValue<QRPCListenRequest*>(&request);
-                            }
+            if(controller!=nullptr){
+                controller->setRequest(request);
+                controller->setServer(this->listenQRPC->server());
+            }
 
-                            static const auto sQVariant=qbl("QVariant");
-                            auto invokeArg0=QGenericArgument(sQVariant, &vArgValue);
-                            bool invokeResult=false;
-                            bool goInvoke=true;
-                            if(controller!=nullptr){
+            request.co().setOK();
 
-                                goInvoke=false;
-                                if(!controller->requestBeforeInvoke()){
-                                    if(controller->rq().co().isOK()){
-                                        controller->rq().co().setBadRequest();
-                                    }
-                                }
-                                else{
-                                    goInvoke=true;
-                                }
+            if(controller->requestRedirect()){
+                return;
+            }
 
-                                if(goInvoke){
 
-                                    if(controller->canAuthorization()){
-                                        if(!controller->beforeAuthorization()){
-                                            sWarning()<<qsl("authorization in Controller::beforeAuthorization()");
-                                            if(controller->rq().co().isOK())
-                                                controller->rq().co().setUnauthorized();
-                                            goInvoke=false;
-                                        }
-                                        else if(!controller->authorization()){
-                                            sWarning()<<qsl("authorization in Controller::authorization()");
-                                            if(controller->rq().co().isOK())
-                                                controller->rq().co().setUnauthorized();
-                                            goInvoke=false;
-                                        }
-                                        else if(!controller->afterAuthorization()){
-                                            sWarning()<<qsl("authorization in Controller::afterAuthorization()");
-                                            if(controller->rq().co().isOK())
-                                                controller->rq().co().setUnauthorized();
-                                            goInvoke=false;
-                                        }
-                                    }
-                                }
-                            }
+            metaMethod = routeMethods.value(requestPath);
+            if(!controller->routeRedirectMethod(className, requestPath, metaMethod)){
+                if(request.co().isOK())
+                    request.co().setNotFound();
+                return;
+            }
 
-                            if(goInvoke){
-                                for(auto&mObjParser:this->listenQRPCParserRequest){
+            if(!metaMethod.isValid()){
+                if(request.co().isOK())
+                    request.co().setNotFound();
+                return;
+            }
 
-                                    QMetaMethod methodParse;
+            if(!controller->requestBeforeInvoke()){
+                if(controller->rq().co().isOK())
+                    controller->rq().co().setBadRequest();
+                return;
+            }
 
-                                    if(!QRPCListenRequestParser::routeToMethod(*mObjParser, request.requestPath(), methodParse))
-                                        continue;
-                                    else if(!methodParse.isValid())
-                                        continue;
-                                    else{
-                                        QScopedPointer<QObject> sObj(mObjParser->newInstance(Q_ARG(QObject*, controller )));
-                                        if(sObj.data()==nullptr){
-#if Q_RPC_LOG
-                                            sWarning()<<qsl("Parser not valid ")<<className;
-#endif
-                                            continue;
-                                        }
-                                        else{
-                                            auto object=sObj.data();
-                                            auto parser=dynamic_cast<QRPCListenRequestParser*>(object);
-                                            if(parser!=nullptr){
-                                                parser->setController(controller);
-                                                if(!parser->parse(methodParse)){
-#if Q_RPC_LOG
-                                                    sWarning()<<qsl("Listen request parser fail: parser ")<<mObjParser->className();
-#endif
-                                                    goInvoke=false;
-                                                    if(request.co().isOK())
-                                                        request.co().setNotAcceptable(qsl_null);
-                                                }
-                                                else{
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            if(!goInvoke){
-                                if(request.co().isOK())
-                                    request.co().setInternalServerError();
-                            }
-                            else if(!this->controllerRouter->router(&request, metaMethod)){
-                                request.co().setCode(this->controllerRouter->lr().sc());
-                                if(request.co().isOK())
-                                    request.co().setNotFound();
-                            }
-                            else{
-                                if(returnType==QMetaType::Void){
-                                    if(parameterCount==0)
-                                        invokeResult=metaMethod.invoke(object, Qt::DirectConnection);
-                                    else
-                                        invokeResult=metaMethod.invoke(object, Qt::DirectConnection, invokeArg0);
-                                }
-                                else{
-                                    if(parameterCount==0)
-                                        invokeResult=metaMethod.invoke(object, Qt::DirectConnection, argReturn);
-                                    else
-                                        invokeResult=metaMethod.invoke(object, Qt::DirectConnection, argReturn, invokeArg0);
-                                }
-                            }
+            if(controller->canAuthorization()){
+                if(!controller->beforeAuthorization()){
+                    sWarning()<<qsl("authorization in Controller::beforeAuthorization()");
+                    if(controller->rq().co().isOK())
+                        controller->rq().co().setUnauthorized();
+                    return;
+                }
 
-                            if(controller!=nullptr){
-                                controller->requestAfterInvoke();
-                            }
-                            if(!goInvoke && request.co().isOK()){
-                                if(request.co().isOK())
-                                    request.co().setInternalServerError();
-                            }
-                            else if(!invokeResult){
-                                if(request.co().isOK())
-                                    request.co().setInternalServerError();
-                            }
-                            else if(returnType!=QMetaType::Void){
-                                request.setResponseBody(returnVariant);
-                            }
-                            break;
-                        }
+                if(!controller->authorization()){
+                    sWarning()<<qsl("authorization in Controller::authorization()");
+                    if(controller->rq().co().isOK())
+                        controller->rq().co().setUnauthorized();
+                    return;
+                }
+
+                if(!controller->afterAuthorization()){
+                    sWarning()<<qsl("authorization in Controller::afterAuthorization()");
+                    if(controller->rq().co().isOK())
+                        controller->rq().co().setUnauthorized();
+                    return;
+                }
+            }
+
+
+            for(auto&mObjParser:this->listenQRPCParserRequest){
+
+                QMetaMethod methodParse;
+
+                if(!QRPCListenRequestParser::routeToMethod(*mObjParser, request.requestPath(), methodParse))
+                    continue;
+
+                if(!methodParse.isValid())
+                    continue;
+
+                QScopedPointer<QObject> sObj(mObjParser->newInstance(Q_ARG(QObject*, controller )));
+                if(sObj.data()==nullptr){
+    #if Q_RPC_LOG
+                    sWarning()<<qsl("Parser not valid ")<<className;
+    #endif
+                    continue;
+                }
+
+                auto object=sObj.data();
+                auto parser=dynamic_cast<QRPCListenRequestParser*>(object);
+                if(parser!=nullptr){
+                    parser->setController(controller);
+                    if(!parser->parse(methodParse)){
+    #if Q_RPC_LOG
+                        sWarning()<<qsl("Listen request parser fail: parser ")<<mObjParser->className();
+    #endif
+                        if(request.co().isOK())
+                            request.co().setNotAcceptable(qsl_null);
+
+                        return;
                     }
                 }
             }
 
+            if(!this->controllerRouter->router(&request, metaMethod)){
+                request.co().setCode(this->controllerRouter->lr().sc());
+                if(request.co().isOK())
+                    request.co().setNotFound();
+                return;
+            }
+
+            QVariant returnVariant;
+            auto argReturn=Q_RETURN_ARG(QVariant, returnVariant);
+            auto parameterType=metaMethod.parameterType(0);
+            auto parameterCount=metaMethod.parameterCount();
+            auto returnType=metaMethod.returnType();
+
+            QVariant vArgValue;
+            if(parameterCount==1){
+                switch (parameterType) {
+                case QMetaType_QVariantMap:
+                    vArgValue=request.toMap();
+                    break;
+                case QMetaType_QVariantHash:
+                    vArgValue=request.toHash();
+                    break;
+                default:
+                    vArgValue=QVariant::fromValue<QRPCListenRequest*>(&request);
+                }
+            }
+
+            static const auto sQVariant=qbl("QVariant");
+            auto invokeArg0=QGenericArgument(sQVariant, &vArgValue);
+            bool invokeResult=false;
+
+            if(returnType==QMetaType_Void){
+                if(parameterCount==0)
+                    invokeResult=metaMethod.invoke(objectController, Qt::DirectConnection);
+                else
+                    invokeResult=metaMethod.invoke(objectController, Qt::DirectConnection, invokeArg0);
+            }
+            else{
+                if(parameterCount==0)
+                    invokeResult=metaMethod.invoke(objectController, Qt::DirectConnection, argReturn);
+                else
+                    invokeResult=metaMethod.invoke(objectController, Qt::DirectConnection, argReturn, invokeArg0);
+            }
+
+            if(controller!=nullptr){
+                controller->requestAfterInvoke();
+            }
+
+            if(!invokeResult){
+                if(request.co().isOK())
+                    request.co().setInternalServerError();
+                return;
+            }
+
+            if(returnType!=QMetaType_Void){
+                request.setResponseBody(returnVariant);
+            }
+            break;
         }
-
-
-}
+    }
 
 private slots:
-void onRequestInvoke(QVariantHash vRequestMap, const QVariant&uploadedFiles){
-    if(this->listenQRPC==nullptr){
-        qFatal("listen pool is nullptr");
-    }
-    else{
+    void onRequestInvoke(QVariantHash vRequestMap, const QVariant&uploadedFiles){
+        if(this->listenQRPC==nullptr){
+            qFatal("listen pool is nullptr");
+        }
+
         auto requestPath=vRequestMap.value(qsl("requestPath")).toString();
         const auto&controllerSetting=this->listenQRPC->server()->controllerOptions().setting(requestPath);
         QRPCListenRequest request(vRequestMap, controllerSetting);
@@ -262,7 +242,6 @@ void onRequestInvoke(QVariantHash vRequestMap, const QVariant&uploadedFiles){
         this->lockedMutex.unlock();
         this->locked=false;
     }
-}
 };
 
 QRPCListenQRPCSlot::QRPCListenQRPCSlot(QRPCListenQRPC *listenQRPC):QThread(nullptr)
@@ -285,33 +264,29 @@ bool QRPCListenQRPCSlot::canRequestInvoke(QVariantHash&v, const QVariant &upload
     dPvt();
     if(p.locked)
         return false;
-    else if(!p.lockedMutex.tryLock(1))
+
+    if(!p.lockedMutex.tryLock(1))
         return false;
-    else{
-        p.locked=true;
-        this->start();
-        emit requestInvoke(v, uploadedFiles);
-        return true;
-    }
+
+    p.locked=true;
+    this->start();
+    emit requestInvoke(v, uploadedFiles);
+    return true;
 }
 
 void QRPCListenQRPCSlot::start()
 {
     QThread::start();
-    while(this->eventDispatcher()==nullptr){
+    while(this->eventDispatcher()==nullptr)
         QThread::msleep(1);
-    }
 }
 
 bool QRPCListenQRPCSlot::lock()
 {
     dPvt();
-    if(p.lockedMutex.tryLock(1)){
+    if(p.lockedMutex.tryLock(1))
         return true;
-    }
-    else{
-        return false;
-    }
+    return false;
 }
 
 void QRPCListenQRPCSlot::unlock()

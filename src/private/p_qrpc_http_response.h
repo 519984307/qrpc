@@ -25,6 +25,7 @@ public:
     virtual QNetworkReply::NetworkError &qtStatusCode() const;
     virtual QVariantHash toMap() const;
     virtual QVariantHash toHash() const;
+    virtual QVariantHash toResponse() const;
     virtual bool isOk() const;
     virtual bool isCreated() const;
     virtual bool isNotFound() const;

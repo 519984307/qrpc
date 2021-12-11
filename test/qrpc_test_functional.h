@@ -23,12 +23,14 @@ namespace QRpc {
     };
 
     static const QString default_route_rpc="/";
-    class Q_RPC_Interface : public QRpc::QRPCInterfaceCheck{
+    class Q_RPC_Interface : public QRpc::QRPCController
+    {
         Q_OBJECT
         Q_DECLARE_OBJECT()
         QRPC_DECLARE_ROUTE(InterfaceAgent, default_route_rpc)
+        Q_RPC_DECLARE_INTERFACE_METHOD_CHECK()
     public:
-        Q_INVOKABLE explicit Q_RPC_Interface(QObject *parent=nullptr):QRpc::QRPCInterfaceCheck(parent){
+        Q_INVOKABLE explicit Q_RPC_Interface(QObject *parent=nullptr):QRpc::QRPCController(parent){
         }
         Q_INVOKABLE ~Q_RPC_Interface(){
         }

@@ -57,8 +57,8 @@ QRPCHttpHeaders &QRPCHttpResponse::header() const
 void QRPCHttpResponse::setBody(const QVariant &vBody)
 {
     dPvt();
-    auto t=vBody.typeId();
-    if(t==QMetaType::QVariantMap || t==QMetaType::QVariantHash || t==QMetaType::QVariantList || t==QMetaType::QString){
+    auto t=qTypeId(vBody);
+    if(t==QMetaType_QVariantMap || t==QMetaType_QVariantHash || t==QMetaType_QVariantList || t==QMetaType_QString){
         if(this->header().isContentType(AppJson)){
             auto doc=QJsonDocument::fromVariant(vBody);
             p.response_body=doc.toJson(doc.Compact);
@@ -147,7 +147,7 @@ QVariantList QRPCHttpResponse::bodyArray() const
 QVariantList QRPCHttpResponse::bodyToList() const
 {
     auto v=this->bodyVariant();
-    if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList)
+    if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList)
         return v.toList();
 
     if(v.isValid())
@@ -184,6 +184,18 @@ QVariantHash QRPCHttpResponse::toHash() const
 {
     dPvt();
     return QJsonDocument::fromJson(p.response_body).object().toVariantHash();
+}
+
+QVariantHash QRPCHttpResponse::toResponse() const
+{
+    dPvt();
+    auto response_body=QJsonDocument::fromJson(p.response_body).object().toVariantHash();
+    QVariantHash vBody;
+    vBody[qsl("response_body")]=response_body;
+    vBody[qsl("qt_status_code")]=p.response_qt_status_code;
+    vBody[qsl("status_code")]=p.response_status_code;
+    vBody[qsl("reason_phrase")]=p.response_reason_phrase;
+    return vBody;
 }
 
 bool QRPCHttpResponse::isOk() const
@@ -275,9 +287,12 @@ QRPCHttpResponse&QRPCHttpResponse::print(const QString &output)
 QStringList QRPCHttpResponse::printOut(const QString &output)
 {
     auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
-    VariantUtil vu;
+    Q_DECLARE_VU;
     auto out=this->header().printOut(output);
     out<<qsl("%1%2.     %3").arg(space, output, this->toString().trimmed());
+    out<<qsl("%1%2.     statusCode==%3").arg(space, output).arg(this->statusCode());
+    out<<qsl("%1%2.     qtStatusCode==%3").arg(space, output).arg(this->qtStatusCode());
+    out<<qsl("%1%2.     reasonPhrase==%3").arg(space, output, this->reasonPhrase());
     return out;
 }
 

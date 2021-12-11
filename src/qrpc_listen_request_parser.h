@@ -17,7 +17,16 @@ class Q_RPC_EXPORT QRPCListenRequestParser : public QObject
     QRPC_PARSER_DECLARE_ROUTE(QRPCListenRequestParser,"/")
     friend class QRPCListenQRPCSlotPvt;
 public:
+
+    //!
+    //! \brief QRPCListenRequestParser
+    //! \param parent
+    //!
     Q_INVOKABLE explicit QRPCListenRequestParser(QObject *parent = nullptr);
+
+    //!
+    //! \brief ~QRPCListenRequestParser
+    //!
     Q_INVOKABLE ~QRPCListenRequestParser();
 
     //!

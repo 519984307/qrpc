@@ -54,40 +54,40 @@ public:
                         sWarning()<<tr("LocalServerListener: Cannot load certfile : %1").arg(certFile.fileName());
                         continue;
                     }
-                    else if(!keyFile.open(QIODevice::ReadOnly)){
+
+                    if(!keyFile.open(QIODevice::ReadOnly)){
                         sWarning()<<tr("LocalServerListener: Cannot load keyfile : %s").arg(keyFile.fileName());
                         continue;
                     }
+
+                    QSslCertificate certificate(&certFile, QSsl::Pem);
+                    QSslKey sslKey(&keyFile, QSsl::Rsa, QSsl::Pem);
+                    certFile.close();
+                    keyFile.close();
+                    QSslConfiguration sslConfiguration;
+                    sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
+                    sslConfiguration.setLocalCertificate(certificate);
+                    sslConfiguration.setPrivateKey(sslKey);
+
+                    auto server = new QWebSocketServer(qsl("SSL QRpcServer"),  QWebSocketServer::NonSecureMode, this);
+
+                    connect(server, &QWebSocketServer::newConnection,this, &WebSocketServer::onServerNewConnection);
+                    connect(server, &QWebSocketServer::closed, this, &WebSocketServer::onServerClosed);
+
+                    if (!server->listen(QHostAddress(QHostAddress::LocalHost), port)) {
+                        sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
+                        server->close();
+                        server->deleteLater();
+                    }
+                    else if(!server->isListening()){
+                        sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
+                        server->close();
+                        server->deleteLater();
+                    }
                     else{
-                        QSslCertificate certificate(&certFile, QSsl::Pem);
-                        QSslKey sslKey(&keyFile, QSsl::Rsa, QSsl::Pem);
-                        certFile.close();
-                        keyFile.close();
-                        QSslConfiguration sslConfiguration;
-                        sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
-                        sslConfiguration.setLocalCertificate(certificate);
-                        sslConfiguration.setPrivateKey(sslKey);
-
-                        auto server = new QWebSocketServer(qsl("SSL QRpcServer"),  QWebSocketServer::NonSecureMode, this);
-
-                        connect(server, &QWebSocketServer::newConnection,this, &WebSocketServer::onServerNewConnection);
-                        connect(server, &QWebSocketServer::closed, this, &WebSocketServer::onServerClosed);
-
-                        if (!server->listen(QHostAddress(QHostAddress::LocalHost), port)) {
-                            sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
-                            server->close();
-                            server->deleteLater();
-                        }
-                        else if(!server->isListening()){
-                            sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
-                            server->close();
-                            server->deleteLater();
-                        }
-                        else{
-                            RETURN=true;
-                            sDebug()<<QString("LocalServerListener: Listening on port %1").arg(port);
-                            this->servers.insert(port, server);
-                        }
+                        RETURN=true;
+                        sDebug()<<QString("LocalServerListener: Listening on port %1").arg(port);
+                        this->servers.insert(port, server);
                     }
 
                 }

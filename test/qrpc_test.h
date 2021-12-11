@@ -10,6 +10,7 @@
 #include <QLocale>
 #include <QJsonDocument>
 #include <gtest/gtest.h>
+#include "./qstm_types.h"
 
 namespace QRpc {
 
@@ -39,7 +40,7 @@ public:
 
     static QByteArray toMd5(const QVariant&v){
         QByteArray bytes;
-        if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList || v.typeId()==QMetaType::QVariantMap || v.typeId()==QMetaType::QVariantHash)
+        if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList || qTypeId(v)==QMetaType_QVariantMap || qTypeId(v)==QMetaType_QVariantHash)
             bytes=QJsonDocument::fromVariant(v).toJson(QJsonDocument::Compact);
         else
             bytes=v.toByteArray();
@@ -47,10 +48,9 @@ public:
     }
 
     static QVariant toVar(const QVariant&v){
-        if(v.typeId()==QMetaType::QString || v.typeId()==QMetaType::QByteArray)
+        if(QStmTypesListString.contains(qTypeId(v)))
             return QJsonDocument::fromJson(v.toByteArray()).toVariant();
-        else
-            return v;
+        return v;
     }
 
     static void SetUpTestCase()

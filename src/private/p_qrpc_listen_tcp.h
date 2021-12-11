@@ -7,6 +7,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCListenTCP class
+//!
 class Q_RPC_EXPORT QRPCListenTCP:public QRPCListen{
     Q_OBJECT
 public:
@@ -14,16 +17,16 @@ public:
     explicit QRPCListenTCP(QObject*parent=nullptr);
     Q_INVOKABLE ~QRPCListenTCP();
 
-    /**
-     * @brief start
-     * @return
-     */
+    //!
+    //! \brief start
+    //! \return
+    //!
     bool start()override;
 
-    /**
-     * @brief stop
-     * @return
-     */
+    //!
+    //! \brief stop
+    //! \return
+    //!
     bool stop()override;
 private:
     void*p=nullptr;

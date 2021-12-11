@@ -4,12 +4,23 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCListenLocalSocket class
+//!
 class Q_RPC_EXPORT QRPCListenLocalSocket:public QRPCListen{
     Q_OBJECT
 public:
 
+    //!
+    //! \brief QRPCListenLocalSocket
+    //! \param parent
+    //!
     explicit QRPCListenLocalSocket(QObject*parent=nullptr);
-    Q_INVOKABLE ~QRPCListenLocalSocket();
+
+    //!
+    //! \brief ~QRPCListenLocalSocket
+    //!
+    ~QRPCListenLocalSocket();
 
     /**
      * @brief start

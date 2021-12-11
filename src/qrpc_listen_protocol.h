@@ -74,6 +74,11 @@ public:
     //!
     virtual int protocol();
 private:
+
+    //!
+    //! \brief setProtocol
+    //! \param value
+    //!
     virtual void setProtocol(const int &value);
 public:
 

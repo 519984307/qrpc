@@ -32,10 +32,10 @@ public:
             i.next();
             if(i.key().trimmed().toLower()==vkey){
                 auto&v=i.value();
-                if(v.typeId()==QMetaType::QStringList){
+                if(qTypeId(v)==QMetaType_QStringList){
                     vList=v.toStringList();
                 }
-                else if(v.typeId()==QMetaType::QVariantList){
+                else if(qTypeId(v)==QMetaType_QVariantList){
                     for(auto&v:v.toList()){
                         vList<<v.toString();
                     }
@@ -92,7 +92,7 @@ QVariant QRPCHttpHeaders::rawHeader(const QString &headername)const
         if(i.key().toLower()==headername.toLower()){
             auto&v=i.value();
             QStringList vList;
-            if(v.typeId()==QMetaType::QVariantList || v.typeId()==QMetaType::QStringList){
+            if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList){
                 vList=v.toStringList();
             }
             else{
@@ -123,11 +123,11 @@ QRPCHttpHeaders &QRPCHttpHeaders::setRawHeader(const QVariantHash &rawHeader)
 QRPCHttpHeaders &QRPCHttpHeaders::setRawHeader(const QString &header, const QVariant &value)
 {
     QVariantList list;
-    if(value.typeId()==QMetaType::QStringList){
+    if(qTypeId(value)==QMetaType_QStringList){
         for(auto&v:value.toStringList())
             list<<v;
     }
-    else if(value.typeId()==QMetaType::QVariantList){
+    else if(qTypeId(value)==QMetaType_QVariantList){
         for(auto&v:value.toList())
             list<<v;
     }
@@ -176,11 +176,11 @@ QRPCHttpHeaders &QRPCHttpHeaders::addRawHeader(const QVariantHash &rawHeader)
 QRPCHttpHeaders &QRPCHttpHeaders::addRawHeader(const QString &header, const QVariant &value)
 {
     QVariantList list;
-    if(value.typeId()==QMetaType::QStringList){
+    if(qTypeId(value)==QMetaType_QStringList){
         for(auto&v:value.toStringList())
             list<<v;
     }
-    else if(value.typeId()==QMetaType::QVariantList){
+    else if(qTypeId(value)==QMetaType_QVariantList){
         for(auto&v:value.toList())
             list<<v;
     }
@@ -222,7 +222,7 @@ QRPCHttpHeaders &QRPCHttpHeaders::setContentType(const QVariant &v)
     p.header.remove(ContentTypeName);
     p.header.remove(ContentTypeName.toLower());
     QVariant value=v;
-    if(v.typeId()==QMetaType::QUrl){
+    if(qTypeId(v)==QMetaType_QUrl){
         value=QVariant();
         auto url=v.toUrl();
         if(url.isLocalFile()){
@@ -278,7 +278,7 @@ QRPCHttpHeaders &QRPCHttpHeaders::setAuthorization(const QString &authorization,
 {
 
     QString scredentials;
-    if(credentials.typeId()==QMetaType::QVariantMap){
+    if(qTypeId(credentials)==QMetaType_QVariantMap){
         QStringList params;
         QHashIterator<QString, QVariant> i(credentials.toHash());
         while (i.hasNext()) {
@@ -287,7 +287,7 @@ QRPCHttpHeaders &QRPCHttpHeaders::setAuthorization(const QString &authorization,
         }
         scredentials=params.join(qsl_space);
     }
-    else if(credentials.typeId()==QMetaType::QVariantHash){
+    else if(qTypeId(credentials)==QMetaType_QVariantHash){
         QStringList params;
         QHashIterator<QString, QVariant> i(credentials.toHash());
         while (i.hasNext()) {
@@ -325,16 +325,13 @@ QRPCHttpHeaders &QRPCHttpHeaders::setAuthorization(const QString &authorization,
 
     if(type!=Basic)
         return this->setAuthorization(authorization, stype, credentials);
-    else{
-        auto v=QByteArray::fromBase64(credentials.toByteArray());
-        if(!v.isEmpty()){
-            return this->setAuthorization(authorization, stype, credentials);
-        }
-        else{
-            v=credentials.toByteArray().toBase64();
-            return this->setAuthorization(authorization, stype, v);
-        }
-    }
+
+    auto v=QByteArray::fromBase64(credentials.toByteArray());
+    if(!v.isEmpty())
+        return this->setAuthorization(authorization, stype, credentials);
+
+    v=credentials.toByteArray().toBase64();
+    return this->setAuthorization(authorization, stype, v);
 }
 
 
@@ -488,7 +485,7 @@ QRPCHttpHeaders &QRPCHttpHeaders::operator=(const QVariant &v)
     dPvt();
     p.header.clear();
     QVariantHash vMap;
-    if(v.typeId()==QMetaType::QString || v.typeId()==QMetaType::QByteArray)
+    if(qTypeId(v)==QMetaType_QString || qTypeId(v)==QMetaType_QByteArray)
         vMap=QJsonDocument::fromJson(v.toByteArray()).toVariant().toHash();
     else
         vMap=v.toHash();
@@ -498,7 +495,7 @@ QRPCHttpHeaders &QRPCHttpHeaders::operator=(const QVariant &v)
 QRPCHttpHeaders &QRPCHttpHeaders::operator<<(const QVariant &v)
 {
     QVariantHash vMap;
-    if(v.typeId()==QMetaType::QString || v.typeId()==QMetaType::QByteArray)
+    if(qTypeId(v)==QMetaType_QString || qTypeId(v)==QMetaType_QByteArray)
         vMap=QJsonDocument::fromJson(v.toByteArray()).toVariant().toHash();
     else
         vMap=v.toHash();

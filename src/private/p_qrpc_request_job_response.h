@@ -60,18 +60,18 @@ public:
      * @return
      */
     QRPCRequestJobResponse &operator =(QRPCRequestJobResponse &e){
-        this->request_exchange              = e.request_exchange                    ;
-        this->qrpcRequest                   = e.qrpcRequest                         ;
-        this->request_url                   = e.request_url                         ;
-        this->request_header                = e.request_header                      ;
-        this->request_body                  = e.request_body                        ;
-        this->activityLimit                 =(e.activityLimit>0)?e.activityLimit:this->activityLimit;
-        this->request_start                 = e.request_start                       ;
-        this->response_status_code          = e.response_status_code                ;
-        this->response_status_reason_phrase = e.response_status_reason_phrase       ;
-        this->response_body                 = e.response_body                       ;
-        this->response_qt_status_code       = e.response_qt_status_code             ;
-        this->responseHeader                = e.responseHeader                      ;
+        this->request_exchange=e.request_exchange;
+        this->qrpcRequest=e.qrpcRequest;
+        this->request_url=e.request_url;
+        this->request_header=e.request_header;
+        this->request_body=e.request_body;
+        this->activityLimit=(e.activityLimit>0)?e.activityLimit:this->activityLimit;
+        this->request_start=e.request_start;
+        this->response_status_code=e.response_status_code;
+        this->response_status_reason_phrase=e.response_status_reason_phrase;
+        this->response_body=e.response_body;
+        this->response_qt_status_code=e.response_qt_status_code;
+        this->responseHeader=e.responseHeader;
         return*this;
     }
 
