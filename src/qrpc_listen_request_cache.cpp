@@ -14,23 +14,18 @@ class QRPCListenRequestCachePvt:public QObject{
 public:
     QMutex lock;
     QHash<QString, QRPCListenRequest*> cache;
-    QRPCListen*listen()
-    {
+    QRPCListen*listen(){
         auto listen=dynamic_cast<QRPCListen*>(this->parent()->parent());
         return listen;
-    }
 
-    explicit QRPCListenRequestCachePvt(QObject*parent):QObject(parent)
-    {
+    };
+    explicit QRPCListenRequestCachePvt(QObject*parent):QObject(parent){
     }
-
-    virtual ~QRPCListenRequestCachePvt()
-    {
+    virtual ~QRPCListenRequestCachePvt(){
         this->clear();
     }
 
-    void clear()
-    {
+    void clear(){
         QMutexLOCKER locker(&this->lock);
         auto aux=this->cache;
         this->cache.clear();
@@ -62,7 +57,8 @@ QRPCListenRequest &QRPCListenRequestCache::toRequest(const QUuid &uuid)
     auto request=p.cache.value(uuid.toString());
     if(request!=nullptr)
         return*request;
-    return ___QRPCListenRequest;
+    else
+        return ___QRPCListenRequest;
 }
 
 QRPCListenRequest &QRPCListenRequestCache::createRequest()

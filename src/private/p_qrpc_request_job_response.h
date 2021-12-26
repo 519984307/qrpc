@@ -82,7 +82,7 @@ public:
 
     QVariantHash toMapResponse(){
         QVariantHash map;
-        Q_DECLARE_VU;
+        VariantUtil vu;
         map.insert(qsl("finish"), QDateTime::currentDateTime());
         map.insert(qsl("header"), this->responseHeader);
         map.insert(qsl("status_code"), this->response_status_code);

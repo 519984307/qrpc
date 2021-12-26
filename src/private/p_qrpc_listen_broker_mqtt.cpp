@@ -8,17 +8,14 @@ namespace QRpc {
 
 class QRPCListenBrokerMQTTPvt{
 public:
-    explicit QRPCListenBrokerMQTTPvt(QRPCListenBrokerMQTT*object)
-    {
+    explicit QRPCListenBrokerMQTTPvt(QRPCListenBrokerMQTT*object){
         Q_UNUSED(object)
     }
-    virtual ~QRPCListenBrokerMQTTPvt()
-    {
+    virtual ~QRPCListenBrokerMQTTPvt(){
     }
 };
 
-QRPCListenBrokerMQTT::QRPCListenBrokerMQTT(QObject *parent):QRPCListen(parent)
-{
+QRPCListenBrokerMQTT::QRPCListenBrokerMQTT(QObject *parent):QRPCListen(parent){
     this->p = new QRPCListenBrokerMQTTPvt(this);
 }
 

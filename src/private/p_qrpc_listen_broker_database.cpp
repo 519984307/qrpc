@@ -26,20 +26,17 @@ public:
     QMutex lock;
     bool realMessageOnException=false;
 
-    explicit DataBaseListenerServer(QObject* parent=nullptr):QObject(parent)
-    {
+    explicit DataBaseListenerServer(QObject* parent=nullptr):QObject(parent){
         Q_UNUSED(parent)
         this->realMessageOnException=false;
     }
 
-    QRPCListenBrokerDataBase*listen()
-    {
+    QRPCListenBrokerDataBase*listen(){
         auto _listen=dynamic_cast<QRPCListenBrokerDataBase*>(this->parent());
         return _listen;
     }
 
-    bool queueStart()
-    {
+    bool queueStart(){
         auto colletions=this->listen()->colletions();
         auto&option=colletions->protocol(QRPCProtocol::DataBase);
         for(auto&v:option.port()){
@@ -60,8 +57,7 @@ public:
         return this->isListening();
     }
 
-    void queueRemove(const QString&connectionName)
-    {
+    void queueRemove(const QString&connectionName){
         auto __connection=listenersQSqlDatabase.value(connectionName);
         if(__connection.isValid()){
             QObject::disconnect(__connection.driver(), QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &DataBaseListenerServer::service);
@@ -74,8 +70,7 @@ public:
         }
     }
 
-    QSqlDatabase queueMake(const QVariantHash&options)
-    {
+    QSqlDatabase queueMake(const QVariantHash&options){
         Q_UNUSED(options)
 
         auto driver=options[qsl("driver")].toString().trimmed();
@@ -116,8 +111,7 @@ public:
     }
 
 public slots:
-    void queueCheck()
-    {
+    void queueCheck(){
         if(this->lock.tryLock(1000)){
             Q_V_DATABASE_ITERATOR(this->listenersQSqlDatabase){
                 i.next();
@@ -135,8 +129,7 @@ public slots:
         }
     }
 public:
-    void queueStop()
-    {
+    void queueStop(){
         QMutexLOCKER locker(&this->lock);
         auto v=this->listenersQSqlDatabase;
         this->listenersQSqlDatabase.clear();
@@ -146,8 +139,7 @@ public:
         }
     }
 
-    bool isListening()
-    {
+    bool isListening(){
         QMutexLOCKER locker(&this->lock);
         Q_V_DATABASE_ITERATOR(this->listenersQSqlDatabase){
             i.next();
@@ -160,8 +152,7 @@ public:
 
 
 
-    void service(const QString &requestPath, QSqlDriver::NotificationSource, const QVariant &payload)
-    {
+    void service(const QString &requestPath, QSqlDriver::NotificationSource, const QVariant &payload){
 
         auto listen=this->listen();
         auto&request=listen->cacheRequest()->createRequest(payload);
@@ -245,40 +236,41 @@ public:
 
 public slots:
 
-    void onRpcResponse(QUuid uuid,const QVariantHash&vRequest)
-    {
+    void onRpcResponse(QUuid uuid,const QVariantHash&vRequest){
         auto&request=this->listen()->cacheRequest()->toRequest(uuid);
-        if(!request.isValid())
-            return;
-        if(!request.fromResponseMap(vRequest))
-            request.co().setInternalServerError();
-        emit request.finish();
+        if(request.isValid()){
+            if(!request.fromResponseMap(vRequest)){
+                request.co().setInternalServerError();
+            }
+            emit request.finish();
+        }
     }
-    void onRPCResponseClient(QSqlDriver*sqlDriver, const QString&requestPath, const QVariantHash&responseBody)
-    {
+    void onRPCResponseClient(QSqlDriver*sqlDriver, const QString&requestPath, const QVariantHash&responseBody){
+
+
         auto connectionName=this->listenersQSqlDrivers.key(sqlDriver);
         auto connection=this->listenersQSqlDatabase.value(connectionName);
-        if(!connection.isValid())
-            return;
-        connectionName=connectionName+qsl("_response");
-        connection=QSqlDatabase::cloneDatabase(connection.connectionName(), connectionName);
-        if(!connection.isOpen()){
-            connection.open();
+        if(connection.isValid()){
+            connectionName=connectionName+qsl("_response");
+            connection=QSqlDatabase::cloneDatabase(connection.connectionName(), connectionName);
+            if(!connection.isOpen()){
+                connection.open();
+            }
+            if(connection.isOpen()){
+                auto responseBytes=QJsonDocument::fromVariant(responseBody).toJson();
+                QString command;
+                auto dbDriverType=sqlDriver->dbmsType();
+                if(dbDriverType==QSqlDriver::PostgreSQL){
+                    command=QString("select pg_notify('%1', '%2');").arg(requestPath, responseBytes);
+                }
+                if(!command.isEmpty()){
+                    auto q=connection.exec(command);
+                    q.finish();
+                    q.clear();
+                }
+                connection.close();
+            }
         }
-        if(!connection.isOpen())
-            return;
-        auto responseBytes=QJsonDocument::fromVariant(responseBody).toJson();
-        QString command;
-        auto dbDriverType=sqlDriver->dbmsType();
-        if(dbDriverType==QSqlDriver::PostgreSQL){
-            command=QString("select pg_notify('%1', '%2');").arg(requestPath, responseBytes);
-        }
-        if(!command.isEmpty()){
-            auto q=connection.exec(command);
-            q.finish();
-            q.clear();
-        }
-        connection.close();
 
     }
 

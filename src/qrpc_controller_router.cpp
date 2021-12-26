@@ -12,7 +12,8 @@ public:
     explicit ConstsQRPCControllerRouter(){
         defaultRouters<<&QRPCControllerRouter::staticMetaObject;
     }
-    virtual ~ConstsQRPCControllerRouter(){
+    ~ConstsQRPCControllerRouter(){
+
     }
 };
 Q_GLOBAL_STATIC_WITH_ARGS(ConstsQRPCControllerRouter, __constsQRPCControllerRouter, (ConstsQRPCControllerRouter()))
@@ -21,8 +22,7 @@ static auto&constsQRPCControllerRouter=*__constsQRPCControllerRouter;
 class QRPCControllerRouterPvt{
 public:
     QRPCControllerRouter*ControllerRouter=nullptr;
-    explicit QRPCControllerRouterPvt(QRPCControllerRouter*parent)
-    {
+    explicit QRPCControllerRouterPvt(QRPCControllerRouter*parent){
         this->ControllerRouter=parent;
     }
 
@@ -54,7 +54,9 @@ bool QRPCControllerRouter::installDefaultRouter(const QMetaObject*metaObject)
         constsQRPCControllerRouter.defaultRouters<<metaObject;
         return true;
     }
-    constsQRPCControllerRouter.defaultRouters<<&QRPCControllerRouter::staticMetaObject;
+    else{
+        constsQRPCControllerRouter.defaultRouters<<&QRPCControllerRouter::staticMetaObject;
+    }
     return false;
 }
 
@@ -66,15 +68,17 @@ QRPCControllerRouter *QRPCControllerRouter::newRouter(QObject *parent)
     auto&defaultRouter=defaultRouters.first();
 
     if(defaultRouters.isEmpty())
-        return new QRPCControllerRouter(parent);
+        router=new QRPCControllerRouter(parent);
+    else{
+        auto object=defaultRouter->newInstance(Q_ARG(QObject*, parent));
+        router=dynamic_cast<QRPCControllerRouter*>(object);
+        if(router==nullptr){
+            if(object!=nullptr)
+                delete object;
 
-    auto object=defaultRouter->newInstance(Q_ARG(QObject*, parent));
-    router=dynamic_cast<QRPCControllerRouter*>(object);
-    if(router!=nullptr)
-        return router;
-    if(object!=nullptr)
-        delete object;
-    return nullptr;
+        }
+    }
+    return router;
 }
 
 }

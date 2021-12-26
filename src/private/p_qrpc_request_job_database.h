@@ -230,9 +230,8 @@ public:
 
 private slots:
 
-    void onReceiveBroker(const QString &responseTopic, QSqlDriver::NotificationSource, const QVariant &responseBody)
-    {
-        Q_DECLARE_VU;
+    void onReceiveBroker(const QString &responseTopic, QSqlDriver::NotificationSource, const QVariant &responseBody){
+        VariantUtil vu;
         if(!this->listen_response.fromHash(responseBody.toHash())){
             response->response_qt_status_code=QNetworkReply::InternalServerError;
             response->response_status_code=501;

@@ -138,7 +138,7 @@ QStringList QRPCRequestExchangeSetting::printOut(const QString &output)
 {
     auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
     QStringList out;
-    Q_DECLARE_VU;
+    VariantUtil vu;
     auto vMap=this->toHash();
     if(!vMap.isEmpty()){
         out<<qsl("%1%2 attributes").arg(space, output).trimmed();

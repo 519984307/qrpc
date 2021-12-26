@@ -12,31 +12,21 @@ namespace QRpc {
             auto url=qsl("%1:%2/%3").arg(this->hostName()).arg(this->port()).arg(route);
             while(url.contains(qsl("//")))
                 url=url.replace(qsl("//"), qsl("/"));
-
-
-            switch (qTypeId(protocol())) {
-            case QMetaType_QVariantList:
-            case QMetaType_QStringList:
-            {
+            if(qTypeId(protocol())==QMetaType_QVariantList || qTypeId(protocol())==QMetaType_QStringList){
                 auto record=this->protocol().toList();
                 for(const auto&v:record){
                     QString protocol;
-                    switch (qTypeId(v)) {
-                    case QMetaType_Int:
+                    if(qTypeId(v)==QMetaType_Int)
                         protocol=QRPCProtocolName.value(v.toInt());
-                        break;
-                    case QMetaType_QString:
-                    case QMetaType_QByteArray:
+                    else if(qTypeId(v)==QMetaType_QString || qTypeId(v)==QMetaType_QByteArray)
                         protocol=v.toString().toLower();
-                        break;
-                    default:
+                    else
                         continue;
-                    }
+
                     vList<<qsl("%1://%2").arg(protocol,url);
                 }
-                break;
             }
-            default:
+            else{
                 const auto protocol=this->protocol().toString();
                 vList<<qsl("%1://%2").arg(protocol,url);;
             }

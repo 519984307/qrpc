@@ -48,7 +48,7 @@ namespace QRpc {
         /**
          * @brief vu
          */
-        Q_DECLARE_VU;
+        VariantUtil vu;
     public:
 
         QString authorizationBasic() const;

@@ -34,39 +34,37 @@ public:
     }
 
     bool start(){
+        bool RETURN=false;
 
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::TcpSocket);
+        //auto port=protocol.port();
         this->stop();
 
-        if(!protocol.enabled())
-            return false;
-
-        bool RETURN=false;
-        for(auto&sport:protocol.port()){
-            auto port=sport.toInt();
-            if(port<=0)
-                continue;
-
-            auto server = new QTcpServer(this);
-            connect(server, &QTcpServer::newConnection,this, &ServerTCPSocket::onServerNewConnection);
-            if (!server->listen(QHostAddress::LocalHost, port)) {
-                sWarning()<<tr("WebsocketListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
-                server->close();
-                server->deleteLater();
-                continue;
+        if(protocol.enabled()){
+            for(auto&sport:protocol.port()){
+                auto port=sport.toInt();
+                if(port>0){
+                    auto server = new QTcpServer(this);
+                    connect(server, &QTcpServer::newConnection,this, &ServerTCPSocket::onServerNewConnection);
+                    if (!server->listen(QHostAddress::LocalHost, port)) {
+                        sWarning()<<tr("WebsocketListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
+                        server->close();
+                        server->deleteLater();
+                    }
+                    else{
+                        if(server->isListening()){
+                            RETURN=true;
+                            sDebug()<<QString("TcpsocketListener: Listening on port %i").arg(port);
+                            this->servers.insert(port, server);
+                        }
+                        else{
+                            sWarning()<<tr("TcpsocketListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
+                            server->close();
+                            server->deleteLater();
+                        }
+                    }
+                }
             }
-
-            if(server->isListening()){
-                RETURN=true;
-                sDebug()<<QString("TcpsocketListener: Listening on port %i").arg(port);
-                this->servers.insert(port, server);
-                continue;
-            }
-
-            sWarning()<<tr("TcpsocketListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
-            server->close();
-            server->deleteLater();
-            continue;
         }
 
         if(!RETURN){

@@ -264,7 +264,7 @@ virtual QString module()const override{\
     return __return;\
 }\
 virtual QUuid moduleUuid()const override{\
-    Q_DECLARE_VU;\
+    VariantUtil vu;\
     static auto __return=vu.toMd5Uuid(vmodule);\
     return __return;\
 }

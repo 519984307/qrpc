@@ -8,17 +8,14 @@ namespace QRpc {
 
 class QRPCListenBrokerKAFKAPvt{
 public:
-    explicit QRPCListenBrokerKAFKAPvt(QRPCListenBrokerKAFKA*object)
-    {
+    explicit QRPCListenBrokerKAFKAPvt(QRPCListenBrokerKAFKA*object){
         Q_UNUSED(object)
     }
-    virtual ~QRPCListenBrokerKAFKAPvt()
-    {
+    virtual ~QRPCListenBrokerKAFKAPvt(){
     }
 };
 
-QRPCListenBrokerKAFKA::QRPCListenBrokerKAFKA(QObject *parent):QRPCListen(parent)
-{
+QRPCListenBrokerKAFKA::QRPCListenBrokerKAFKA(QObject *parent):QRPCListen(parent){
     this->p = new QRPCListenBrokerKAFKAPvt(this);
 }
 

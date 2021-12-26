@@ -22,20 +22,17 @@ public:
     QRPCListenQRPC*listenQRPC=nullptr;
     QList<const QMetaObject*> listenQRPCControllers;
     QList<const QMetaObject*> listenQRPCParserRequest;
-    explicit QRPCListenQRPCSlotPvt(QRPCListenQRPCSlot*slot, QRPCListenQRPC*listenQRPC) : QObject(slot)
-    {
+    explicit QRPCListenQRPCSlotPvt(QRPCListenQRPCSlot*slot, QRPCListenQRPC*listenQRPC) : QObject(slot){
         QObject::connect(slot, &QRPCListenQRPCSlot::requestInvoke, this, &QRPCListenQRPCSlotPvt::onRequestInvoke);
         this->listenQRPC = listenQRPC;
         this->listenQRPCControllers=listenQRPC->server()->controllers();
         this->listenQRPCParserRequest=listenQRPC->server()->parsers();
         this->controllerRouter=QRPCControllerRouter::newRouter(this);
     }
-    virtual ~QRPCListenQRPCSlotPvt()
-    {
+    virtual ~QRPCListenQRPCSlotPvt(){
     }
 
-    void invokeController(QRPCListenRequest&request)
-    {
+    void invokeController(QRPCListenRequest&request){
         request.co().setMethodNotAllowed();
         QMetaMethod metaMethod;
         auto requestPath=request.requestPath().toLower();
@@ -173,6 +170,8 @@ public:
             if(parameterCount==1){
                 switch (parameterType) {
                 case QMetaType_QVariantMap:
+                    vArgValue=request.toMap();
+                    break;
                 case QMetaType_QVariantHash:
                     vArgValue=request.toHash();
                     break;

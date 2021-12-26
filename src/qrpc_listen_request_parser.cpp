@@ -29,12 +29,10 @@ Q_GLOBAL_STATIC(QMutex, staticMetaObjectLock);
 class QRPCListenRequestParserPvt{
 public:
     QRPCController*controller=nullptr;
-    explicit QRPCListenRequestParserPvt(QObject*parent=nullptr)
-    {
+    explicit QRPCListenRequestParserPvt(QObject*parent=nullptr){
         Q_UNUSED(parent)
     }
-    virtual ~QRPCListenRequestParserPvt()
-    {
+    virtual ~QRPCListenRequestParserPvt(){
     }
 };
 
@@ -63,7 +61,9 @@ QRPCListenRequest &QRPCListenRequestParser::request()
         req.clear();
         return req;
     }
-    return p.controller->request();
+    else{
+        return p.controller->request();
+    }
 }
 
 QRPCListenRequest &QRPCListenRequestParser::rq()
@@ -79,7 +79,8 @@ bool QRPCListenRequestParser::canRoute(const QMetaObject &metaObject, const QStr
     auto route2=QRpc::Util::routeExtract(route).toLower();
     if(route==route2 || route==route2 || route1==route2)
         return true;
-    return false;
+    else
+        return false;
 }
 
 bool QRPCListenRequestParser::routeToMethod(const QMetaObject &metaObject, const QString &route, QMetaMethod&outMethod)
@@ -90,10 +91,10 @@ bool QRPCListenRequestParser::routeToMethod(const QMetaObject &metaObject, const
         auto v0=QRpc::Util::routeExtractMethod(route);
         for(auto&v:list){
             auto v1=QByteArray(v.name()).toLower();
-            if(v0!=v1)
-                continue;
-            outMethod=v;
-            return outMethod.isValid();
+            if(v0==v1){
+                outMethod=v;
+                return outMethod.isValid();
+            }
         }
     }
     outMethod=QMetaMethod();
@@ -104,37 +105,36 @@ void QRPCListenRequestParser::makeRoute(const QMetaObject &metaObject)
 {
     QScopedPointer<QObject> scopePointer(metaObject.newInstance(Q_ARG(QObject*, nullptr )));
     auto object=scopePointer.data();
-    if(object==nullptr)
-        return;
+    if(object!=nullptr){
+        auto parser=dynamic_cast<QRPCListenRequestParser*>(object);
+        if(parser!=nullptr){
+            static const auto ignoreNames=QVector<QString>()<<qsl("route")<<qsl("makeRoute");
+            auto className=QByteArray(metaObject.className());
+            if(!staticMetaObjectRoute->contains(className)){
+                auto route=parser->route();
+                QMutexLOCKER locker(staticMetaObjectLock);
+                staticMetaObjectRoute->insert(className, route);
+                for(int methodIndex = 0; methodIndex < metaObject.methodCount(); ++methodIndex) {
+                    auto method = metaObject.method(methodIndex);
+                    if(method.returnType()!=QMetaType_Bool)
+                        continue;
 
-    auto parser=dynamic_cast<QRPCListenRequestParser*>(object);
-    if(parser==nullptr)
-        return;
+                    if(method.parameterCount()>0)
+                        continue;
 
-    static const auto ignoreNames=QVector<QString>()<<qsl("route")<<qsl("makeRoute");
-    auto className=QByteArray(metaObject.className());
-    if(staticMetaObjectRoute->contains(className))
-        return;
+                    if(ignoreNames.contains(method.name()))
+                        continue;
 
-    auto route=parser->route();
-    QMutexLOCKER locker(staticMetaObjectLock);
-    staticMetaObjectRoute->insert(className, route);
-    for(int methodIndex = 0; methodIndex < metaObject.methodCount(); ++methodIndex) {
-        auto method = metaObject.method(methodIndex);
-        if(method.returnType()!=QMetaType_Bool)
-            continue;
-
-        if(method.parameterCount()>0)
-            continue;
-
-        if(ignoreNames.contains(method.name()))
-            continue;
-
+                    {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-        staticMetaObjectMetaMethod->insert(className, method);
+                        staticMetaObjectMetaMethod->insert(className, method);
 #else
-        staticMetaObjectMetaMethod->insertMulti(className, method);
+                        staticMetaObjectMetaMethod->insertMulti(className, method);
 #endif
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -147,16 +147,16 @@ bool QRPCListenRequestParser::parse(const QMetaMethod&metaMethod)
 #if Q_RPC_LOG
         sWarning()<<"Parser not valid "<<className;
 #endif
-        return this->rq().co().setInternalServerError().isOK();
     }
-    if(!returnVariant){//Unauthorized
+    else if(!returnVariant){//Unauthorized
 #if Q_RPC_LOG
         sWarning()<<"Parser validation error "<<className;
 #endif
-        return this->rq().co().setInternalServerError().isOK();
     }
-
-    return true;
+    else{
+        return true;
+    }
+    return this->rq().co().setInternalServerError().isOK();
 }
 
 void QRPCListenRequestParser::setController(QRPCController *value)

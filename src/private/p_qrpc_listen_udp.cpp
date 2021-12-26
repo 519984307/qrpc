@@ -24,29 +24,28 @@ public:
     }
 
     bool start(){
+        bool RETURN=true;
 
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::UdpSocket);
         this->stop();
 
-        if(!protocol.enabled())
-            return false;
-
-        bool RETURN=true;
-        for(auto&sport:protocol.port()){
-            auto port=sport.toInt();
-            if(port<=0)
-                continue;
-
-            auto server = new QUdpSocket(this);
-            connect(server, &QUdpSocket::readyRead, this, &ServerUDPSocket::onClientConnected);
-            if(server->bind(QHostAddress::LocalHost, port))
-                continue;
-            RETURN=false;
-            break;
+        if(protocol.enabled()){
+            for(auto&sport:protocol.port()){
+                auto port=sport.toInt();
+                if(port>0){
+                    auto server = new QUdpSocket(this);
+                    connect(server, &QUdpSocket::readyRead, this, &ServerUDPSocket::onClientConnected);
+                    if(!server->bind(QHostAddress::LocalHost, port)){
+                        RETURN=false;
+                        break;
+                    }
+                }
+            }
         }
 
-        if(!RETURN)
+        if(!RETURN){
             this->stop();
+        }
 
         return RETURN;
 

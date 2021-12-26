@@ -59,8 +59,7 @@ public:
         return __return;
     }
 
-    void setSettings(const QVariantHash&settings, const QVariantHash&defaultSettings)
-    {
+    void setSettings(const QVariantHash&settings, const QVariantHash&defaultSettings){
         static auto exceptionProperty=QStringList{qsl("protocol"),qsl("protocolname"),qsl("optionname")};
         this->settingsHash=settings.isEmpty()?this->settingsHash:settings;
         const QMetaObject* metaObject = dynamic_cast<QRPCListenProtocol*>(this->parent())->metaObject();
@@ -73,41 +72,28 @@ public:
 
             propertyName=QString::fromUtf8(property.name());
             auto value=this->settingsHash.value(propertyName);
-            if(!value.isValid())
+            if(!value.isValid()){
                 value=defaultSettings.value(propertyName);
+            }
+            if(!property.write(this->parent(), value)){
+                if(qTypeId(property)==QMetaType_QUuid && property.write(this->parent(), value.toUuid()))
+                    continue;
 
-            if(property.write(this->parent(), value))
-                continue;
+                if((qTypeId(property)==QMetaType_LongLong || qTypeId(property)==QMetaType_ULongLong) && property.write(this->parent(), value.toLongLong()))
+                    continue;
 
-            switch (qTypeId(property)) {
-            case QMetaType_QUuid:
-                if(property.write(this->parent(), value.toUuid()))
+                if((qTypeId(property)==QMetaType_Int || qTypeId(property)==QMetaType_UInt) && property.write(this->parent(), value.toInt()))
                     continue;
-                break;
-            case QMetaType_LongLong:
-            case QMetaType_ULongLong:
-                if(property.write(this->parent(), value.toLongLong()))
+
+                if((qTypeId(property)==QMetaType_Bool) && property.write(this->parent(), value.toBool()))
                     continue;
-                break;
-            case QMetaType_Int:
-            case QMetaType_UInt:
-                if(property.write(this->parent(), value.toInt()))
-                    continue;
-                break;
-            case QMetaType_Bool:
-                if(property.write(this->parent(), value.toBool()))
-                    continue;
-                break;
-            default:
-                break;
             }
         }
-        this->makeHash();
+        this->makeMap();
     }
 
 
-    QRPCListenProtocolPvt&makeHash()
-    {
+    QRPCListenProtocolPvt&makeMap(){
         this->settingsHash.clear();
         this->settings->clear();
         const QMetaObject* metaObject = dynamic_cast<QRPCListenProtocol*>(this->parent())->metaObject();
@@ -122,10 +108,11 @@ public:
     }
 
 public slots:
-    void changeMap()
-    {
-        this->makeHash();
+    void changeMap(){
+        this->makeMap();
     }
+
+
 };
 
 QRPCListenProtocol::QRPCListenProtocol(QObject *parent):QObject(parent)
@@ -141,7 +128,7 @@ QRPCListenProtocol::QRPCListenProtocol(int protocol, const QMetaObject&metaObjec
     p.protocol = protocol;
     p.optionName = p.protocolName();
     p.protocolMetaObject = metaObject;
-    p.makeHash();
+    p.makeMap();
 }
 
 bool QRPCListenProtocol::isValid() const
@@ -154,18 +141,18 @@ QRPCListen*QRPCListenProtocol::makeListen()
 {
     dPvt();
     auto object=p.protocolMetaObject.newInstance();
-    if(object==nullptr)
-        return nullptr;
-
-    auto listen=dynamic_cast<QRPCListen*>(object);
-    if(listen==nullptr){
-        delete object;
-        object=nullptr;
-        return nullptr;
+    if(object!=nullptr){
+        auto listen=dynamic_cast<QRPCListen*>(object);
+        if(listen==nullptr){
+            delete object;
+            object=nullptr;
+        }
+        else{
+            object->setObjectName(qsl("lis_%1").arg(QString::fromUtf8(this->protocolName())));
+        }
+        return listen;
     }
-
-    object->setObjectName(qsl("lis_%1").arg(QString::fromUtf8(this->protocolName())));
-    return listen;
+    return nullptr;
 }
 
 int QRPCListenProtocol::protocol()
@@ -359,42 +346,42 @@ void QRPCListenProtocol::setQueue(const QVariantList &value)
 QVariantList QRPCListenProtocol::port() const
 {
     dPvt();
-    if(!p.port.isEmpty())
-        return p.port;
+    if(p.port.isEmpty()){
+        QByteArray port;
+        if(p.protocol==QRPCProtocol::TcpSocket)
+            port=listen_tcp_port;
+        else if(p.protocol==QRPCProtocol::UdpSocket)
+            port=listen_udp_port;
+        else if(p.protocol==QRPCProtocol::WebSocket)
+            port=listen_web_port;
+        else if(p.protocol==QRPCProtocol::Http || p.protocol==QRPCProtocol::Https)
+            port=listen_http_port;
+        else if(p.protocol==QRPCProtocol::Amqp)
+            port=listen_amqp_port;
+        else if(p.protocol==QRPCProtocol::Mqtt)
+            port=listen_mqtt_port;
+        else if(p.protocol==QRPCProtocol::DataBase)
+            port=listen_database_port;
+        else if(p.protocol==QRPCProtocol::Kafka)
+            port=listen_kafka_port;
+        else
+            port=qbl_null;
 
-    switch (p.protocol) {
-    case QRPCProtocol::TcpSocket:
-        return QVariantList{listen_tcp_port};
-    case QRPCProtocol::UdpSocket:
-        return QVariantList{listen_udp_port};
-    case QRPCProtocol::WebSocket:
-        return QVariantList{listen_web_port};
-    case QRPCProtocol::Http:
-    case QRPCProtocol::Https:
-        return QVariantList{listen_http_port};
-    case QRPCProtocol::Amqp:
-        return QVariantList{listen_amqp_port};
-    case QRPCProtocol::Mqtt:
-        return QVariantList{listen_mqtt_port};
-    case QRPCProtocol::DataBase:
-        return QVariantList{listen_database_port};
-    case QRPCProtocol::Kafka:
-        return QVariantList{listen_kafka_port};
-    default:
-        return QVariantList{};
+        if(!port.isEmpty())
+            p.port<<QByteArray(port).trimmed();
     }
+
+    return p.port;
 }
 
 void QRPCListenProtocol::setPort(const QVariant &value)
 {
     dPvt();
     QVariantList l;
-    switch (qTypeId(value)) {
-    case QMetaType_QStringList:
-    case QMetaType_QVariantList:
+    if(qTypeId(value)==QMetaType_QStringList || qTypeId(value)==QMetaType_QVariantList){
         l=value.toList();
-        break;
-    default:
+    }
+    else{
         l<<value;
     }
     p.port=l;
@@ -403,26 +390,26 @@ void QRPCListenProtocol::setPort(const QVariant &value)
 QVariantMap QRPCListenProtocol::toMap() const
 {
     dPvt();
-    return QVariant(p.makeHash().settingsHash).toMap();
+    return QVariant(p.makeMap().settingsHash).toMap();
 }
 
 QVariantHash &QRPCListenProtocol::toHash() const
 {
     dPvt();
-    return p.makeHash().settingsHash;
+    return p.makeMap().settingsHash;
 }
 
 QSettings &QRPCListenProtocol::settings() const
 {   
     dPvt();
-    return*p.makeHash().settings;
+    return*p.makeMap().settings;
 }
 
 QSettings *QRPCListenProtocol::makeSettings(QObject*parent)
 {
     dPvt();
     auto settings=new QSettings(parent);
-    Q_V_HASH_ITERATOR(p.makeHash().settingsHash){
+    Q_V_HASH_ITERATOR(p.makeMap().settingsHash){
         i.next();
         settings->setValue(i.key().toLower(), i.value());
     }
@@ -432,7 +419,7 @@ QSettings *QRPCListenProtocol::makeSettings(QObject*parent)
 QVariantHash QRPCListenProtocol::makeSettingsHash()const
 {
     dPvt();
-    return p.makeHash().settingsHash;
+    return p.makeMap().settingsHash;
 }
 
 bool QRPCListenProtocol::enabled() const

@@ -37,63 +37,61 @@ public:
     }
 
     bool start(){
+        bool RETURN=false;
 
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::WebSocket);
 
         this->stop();
 
-        if(!protocol.enabled())
-            return false;
+        if(protocol.enabled()){
+            for(auto&sport:protocol.port()){
+                auto port=sport.toInt();
+                if(port>0){
+                    QFile certFile(qsl(":/sslconfiguration/rpc.cert"));
+                    QFile keyFile(qsl(":/sslconfiguration/rpc.key"));
 
-        bool RETURN=false;
-        for(auto&sport:protocol.port()){
-            auto port=sport.toInt();
-            if(port<=0)
-                continue;
+                    if(!certFile.open(QIODevice::ReadOnly)){
+                        sWarning()<<tr("LocalServerListener: Cannot load certfile : %1").arg(certFile.fileName());
+                        continue;
+                    }
 
-            QFile certFile(qsl(":/sslconfiguration/rpc.cert"));
-            QFile keyFile(qsl(":/sslconfiguration/rpc.key"));
+                    if(!keyFile.open(QIODevice::ReadOnly)){
+                        sWarning()<<tr("LocalServerListener: Cannot load keyfile : %s").arg(keyFile.fileName());
+                        continue;
+                    }
 
-            if(!certFile.open(QIODevice::ReadOnly)){
-                sWarning()<<tr("LocalServerListener: Cannot load certfile : %1").arg(certFile.fileName());
-                continue;
+                    QSslCertificate certificate(&certFile, QSsl::Pem);
+                    QSslKey sslKey(&keyFile, QSsl::Rsa, QSsl::Pem);
+                    certFile.close();
+                    keyFile.close();
+                    QSslConfiguration sslConfiguration;
+                    sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
+                    sslConfiguration.setLocalCertificate(certificate);
+                    sslConfiguration.setPrivateKey(sslKey);
+
+                    auto server = new QWebSocketServer(qsl("SSL QRpcServer"),  QWebSocketServer::NonSecureMode, this);
+
+                    connect(server, &QWebSocketServer::newConnection,this, &WebSocketServer::onServerNewConnection);
+                    connect(server, &QWebSocketServer::closed, this, &WebSocketServer::onServerClosed);
+
+                    if (!server->listen(QHostAddress(QHostAddress::LocalHost), port)) {
+                        sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
+                        server->close();
+                        server->deleteLater();
+                    }
+                    else if(!server->isListening()){
+                        sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
+                        server->close();
+                        server->deleteLater();
+                    }
+                    else{
+                        RETURN=true;
+                        sDebug()<<QString("LocalServerListener: Listening on port %1").arg(port);
+                        this->servers.insert(port, server);
+                    }
+
+                }
             }
-
-            if(!keyFile.open(QIODevice::ReadOnly)){
-                sWarning()<<tr("LocalServerListener: Cannot load keyfile : %s").arg(keyFile.fileName());
-                continue;
-            }
-
-            QSslCertificate certificate(&certFile, QSsl::Pem);
-            QSslKey sslKey(&keyFile, QSsl::Rsa, QSsl::Pem);
-            certFile.close();
-            keyFile.close();
-            QSslConfiguration sslConfiguration;
-            sslConfiguration.setPeerVerifyMode(QSslSocket::VerifyNone);
-            sslConfiguration.setLocalCertificate(certificate);
-            sslConfiguration.setPrivateKey(sslKey);
-
-            auto server = new QWebSocketServer(qsl("SSL QRpcServer"),  QWebSocketServer::NonSecureMode, this);
-
-            connect(server, &QWebSocketServer::newConnection,this, &WebSocketServer::onServerNewConnection);
-            connect(server, &QWebSocketServer::closed, this, &WebSocketServer::onServerClosed);
-
-            if (!server->listen(QHostAddress(QHostAddress::LocalHost), port)) {
-                sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
-                server->close();
-                server->deleteLater();
-                continue;
-            }
-
-            if(!server->isListening()){
-                sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
-                server->close();
-                server->deleteLater();
-                continue;
-            }
-            RETURN=true;
-            sDebug()<<QString("LocalServerListener: Listening on port %1").arg(port);
-            this->servers.insert(port, server);
         }
 
         if(!RETURN){
@@ -113,98 +111,92 @@ public:
             }
         }
         for(auto&server:this->servers){
-            if(server==nullptr)
-                continue;
-            server->disconnect();
-            delete server;
-            server=nullptr;
+            if(server!=nullptr){
+                server->disconnect();
+                delete server;
+                server=nullptr;
+            }
         }
         return true;
     };
 
-    void onRpcFinish(QRPCListenRequest&request)
-    {
-        if(request.isValid())
-            return;
-
-        auto socket = this->clientsMap.value(request.requestUuid());
-        if(socket==nullptr)
-            return;
-
-        socket->sendBinaryMessage(request.toJson());
-        socket->flush();
-        emit request.finish();
+    void onRpcFinish(QRPCListenRequest&request){
+        if(request.isValid()){
+            auto socket = this->clientsMap.value(request.requestUuid());
+            if(socket!=nullptr){
+                socket->sendBinaryMessage(request.toJson());
+                socket->flush();
+                //socket->close();//NO CLOSE
+            }
+            emit request.finish();
+        }
     }
 
-    void onRpcRequest(QRPCListenRequest&request)
-    {
+    void onRpcRequest(QRPCListenRequest&request){
         if(!request.isValid()){
             request.co().setBadRequest();
             this->onRpcFinish(request);
-            return;
         }
-        emit this->listen().rpcRequest(request.toHash(), QVariant());
+        else{
+            emit this->listen().rpcRequest(request.toHash(), QVariant());
+        }
 
     }
 
 public slots:
 
-    void onRpcResponse(QUuid uuid, QVariantHash vRequest)
-    {
+
+
+    void onRpcResponse(QUuid uuid, QVariantHash vRequest){
         auto&request=this->listen().cacheRequest()->toRequest(uuid);
-        if(!request.isValid())
-            return;
-        if(!request.fromResponseMap(vRequest))
-            request.co().setInternalServerError();
-        onRpcFinish(request);
+        if(request.isValid()){
+            if(!request.fromResponseMap(vRequest))
+                request.co().setInternalServerError();
+            onRpcFinish(request);
+        }
     }
 
 
-    void onServerNewConnection()
-    {
+    void onServerNewConnection(){
         auto server=dynamic_cast<QWebSocketServer*>(QObject::sender());
-        if(server==nullptr)
-            return;
-        auto socket = server->nextPendingConnection();
-        QObject::connect(socket, &QWebSocket::disconnected          , this, &WebSocketServer::onClientDisconnected);
-        QObject::connect(socket, &QWebSocket::binaryMessageReceived , this, &WebSocketServer::onBodyBinary);
-        QObject::connect(socket, &QWebSocket::textMessageReceived   , this, &WebSocketServer::onBodyText);
+        if(server!=nullptr){
+            auto socket = server->nextPendingConnection();
+            connect(socket, &QWebSocket::disconnected          , this, &WebSocketServer::onClientDisconnected);
+            connect(socket, &QWebSocket::binaryMessageReceived , this, &WebSocketServer::onBodyBinary);
+            connect(socket, &QWebSocket::textMessageReceived   , this, &WebSocketServer::onBodyText);
+        }
     }
 
-    void onServerClosed()
-    {
+    void onServerClosed(){
 
     }
 
-    void onBodyText(QString bytes)
-    {
+    void onBodyText(QString bytes){
         auto socket = qobject_cast<QWebSocket*>(QObject::sender());
-        if (socket==nullptr)
-            return;
-        auto&request=this->listen().cacheRequest()->createRequest(bytes);
-        this->clientsMap.insert(request.requestUuid(), socket);
-        this->onRpcRequest(request);
+        if (socket!=nullptr) {
+            auto&request=this->listen().cacheRequest()->createRequest(bytes);
+            this->clientsMap.insert(request.requestUuid(), socket);
+            this->onRpcRequest(request);
+        }
     }
 
-    void onBodyBinary(QByteArray bytes)
-    {
+    void onBodyBinary(QByteArray bytes) {
         auto socket = qobject_cast<QWebSocket*>(QObject::sender());
-        if (socket==nullptr)
-            return;
-        auto&request=this->listen().cacheRequest()->createRequest(bytes);
-        this->clientsMap.insert(request.requestUuid(), socket);
-        this->onRpcRequest(request);
+        if (socket!=nullptr) {
+            auto&request=this->listen().cacheRequest()->createRequest(bytes);
+            this->clientsMap.insert(request.requestUuid(), socket);
+            this->onRpcRequest(request);
+        }
     }
 
-    void onClientDisconnected()
-    {
+    void onClientDisconnected()    {
         auto socket = qobject_cast<QWebSocket*>(QObject::sender());
-        if (socket==nullptr)
-            return;
-        auto key=this->clientsMap.key(socket);
-        if(!key.isNull())
-            this->clientsMap.remove(key);
-        socket->deleteLater();
+        if (socket!=nullptr) {
+            auto key=this->clientsMap.key(socket);
+            if(!key.isNull())
+                this->clientsMap.remove(key);
+            socket->deleteLater();
+        }
     }
 
 };
@@ -218,13 +210,10 @@ class QRPCListenWebSocketPvt:public QObject{
 public:
     WebSocketServer*_listenServer=nullptr;
 
-    explicit QRPCListenWebSocketPvt(QRPCListenWebSocket*parent):QObject(parent)
-    {
+    explicit QRPCListenWebSocketPvt(QRPCListenWebSocket*parent):QObject(parent){
         this->_listenServer = new WebSocketServer(parent);
     }
-
-    virtual ~QRPCListenWebSocketPvt()
-    {
+    virtual ~QRPCListenWebSocketPvt(){
         this->_listenServer->stop();
         delete this->_listenServer;
         this->_listenServer=nullptr;
