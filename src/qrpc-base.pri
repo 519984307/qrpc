@@ -2,7 +2,7 @@ QT += core
 QT += network
 QT += websockets
 
-INCLUDEPATH+=$$PWD
+#INCLUDEPATH+=$$PWD
 
 HEADERS += \
     $$PWD/private/p_qrpc_controller_options.h \

@@ -3,13 +3,13 @@
 #include <QLocalServer>
 #include <QLocalSocket>
 #include <QFile>
-#include "./qrpc_macro.h"
-#include "./qrpc_server.h"
-#include "./qrpc_listen.h"
-#include "./qrpc_listen_colletion.h"
-#include "./qrpc_listen_protocol.h"
-#include "./qrpc_listen_request.h"
-#include "./qrpc_listen_request_cache.h"
+#include "../qrpc_macro.h"
+#include "../qrpc_server.h"
+#include "../qrpc_listen.h"
+#include "../qrpc_listen_colletion.h"
+#include "../qrpc_listen_protocol.h"
+#include "../qrpc_listen_request.h"
+#include "../qrpc_listen_request_cache.h"
 
 
 namespace QRpc {

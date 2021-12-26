@@ -6,12 +6,12 @@
 #include "../3rdparty/qtwebapp/httpserver/staticfilecontroller.h"
 #include "../3rdparty/qtwebapp/httpserver/httpsessionstore.h"
 #include "../../../qstm/src/qstm_url.h"
-#include "./qrpc_server.h"
-#include "./qrpc_macro.h"
-#include "./qrpc_listen_colletion.h"
-#include "./qrpc_listen_protocol.h"
-#include "./qrpc_listen_request.h"
-#include "./qrpc_listen_request_cache.h"
+#include "../qrpc_server.h"
+#include "../qrpc_macro.h"
+#include "../qrpc_listen_colletion.h"
+#include "../qrpc_listen_protocol.h"
+#include "../qrpc_listen_request.h"
+#include "../qrpc_listen_request_cache.h"
 
 namespace QRpc {
 

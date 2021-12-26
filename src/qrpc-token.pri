@@ -2,7 +2,7 @@ QT += core
 QT += network
 QT += websockets
 
-INCLUDEPATH+=$$PWD
+#INCLUDEPATH+=$$PWD
 
 HEADERS += \
     $$PWD/qrpc_token_pool.h

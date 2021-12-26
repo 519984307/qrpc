@@ -1,6 +1,6 @@
 include($$PWD/../qrpc.pri)
 
-INCLUDEPATH+=$$PWD
+#INCLUDEPATH+=$$PWD
 
 CONFIG += console
 CONFIG -= debug_and_release

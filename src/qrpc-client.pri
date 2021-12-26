@@ -2,6 +2,8 @@ QT += core
 QT += network
 QT += websockets
 
+#INCLUDEPATH+=$$PWD
+
 HEADERS += \
     $$PWD/private/p_qrpc_http_headers.h \
     $$PWD/private/p_qrpc_http_response.h \
@@ -32,5 +34,3 @@ SOURCES += \
     $$PWD/qrpc_request_exchange_setting.cpp \
     $$PWD/qrpc_request.cpp \
     $$PWD/private/p_qrpc_util.cpp \
-
-INCLUDEPATH+=$$PWD

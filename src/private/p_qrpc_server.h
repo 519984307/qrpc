@@ -7,11 +7,11 @@
 #include <QList>
 #include <QDebug>
 #include <QMutex>
-#include "./qrpc_server.h"
-#include "./qrpc_listen_colletion.h"
-#include "./qrpc_controller_options.h"
-#include "./private/p_qrpc_listen_qrpc.h"
+#include "../qrpc_server.h"
+#include "../qrpc_listen_colletion.h"
+#include "../qrpc_controller_options.h"
 #include "../qrpc_controller.h"
+#include "./p_qrpc_listen_qrpc.h"
 
 namespace QRpc {
 

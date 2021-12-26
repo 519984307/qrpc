@@ -2,7 +2,7 @@ QT += core
 QT += network
 QT += websockets
 
-INCLUDEPATH+=$$PWD
+#INCLUDEPATH+=$$PWD
 
 include($$PWD/src/qrpc-base.pri)
 include($$PWD/src/qrpc-token.pri)

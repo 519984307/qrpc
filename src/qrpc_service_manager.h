@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../qstm/src/qstm_setting_manager.h"
+#include "../../qstm/src/qstm_setting_manager.h"
 #include "./qrpc_global.h"
 #include "./qrpc_service_setting.h"
 #include <QSettings>
