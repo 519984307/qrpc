@@ -17,7 +17,7 @@ QRPC_DECLARE_REQUEST_CLASS(Q_RPC_RequestHTTPFunctionalV1,QRpc::AppJson,/)
 
 TEST_F(Q_RPC_RequestHTTPFunctional, serviceStart)
 {
-    EXPECT_EQ(this->serviceStart(),true)<<"fail: service start";
+    EXPECT_TRUE(this->serviceStart())<<"fail: service start";
 }
 
 TEST_F(Q_RPC_RequestHTTPFunctional, check_header)
@@ -67,7 +67,7 @@ TEST_F(Q_RPC_RequestHTTPFunctional, check_delete)
 
 TEST_F(Q_RPC_RequestHTTPFunctional, serviceStop)
 {
-    EXPECT_EQ(this->serviceStop(),true)<<"fail: service stop";
+    EXPECT_TRUE(this->serviceStop())<<"fail: service stop";
 }
 
 }

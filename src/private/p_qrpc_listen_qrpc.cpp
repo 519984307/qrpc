@@ -28,28 +28,29 @@ public:
     QMap<QUuid, QRPCListen*> listens;
     QRPCServer*server=nullptr;
 
-    explicit QRPCListenQRPCPvt(QRPCListenQRPC*parent):QObject(parent){
+    explicit QRPCListenQRPCPvt(QRPCListenQRPC*parent):QObject(parent)
+    {
         this->listenQRPC = dynamic_cast<QRPCListenQRPC*>(this->parent());
         if(this->listenQRPC!=nullptr)
             this->server = this->listenQRPC->server();
     }
-    virtual ~QRPCListenQRPCPvt(){
-        {
-            auto list=listenSlotCache.values();
-            listenSlotCache.clear();
-            qDeleteAll(list);
-        }
+    virtual ~QRPCListenQRPCPvt()
+    {
+        auto list=listenSlotCache.values();
+        listenSlotCache.clear();
+        qDeleteAll(list);
     }
 
-    void registerListen(QRPCListen*listen){
+    void registerListen(QRPCListen*listen)
+    {
         auto listenQRPC=this->listenQRPC;
-        if(listen!=listenQRPC){
-            if(!this->listens.contains(listen->uuid())){
-                this->listens.insert(listen->uuid(), listen);
-                listen->registerListenPool(listenQRPC);
-                QObject::connect(listen, &QRPCListen::rpcRequest, this, &QRPCListenQRPCPvt::onRpcRequest);
-            }
-        }
+        if(listen==listenQRPC)
+            return;
+        if(this->listens.contains(listen->uuid()))
+            return;
+        this->listens.insert(listen->uuid(), listen);
+        listen->registerListenPool(listenQRPC);
+        QObject::connect(listen, &QRPCListen::rpcRequest, this, &QRPCListenQRPCPvt::onRpcRequest);
     }
 
 public slots:
@@ -82,10 +83,10 @@ public slots:
         auto requestInvoke=[&listenSlotList, &vMap, &uploadedFiles](QRPCListenQRPCSlot*&thread){
             thread=nullptr;
             for(auto&v:*listenSlotList){
-                if(v->canRequestInvoke(vMap, uploadedFiles)){
-                    thread=v;
-                    return true;
-                }
+                if(!v->canRequestInvoke(vMap, uploadedFiles))
+                    continue;
+                thread=v;
+                return true;
             }
             return false;
         };
@@ -137,13 +138,14 @@ void QRPCListenQRPC::run()
         for(auto&mObj:this->server()->parsers()){
             auto name=QString::fromUtf8(mObj->className()).split(qsl("::")).last().toUtf8();
             auto object=mObj->newInstance(Q_ARG(QObject*, nullptr ));
-            if(object!=nullptr){
-                auto controller=dynamic_cast<QRPCListenRequestParser*>(object);
-                if(controller!=nullptr)
-                    p.parsers.insert(name,mObj);
-                delete object;
-                object=nullptr;
-            }
+            if(object==nullptr)
+                continue;
+
+            auto controller=dynamic_cast<QRPCListenRequestParser*>(object);
+            if(controller!=nullptr)
+                p.parsers.insert(name,mObj);
+            delete object;
+            object=nullptr;
         }
     }
 
@@ -153,15 +155,15 @@ void QRPCListenQRPC::run()
         for(auto&mObj:this->server()->controllers()){
             auto name=QString::fromUtf8(mObj->className()).split(qsl("::")).last().toUtf8();
             auto object=mObj->newInstance(Q_ARG(QObject*, nullptr ));
-            if(object!=nullptr){
-                auto controller=dynamic_cast<QRPCController*>(object);
-                if(controller!=nullptr){
-                    controller->makeRoute();
-                    p.controller.insert(name,mObj);
-                }
-                delete object;
-                object=nullptr;
+            if(object==nullptr)
+                continue;
+            auto controller=dynamic_cast<QRPCController*>(object);
+            if(controller!=nullptr){
+                controller->makeRoute();
+                p.controller.insert(name,mObj);
             }
+            delete object;
+            object=nullptr;
         }
     }
 

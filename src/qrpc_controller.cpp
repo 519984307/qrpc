@@ -105,13 +105,16 @@ public:
     ControllerSetting controllerSetting;
     bool enabled=true;
 
-    explicit QRPCControllerPvt(){
+    explicit QRPCControllerPvt()
+    {
     }
 
-    virtual ~QRPCControllerPvt(){
+    virtual ~QRPCControllerPvt()
+    {
     }
 
-    static void makeRoute(QObject*makeObject, const QMetaObject*metaObject){
+    static void makeRoute(QObject*makeObject, const QMetaObject*metaObject)
+    {
         static QMutex controllerMethodsMutex;
 
         auto className=QByteArray(metaObject->className()).toLower().trimmed();
@@ -152,21 +155,22 @@ public:
                 continue;
             }
 
-            if(controller!=nullptr){
-                const auto vRoute=controller->route();
-                auto vList=qTypeId(vRoute)==QMetaType_QStringList?vRoute.toStringList():QStringList{vRoute.toString()};
-                for(auto&v:vList){
-                    auto route=v.replace(qsl("*"),qsl_null).toLower().toUtf8();
-                    route=qbl("/")+route+qbl("/")+methodName;
-                    while(route.contains(qbl("\"")) || route.contains(qbl("//"))){
-                        route=QString(route).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/")).toUtf8();
-                    }
-                    if(ctrMethods.contains(route))
-                        continue;
+            if(controller==nullptr)
+                continue;
 
-                    ctrMethods.insert(route, mMth);
-                    staticControllerRoutes.insert(route, mMth);
+            const auto vRoute=controller->route();
+            auto vList=qTypeId(vRoute)==QMetaType_QStringList?vRoute.toStringList():QStringList{vRoute.toString()};
+            for(auto&v:vList){
+                auto route=v.replace(qsl("*"),qsl_null).toLower().toUtf8();
+                route=qbl("/")+route+qbl("/")+methodName;
+                while(route.contains(qbl("\"")) || route.contains(qbl("//"))){
+                    route=QString(route).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/")).toUtf8();
                 }
+                if(ctrMethods.contains(route))
+                    continue;
+
+                ctrMethods.insert(route, mMth);
+                staticControllerRoutes.insert(route, mMth);
             }
         }
         staticControllerMethods.insert(className, ctrMethods);
@@ -275,13 +279,14 @@ bool QRPCController::methodExists(const QByteArray &methodName)const
     auto __route=QRpc::Util::routeExtract(methodName);
     _methodName=QRpc::Util::routeExtractMethod(methodName);
     auto route=QRpc::Util::routeParser(this->route());
-    if(__route.isEmpty() || route==__route){
-        auto mObj=this->metaObject();
-        for (int i = 0; i < mObj->methodCount(); ++i) {
-            auto mMth = mObj->method(i);
-            if(mMth.name().toLower()==_methodName)
-                return true;
-        }
+    if(!(__route.isEmpty() || route==__route))
+        return false;
+
+    auto mObj=this->metaObject();
+    for (int i = 0; i < mObj->methodCount(); ++i) {
+        auto mMth = mObj->method(i);
+        if(mMth.name().toLower()==_methodName)
+            return true;
     }
     return false;
 }
@@ -380,22 +385,26 @@ bool QRPCController::requestBeforeInvoke()
         insertHeaderResponse(qsl("Vary"), qsl("Accept-Encoding, Origin"));
         insertHeaderResponse(qsl("Keep-Alive"), keepAlive);
         insertHeaderResponse(qsl("Connection"), connection);
-    }
-    else{
-        //https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-        header_application_json=(!header_application_json.isEmpty())?header_application_json:qsl("text/javascripton");
-        insertHeaderResponse(qsl("Date"), QDateTime::currentDateTime().toString(Qt::TextDate));
-        insertHeaderResponse(qsl("Server"), this->server()->serverName() );
-        insertHeaderResponse(qsl("Access-Control-Allow-Origin"), accessControlAllowOrigin);
-        insertHeaderResponse(qsl("Vary"), qsl("Accept-Encoding, Origin"));
-        insertHeaderResponse(qsl("Keep-Alive"), keepAlive);
-        insertHeaderResponse(qsl("Connection"), connection);
-        insertHeaderResponse(qsl("Connection-Type"), connectionType);
 
+        rq.setResponseHeader(vHearderResponse);
+        rq.co().setOK();
+        return rq.co().isOK();
     }
+
+    //https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+    header_application_json=(!header_application_json.isEmpty())?header_application_json:qsl("text/javascripton");
+    insertHeaderResponse(qsl("Date"), QDateTime::currentDateTime().toString(Qt::TextDate));
+    insertHeaderResponse(qsl("Server"), this->server()->serverName() );
+    insertHeaderResponse(qsl("Access-Control-Allow-Origin"), accessControlAllowOrigin);
+    insertHeaderResponse(qsl("Vary"), qsl("Accept-Encoding, Origin"));
+    insertHeaderResponse(qsl("Keep-Alive"), keepAlive);
+    insertHeaderResponse(qsl("Connection"), connection);
+    insertHeaderResponse(qsl("Connection-Type"), connectionType);
+
     rq.setResponseHeader(vHearderResponse);
     rq.co().setOK();
     return rq.co().isOK();
+
 }
 
 bool QRPCController::requestRedirect()
@@ -483,10 +492,10 @@ QVariantHash QRPCController::routeFlags(const QString &route) const
     for (int row = 0; row < metaObject.propertyCount(); ++row) {
         auto property = metaObject.property(row);
         auto n2=QByteArray(property.name()).toLower();
-        if(n1==n2){
-            auto flags=property.read(this);
-            return flags.toHash();
-        }
+        if(n1!=n2)
+            continue;
+        auto flags=property.read(this);
+        return flags.toHash();
     }
     return {};
 }

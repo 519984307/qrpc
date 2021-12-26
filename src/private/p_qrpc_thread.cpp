@@ -11,10 +11,12 @@ class QRPCThreadPvt{
 public:
     QMutex lockRunWait;
     QMutex mutexRunning;
-    explicit QRPCThreadPvt(){
+    explicit QRPCThreadPvt()
+    {
     }
 
-    virtual ~QRPCThreadPvt(){
+    virtual ~QRPCThreadPvt()
+    {
     }
 
 };

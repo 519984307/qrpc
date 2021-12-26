@@ -39,7 +39,7 @@ QRPC_DECLARE_REQUEST_CLASS(Q_RPC_RequestFunctionalV1CORS,QRpc::AppJson,/)
 
 TEST_F(Q_RPC_RequestFunctionalCORS, serviceStart)
 {
-    EXPECT_EQ(this->serviceStart(),true)<<"fail: service start";
+    EXPECT_TRUE(this->serviceStart())<<"fail: service start";
 }
 
 TEST_F(Q_RPC_RequestFunctionalCORS, check_header)
@@ -90,7 +90,7 @@ TEST_F(Q_RPC_RequestFunctionalCORS, check_delete)
 
 TEST_F(Q_RPC_RequestFunctionalCORS, serviceStop)
 {
-    EXPECT_EQ(this->serviceStop(),true)<<"fail: service stop";
+    EXPECT_TRUE(this->serviceStop())<<"fail: service stop";
 }
 
 }
