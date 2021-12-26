@@ -1,7 +1,7 @@
 #pragma once
 
 #include "./qrpc_global.h"
-#include "./qstm_setting_base.h"
+#include "../../qstm/src/qstm_setting_base.h"
 #include <QVariant>
 #include <QVariantHash>
 

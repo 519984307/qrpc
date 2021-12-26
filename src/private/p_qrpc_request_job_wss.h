@@ -3,7 +3,7 @@
 #include "./p_qrpc_request_job_protocol.h"
 #include "./qrpc_macro.h"
 #include "./qrpc_listen_request.h"
-#include <QWebSocket>
+#include <QtWebSockets/QWebSocket>
 #include <QFile>
 #include <QSslConfiguration>
 #include <QSslKey>

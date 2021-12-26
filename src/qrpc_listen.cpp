@@ -3,10 +3,11 @@
 #include "./qrpc_listen_request_cache.h"
 #include <QDateTime>
 #include <QProcess>
+#include <QCoreApplication>
 #include <QCryptographicHash>
 
 namespace PrivateQRpc {
-    Q_GLOBAL_STATIC(QByteArray, baseUuid);
+    Q_GLOBAL_STATIC(QByteArray, baseUuid)
 }
 
 namespace QRpc {
@@ -16,31 +17,37 @@ static auto&baseUuid=*PrivateQRpc::baseUuid;
 #define dPvt()\
     auto&p =*reinterpret_cast<QRPCListenPvt*>(this->p)
 
+
+static void init()
+{
+    QProcess process;
+    auto bytes=process.environment().join(qsl(",")).toUtf8()+QDateTime::currentDateTime().toString().toUtf8();
+    baseUuid=QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex();
+}
+
+Q_COREAPP_STARTUP_FUNCTION(init)
+
 class QRPCListenPvt:public QObject{
 public:
     QUuid uuid;
     QRPCListen*listenPool=nullptr;
     QRPCListenRequestCache cacheRequest;
-    explicit QRPCListenPvt(QRPCListen*parent):QObject(parent), cacheRequest(parent){
-        if(baseUuid.isEmpty()){
-            QProcess process;
-            auto bytes=process.environment().join(qsl(",")).toUtf8()+QDateTime::currentDateTime().toString().toUtf8();
-            baseUuid=QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex();
-        }
-        auto uuidNs = QUuid::createUuid();
-        this->uuid=QUuid::createUuidV5(uuidNs, baseUuid);
+    QRPCListenColletions*collections=nullptr;
+    QRPCServer*server=nullptr;
+    explicit QRPCListenPvt(QRPCListen*parent):QObject(parent), cacheRequest(parent)
+    {
+        this->uuid=QUuid::createUuidV5(QUuid::createUuid(), baseUuid);
     }
 
-    virtual ~QRPCListenPvt(){
+    virtual ~QRPCListenPvt()
+    {
     }
 
-    QRPCListen*listen(){
+    QRPCListen*listen()
+    {
         auto listen=dynamic_cast<QRPCListen*>(this->parent());
         return listen;
     }
-
-    QRPCListenColletions*collections=nullptr;
-    QRPCServer*server=nullptr;
 };
 
 QRPCListen::QRPCListen(QObject *parent):QThread(nullptr)
@@ -85,16 +92,14 @@ bool QRPCListen::start()
 
 bool QRPCListen::stop()
 {
-    if(this->isRunning()){
-        QThread::quit();
-        while(this->eventDispatcher()==nullptr)
-            QThread::msleep(1);
-        if(this->wait(1000))
-            return true;
-        else
-            return false;
-    }
-    return true;
+    if(!this->isRunning())
+        return true;
+    QThread::quit();
+    while(this->eventDispatcher()==nullptr)
+        QThread::msleep(1);
+    if(this->wait(1000))
+        return true;
+    return false;
 }
 
 QRPCServer *QRPCListen::server()

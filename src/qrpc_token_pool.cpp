@@ -1,5 +1,5 @@
 #include "./qrpc_token_pool.h"
-#include "./qstm_types.h"
+#include "../../qstm/src/qstm_types.h"
 #include <QTimer>
 
 namespace QRpc {

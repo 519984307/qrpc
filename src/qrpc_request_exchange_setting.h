@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./qstm_object.h"
+#include "../../qstm/src/qstm_object.h"
 #include "./qrpc_global.h"
 #include "./qrpc_types.h"
 

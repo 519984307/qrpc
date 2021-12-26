@@ -1,13 +1,13 @@
 #include "./p_qrpc_listen_http.h"
 #include <QCryptographicHash>
 #include <QCoreApplication>
-#include "./httprequesthandler.h"
-#include "./httplistener.h"
-#include "./staticfilecontroller.h"
-#include "./httpsessionstore.h"
+#include "../3rdparty/qtwebapp/httpserver/httprequesthandler.h"
+#include "../3rdparty/qtwebapp/httpserver/httplistener.h"
+#include "../3rdparty/qtwebapp/httpserver/staticfilecontroller.h"
+#include "../3rdparty/qtwebapp/httpserver/httpsessionstore.h"
+#include "../../../qstm/src/qstm_url.h"
 #include "./qrpc_server.h"
 #include "./qrpc_macro.h"
-#include "./qstm_url.h"
 #include "./qrpc_listen_colletion.h"
 #include "./qrpc_listen_protocol.h"
 #include "./qrpc_listen_request.h"
@@ -18,11 +18,13 @@ namespace QRpc {
 class HttpListeners3drparty{
 public:
 
-    explicit HttpListeners3drparty(){
+    explicit HttpListeners3drparty()
+    {
 
     }
 
-    virtual ~HttpListeners3drparty(){
+    virtual ~HttpListeners3drparty()
+    {
         this->free();
     }
 
@@ -31,7 +33,8 @@ public:
     stefanfrings::StaticFileController *fileController=nullptr;
     stefanfrings::HttpListener *listener=nullptr;
 
-    static HttpListeners3drparty*make(stefanfrings::HttpRequestHandler*requestHandler, QSettings*settings){
+    static HttpListeners3drparty*make(stefanfrings::HttpRequestHandler*requestHandler, QSettings*settings)
+    {
         auto __return=new HttpListeners3drparty();
         __return->settings = settings;
         __return->listener = new stefanfrings::HttpListener(settings, requestHandler, requestHandler);
@@ -41,7 +44,8 @@ public:
         return __return;
     };
 
-    void free(){
+    void free()
+    {
         this->listener->close();
         this->listener->deleteLater();
         this->settings->deleteLater();
@@ -58,33 +62,36 @@ public:
     QMutex lock;
     bool realMessageOnException=false;
 
-    explicit HttpServer3drparty(QObject* parent=nullptr):stefanfrings::HttpRequestHandler(parent){
+    explicit HttpServer3drparty(QObject* parent=nullptr):stefanfrings::HttpRequestHandler(parent)
+    {
         this->realMessageOnException=false;
         auto colletions=this->listen()->colletions();
         auto&option=colletions->protocol(QRPCProtocol::Http);
         for(auto&v:option.port()){
             auto port=v.toInt();
-            if(port>0){
-                auto settings=option.makeSettings(this);
-                if(!this->realMessageOnException)
-                    this->realMessageOnException=option.realMessageOnException();
-                settings->setValue(qsl("port"),port);
-                this->listenersPort<<HttpListeners3drparty::make(this, settings);
-            }
+            if(port<=0)
+                continue;
+            auto settings=option.makeSettings(this);
+            if(!this->realMessageOnException)
+                this->realMessageOnException=option.realMessageOnException();
+            settings->setValue(qsl("port"),port);
+            this->listenersPort<<HttpListeners3drparty::make(this, settings);
         }
     }
 
-    bool isListening(){
+    bool isListening()
+    {
         QMutexLOCKER locker(&this->lock);
         for(auto&h:this->listenersPort){
-            if(h->listener->isListening()){
-                return true;
-            }
+            if(!h->listener->isListening())
+                continue;
+            return true;
         }
         return false;
     }
 
-    virtual ~HttpServer3drparty(){
+    virtual ~HttpServer3drparty()
+    {
         QMutexLOCKER locker(&this->lock);
         auto aux=this->listenersPort;
         this->listenersPort.clear();
@@ -96,7 +103,8 @@ public:
         return _listen;
     }
 
-    void service(stefanfrings::HttpRequest &req, stefanfrings::HttpResponse &ret){
+    void service(stefanfrings::HttpRequest &req, stefanfrings::HttpResponse &ret)
+    {
         Q_UNUSED(req)
         Q_UNUSED(ret)
         const auto time_start=QDateTime::currentDateTime();
@@ -269,14 +277,15 @@ public:
 
 public slots:
 
-    void onRpcResponse(QUuid uuid,const QVariantHash&vRequest){
+    void onRpcResponse(QUuid uuid,const QVariantHash&vRequest)
+    {
         auto&request=this->listen()->cacheRequest()->toRequest(uuid);
-        if(request.isValid()){
-            if(!request.fromResponseMap(vRequest)){
-                request.co().setInternalServerError();
-            }
-            emit request.finish();
+        if(!request.isValid())
+            return;
+        if(!request.fromResponseMap(vRequest)){
+            request.co().setInternalServerError();
         }
+        emit request.finish();
     }
 };
 
@@ -289,11 +298,13 @@ public:
     HttpServer3drparty*_listenServer=nullptr;
     QRPCListenHTTP*parent=nullptr;
 
-    explicit QRPCListenHTTPPvt(QRPCListenHTTP*parent):QObject(parent){
+    explicit QRPCListenHTTPPvt(QRPCListenHTTP*parent):QObject(parent)
+    {
         this->parent=parent;
     }
 
-    virtual ~QRPCListenHTTPPvt(){
+    virtual ~QRPCListenHTTPPvt()
+    {
     }
 
     bool start(){
@@ -303,7 +314,8 @@ public:
         return p._listenServer->isListening();
     }
 
-    bool stop(){
+    bool stop()
+    {
         auto&p=*this;
         if(p._listenServer!=nullptr){
             QObject::disconnect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3drparty::onRpcResponse);

@@ -1,11 +1,11 @@
 #ifndef QRPCListenHTTP_P_H
 #define QRPCListenHTTP_P_H
 
-#include <QWebSocket>
-#include <QWebSocketServer>
+#include <QtWebSockets/QWebSocket>
+#include <QtWebSockets/QWebSocketServer>
 #include "../qrpc_listen.h"
-#include "httprequesthandler.h"
-#include "httplistener.h"
+#include "../3rdparty/qtwebapp/httpserver/httprequesthandler.h"
+#include "../3rdparty/qtwebapp/httpserver/httplistener.h"
 #include "./p_qrpc_listen_http.h"
 
 namespace QRpc {

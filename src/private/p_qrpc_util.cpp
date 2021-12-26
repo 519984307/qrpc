@@ -1,6 +1,6 @@
 #include "./p_qrpc_util.h"
 #include "./qrpc_types.h"
-#include "./qstm_util_variant.h"
+#include "../../qstm/src/qstm_util_variant.h"
 
 namespace QRpc {
 
@@ -18,7 +18,7 @@ const QString routeParser(const QVariant&vRouteBase)
         return route.toLower();
     }
     return routeBase.toUtf8();
-};
+}
 
 const QByteArray routeExtractMethod(const QString&routeBase)
 {

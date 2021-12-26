@@ -9,14 +9,10 @@ using namespace stefanfrings;
 
 HttpRequestHandler::HttpRequestHandler(QObject* parent)
     : QObject(parent)
-{
-
-}
+{}
 
 HttpRequestHandler::~HttpRequestHandler()
-{
-
-}
+{}
 
 void HttpRequestHandler::service(HttpRequest& request, HttpResponse& response)
 {

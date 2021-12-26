@@ -2,7 +2,7 @@
 
 #include "../qrpc_request.h"
 #include "./p_qrpc_util.h"
-#include "./qstm_util_variant.h"
+#include "../../qstm/src/qstm_util_variant.h"
 
 #include <QUuid>
 #include <QDebug>
@@ -82,7 +82,7 @@ public:
 
     QVariantHash toMapResponse(){
         QVariantHash map;
-        VariantUtil vu;
+        Q_DECLARE_VU;
         map.insert(qsl("finish"), QDateTime::currentDateTime());
         map.insert(qsl("header"), this->responseHeader);
         map.insert(qsl("status_code"), this->response_status_code);

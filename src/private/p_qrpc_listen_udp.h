@@ -1,11 +1,9 @@
 #pragma once
 
-#include <QWebSocket>
-#include <QWebSocketServer>
+#include <QtWebSockets/QWebSocket>
+#include <QtWebSockets/QWebSocketServer>
 #include "../qrpc_listen.h"
 #include "./p_qrpc_listen_http.h"
-#include "httprequesthandler.h"
-#include "httplistener.h"
 
 namespace QRpc {
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../qrpc_listen.h"
-#include <QSqlDriver>
+#include <QtSql/QSqlDriver>
 
 namespace QRpc {
 

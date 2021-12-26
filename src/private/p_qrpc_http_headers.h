@@ -1,6 +1,6 @@
 #pragma once
 
-#include "./qrpc_global.h"
+#include "../qrpc_global.h"
 
 namespace QRpc {
 

@@ -2,7 +2,7 @@
 
 #include <QThread>
 #include <QDebug>
-#include "./qstm_macro.h"
+#include "../../qstm/src/qstm_macro.h"
 
 #define Q_RPC_ROUTE_FLAGS(route, r_flags)\
 private:\
@@ -264,7 +264,7 @@ virtual QString module()const override{\
     return __return;\
 }\
 virtual QUuid moduleUuid()const override{\
-    VariantUtil vu;\
+    Q_DECLARE_VU;\
     static auto __return=vu.toMd5Uuid(vmodule);\
     return __return;\
 }

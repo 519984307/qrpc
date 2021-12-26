@@ -25,50 +25,53 @@ public:
      * @brief listen
      * @return
      */
-    QRPCListenLocalSocket&listen(){
+    QRPCListenLocalSocket&listen()
+    {
         auto _listen=dynamic_cast<QRPCListenLocalSocket*>(this->parent());
         return*_listen;
     }
 
-    explicit LocalSocketServer(QObject*parent=nullptr):QObject(parent){
+    explicit LocalSocketServer(QObject*parent=nullptr):QObject(parent)
+    {
     }
 
-    bool start(){
-        bool RETURN=false;
+    bool start()
+    {
 
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::WebSocket);
 
         this->stop();
 
-        if(protocol.enabled()){
-            for(auto&sport:protocol.port()){
-                auto port=sport.toString().trimmed();
-                if(!port.isEmpty()){
-                    {
-                        auto server = new QLocalServer(this);
-                        //server->setSslConfiguration(sslConfiguration);
+        if(!protocol.enabled())
+            return false;
 
-                        connect(server, &QLocalServer::newConnection,this, &LocalSocketServer::onServerNewConnection);
+        bool RETURN=false;
+        for(auto&sport:protocol.port()){
+            auto port=sport.toString().trimmed();
+            if(port.isEmpty())
+                continue;
+            auto server = new QLocalServer(this);
+            //server->setSslConfiguration(sslConfiguration);
 
-                        if (!server->listen(port)) {
-                            sWarning()<<tr("LocalSocketServer: Cannot bind on port %1: %2").arg(port, server->errorString());
-                            server->close();
-                            server->deleteLater();
-                        }
-                        else if(!server->isListening()){
-                            sWarning()<<tr("LocalSocketServer: Cannot bind on port %1: %2").arg(port, server->errorString());
-                            server->close();
-                            server->deleteLater();
-                        }
-                        else{
-                            RETURN=true;
-                            sDebug()<<QString("LocalSocketServer: Listening on port %1").arg(port);
-                            this->servers.insert(port, server);
-                        }
-                    }
+            connect(server, &QLocalServer::newConnection,this, &LocalSocketServer::onServerNewConnection);
 
-                }
+            if (!server->listen(port)) {
+                sWarning()<<tr("LocalSocketServer: Cannot bind on port %1: %2").arg(port, server->errorString());
+                server->close();
+                server->deleteLater();
+                continue;
             }
+
+            if(!server->isListening()){
+                sWarning()<<tr("LocalSocketServer: Cannot bind on port %1: %2").arg(port, server->errorString());
+                server->close();
+                server->deleteLater();
+                continue;
+            }
+
+            RETURN=true;
+            sDebug()<<QString("LocalSocketServer: Listening on port %1").arg(port);
+            this->servers.insert(port, server);
         }
 
         if(!RETURN){
@@ -79,7 +82,8 @@ public:
 
     }
 
-    bool stop(){
+    bool stop()
+    {
         {
             auto aux=this->clientsMap.values();
             this->clientsMap.clear();
@@ -97,7 +101,8 @@ public:
         return true;
     };
 
-    void onRpcFinish(QRPCListenRequest&request){
+    void onRpcFinish(QRPCListenRequest&request)
+    {
         if(request.isValid()){
             auto socket = this->clientsMap.value(request.requestUuid());
             if(socket!=nullptr){
@@ -109,14 +114,14 @@ public:
         }
     }
 
-    void onRpcRequest(QRPCListenRequest&request){
+    void onRpcRequest(QRPCListenRequest&request)
+    {
         if(!request.isValid()){
             request.co().setBadRequest();
             this->onRpcFinish(request);
+            return;
         }
-        else{
-            emit this->listen().rpcRequest(request.toHash(), QVariant());
-        }
+        emit this->listen().rpcRequest(request.toHash(), QVariant());
 
     }
 
@@ -124,7 +129,8 @@ public slots:
 
 
 
-    void onRpcResponse(QUuid uuid, QVariantHash vRequest){
+    void onRpcResponse(QUuid uuid, QVariantHash vRequest)
+    {
         auto&request=this->listen().cacheRequest()->toRequest(uuid);
         if(request.isValid()){
             if(!request.fromResponseMap(vRequest))
@@ -133,40 +139,43 @@ public slots:
         }
     }
 
-    void onServerNewConnection(){
+    void onServerNewConnection()
+    {
         auto server=dynamic_cast<QLocalServer*>(QObject::sender());
-        if(server!=nullptr){
-            auto socket = server->nextPendingConnection();
-            connect(socket, &QLocalSocket::disconnected, this, &LocalSocketServer::onClientDisconnected);
-            if(socket!=nullptr){
-                QByteArray bytes;
-                while(socket->waitForBytesWritten())
-                    bytes+=socket->readAll();
-                auto&request=this->listen().cacheRequest()->createRequest(bytes);
-                this->clientsMap.insert(request.requestUuid(), socket);
-                this->onRpcRequest(request);
-            }
-        }
+        if(server==nullptr)
+            return;
+
+        auto socket = server->nextPendingConnection();
+        connect(socket, &QLocalSocket::disconnected, this, &LocalSocketServer::onClientDisconnected);
+        if(socket==nullptr)
+            return;
+        QByteArray bytes;
+        while(socket->waitForBytesWritten())
+            bytes+=socket->readAll();
+        auto&request=this->listen().cacheRequest()->createRequest(bytes);
+        this->clientsMap.insert(request.requestUuid(), socket);
+        this->onRpcRequest(request);
     }
 
-    void onBodyText(QString bytes){
+    void onBodyText(QString bytes)
+    {
         auto socket = qobject_cast<QLocalSocket*>(QObject::sender());
-        if (socket!=nullptr) {
-            auto&request=this->listen().cacheRequest()->createRequest(bytes);
-            this->clientsMap.insert(request.requestUuid(), socket);
-            this->onRpcRequest(request);
-        }
+        if (socket==nullptr)
+            return;
+        auto&request=this->listen().cacheRequest()->createRequest(bytes);
+        this->clientsMap.insert(request.requestUuid(), socket);
+        this->onRpcRequest(request);
     }
 
 
     void onClientDisconnected()    {
         auto socket = qobject_cast<QLocalSocket*>(QObject::sender());
-        if (socket!=nullptr) {
-            auto key=this->clientsMap.key(socket);
-            if(!key.isNull())
-                this->clientsMap.remove(key);
-            socket->deleteLater();
-        }
+        if (socket==nullptr)
+            return;
+        auto key=this->clientsMap.key(socket);
+        if(!key.isNull())
+            this->clientsMap.remove(key);
+        socket->deleteLater();
     }
 
 };

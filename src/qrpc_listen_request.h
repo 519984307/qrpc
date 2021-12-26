@@ -3,13 +3,13 @@
 #include "./qrpc_global.h"
 #include "./private/p_qrpc_http_headers.h"
 #include "./private/p_qrpc_listen_request_code.h"
+#include "./qrpc_controller_setting.h"
+#include "../../qstm/src/qstm_util_variant.h"
 #include <QThread>
 #include <QTemporaryFile>
 #include <QVariantHash>
 #include <QByteArray>
 #include <QUuid>
-#include "./qstm_util_variant.h"
-#include "./qrpc_controller_setting.h"
 
 namespace QRpc {
 
@@ -48,7 +48,7 @@ namespace QRpc {
         /**
          * @brief vu
          */
-        VariantUtil vu;
+        Q_DECLARE_VU;
     public:
 
         QString authorizationBasic() const;

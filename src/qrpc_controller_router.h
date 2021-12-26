@@ -1,7 +1,7 @@
 #pragma once
 
 #include "./qrpc_global.h"
-#include "./qstm_object.h"
+#include "../../qstm/src/qstm_object.h"
 #include <QObject>
 #include <QMetaObject>
 #include <QMetaMethod>

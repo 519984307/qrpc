@@ -5,10 +5,10 @@
 #include <QDebug>
 #include <QTcpSocket>
 #include <QUrl>
-#include <QSqlDatabase>
-#include <QSqlDriver>
-#include <QSqlQuery>
-#include <QSqlError>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlDriver>
+#include <QtSql/QSqlQuery>
+#include <QtSql/QSqlError>
 
 namespace QRpc {
 
@@ -230,8 +230,9 @@ public:
 
 private slots:
 
-    void onReceiveBroker(const QString &responseTopic, QSqlDriver::NotificationSource, const QVariant &responseBody){
-        VariantUtil vu;
+    void onReceiveBroker(const QString &responseTopic, QSqlDriver::NotificationSource, const QVariant &responseBody)
+    {
+        Q_DECLARE_VU;
         if(!this->listen_response.fromHash(responseBody.toHash())){
             response->response_qt_status_code=QNetworkReply::InternalServerError;
             response->response_status_code=501;

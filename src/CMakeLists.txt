@@ -76,6 +76,8 @@ set(qrpc_SRCS
     qrpc_types.h
 )
 
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
 if(${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     add_library(qrpc STATIC ${qrpc_SRCS})
 else()

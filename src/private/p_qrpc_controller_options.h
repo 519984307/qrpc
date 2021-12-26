@@ -2,7 +2,7 @@
 
 #include "../qrpc_controller_setting.h"
 #include "../qrpc_controller_options.h"
-#include "./qstm_util_variant.h"
+#include "../../../qstm/src/qstm_util_variant.h"
 #include <QDebug>
 #include <QFile>
 #include <QSettings>

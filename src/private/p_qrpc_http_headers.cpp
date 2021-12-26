@@ -1,5 +1,5 @@
 #include "./p_qrpc_http_headers.h"
-#include "./qstm_util_variant.h"
+#include "../../../qstm/src/qstm_util_variant.h"
 #include "./p_qrpc_util.h"
 #include "../qrpc_macro.h"
 #include <QJsonDocument>
@@ -17,14 +17,17 @@ public:
     QObject*parent=nullptr;
     QVariantHash  header;
 
-    explicit QRPCHttpHeadersPvt(QRPCHttpHeaders*parent){
+    explicit QRPCHttpHeadersPvt(QRPCHttpHeaders*parent)
+    {
         this->parent=parent;
     }
 
-    virtual ~QRPCHttpHeadersPvt(){
+    virtual ~QRPCHttpHeadersPvt()
+    {
     }
 
-    QVariant header_v(const QString&key)const{
+    QVariant header_v(const QString&key)const
+    {
         auto vkey=key.trimmed().toLower();
         QHashIterator<QString, QVariant> i(this->header);
         QStringList vList;
@@ -49,7 +52,8 @@ public:
     }
 };
 
-QRPCHttpHeaders::QRPCHttpHeaders(QObject *parent):QObject(parent){
+QRPCHttpHeaders::QRPCHttpHeaders(QObject *parent):QObject(parent)
+{
     this->p = new QRPCHttpHeadersPvt(this);
     dPvt();
     p.parent=parent;
@@ -60,11 +64,12 @@ QRPCHttpHeaders::QRPCHttpHeaders(const QVariant &v, QObject *parent):QObject(par
     this->p = new QRPCHttpHeadersPvt(this);
     dPvt();
     p.parent=parent;
-    VariantUtil vu;
+    Q_DECLARE_VU;
     p.header=vu.toHash(v);
 }
 
-QRPCHttpHeaders::~QRPCHttpHeaders(){
+QRPCHttpHeaders::~QRPCHttpHeaders()
+{
     dPvt();
     delete&p;
 }
@@ -164,7 +169,7 @@ QRPCHttpHeaders &QRPCHttpHeaders::setRawHeader(const QString &header, const QVar
 
 QRPCHttpHeaders &QRPCHttpHeaders::addRawHeader(const QVariantHash &rawHeader)
 {
-    VariantUtil vu;
+    Q_DECLARE_VU;
     QHashIterator<QString, QVariant> i(rawHeader);
     while (i.hasNext()) {
         i.next();
@@ -467,7 +472,7 @@ QStringList QRPCHttpHeaders::printOut(const QString &output)
 {
     auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
     QStringList __return;
-    VariantUtil vu;
+    Q_DECLARE_VU;
     auto vMap=this->rawHeader();
     if(!vMap.isEmpty()){
         __return<<qsl("%1%2 headers").arg(space, output).trimmed();

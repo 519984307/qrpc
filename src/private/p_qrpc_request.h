@@ -22,7 +22,7 @@
 #include <QThread>
 #include <QStringList>
 #include <QDir>
-#include <QCoreApplication>
+#include <QtCore/QCoreApplication>
 
 namespace QRpc {
 
@@ -263,7 +263,7 @@ public:
         auto method=e.method();
         QMultiHash<QString,QVariant> paramsGet;
         if(method==QRpc::Head || method==QRpc::Get || method==QRpc::Delete || method==QRpc::Options){
-            VariantUtil vu;
+            Q_DECLARE_VU;
             paramsGet=vu.toMultiHash(vBody);
             vBody.clear();
             auto paramsGetOriginais = e.parameter();
@@ -342,7 +342,7 @@ public:
 
         QMultiHash<QString,QVariant> paramsGet;
         if(method==QRpc::Head || method==QRpc::Get || method==QRpc::Delete || method==QRpc::Options){
-            VariantUtil vu;
+            Q_DECLARE_VU;
             paramsGet=vu.toMultiHash(vBody);
             vBody.clear();
             auto paramsGetOriginais = e.parameter();

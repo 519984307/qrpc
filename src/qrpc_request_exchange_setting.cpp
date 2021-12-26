@@ -1,6 +1,6 @@
 #include "./qrpc_request_exchange_setting.h"
-#include "./qstm_util_meta_object.h"
-#include "./qstm_util_variant.h"
+#include "../../qstm/src/qstm_util_meta_object.h"
+#include "../../qstm/src/qstm_util_variant.h"
 #include <QMetaProperty>
 
 namespace QRpc {
@@ -138,7 +138,7 @@ QStringList QRPCRequestExchangeSetting::printOut(const QString &output)
 {
     auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
     QStringList out;
-    VariantUtil vu;
+    Q_DECLARE_VU;
     auto vMap=this->toHash();
     if(!vMap.isEmpty()){
         out<<qsl("%1%2 attributes").arg(space, output).trimmed();
