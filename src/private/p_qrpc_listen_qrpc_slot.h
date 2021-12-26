@@ -17,7 +17,7 @@ class Q_RPC_EXPORT QRPCListenQRPCSlot:public QThread
     Q_OBJECT
 public:
     explicit QRPCListenQRPCSlot(QRPCListenQRPC *listenQRPC=nullptr);
-    Q_INVOKABLE ~QRPCListenQRPCSlot();
+    ~QRPCListenQRPCSlot();
 
     //!
     //! \brief run

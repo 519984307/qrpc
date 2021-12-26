@@ -25,7 +25,7 @@ class QRPCInterfaceCheck : public QRpc::QRPCController
     Q_OBJECT
 public:
     Q_INVOKABLE explicit QRPCInterfaceCheck(QObject *parent = nullptr);
-    Q_INVOKABLE ~QRPCInterfaceCheck();
+    ~QRPCInterfaceCheck();
 
 
 signals:

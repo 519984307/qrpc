@@ -14,7 +14,7 @@ namespace QRpc {
         Q_OBJECT
     public:
         Q_INVOKABLE explicit TokenPool(QObject *parent = nullptr);
-        Q_INVOKABLE ~TokenPool();
+        ~TokenPool();
 
         Q_DECLARE_INSTANCE(TokenPool)
 

@@ -29,7 +29,7 @@ public:
     Q_INVOKABLE explicit QRPCRequestJobDataBase(QObject*parent):QRPCRequestJobProtocol(parent), listen_request(this), listen_response(this){
     }
 
-    Q_INVOKABLE ~QRPCRequestJobDataBase(){
+    ~QRPCRequestJobDataBase(){
     }
 
 

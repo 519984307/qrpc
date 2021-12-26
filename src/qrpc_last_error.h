@@ -11,7 +11,7 @@ class Q_RPC_EXPORT LastError : public QObject
 public:
     Q_INVOKABLE explicit LastError(QObject *parent = nullptr);
 
-    Q_INVOKABLE ~LastError();
+    ~LastError();
 
     Q_INVOKABLE virtual QString nativeErrorCode() const;
     Q_INVOKABLE virtual QString text() const;

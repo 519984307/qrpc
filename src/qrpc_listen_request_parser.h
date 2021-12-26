@@ -27,7 +27,7 @@ public:
     //!
     //! \brief ~QRPCListenRequestParser
     //!
-    Q_INVOKABLE ~QRPCListenRequestParser();
+    ~QRPCListenRequestParser();
 
     //!
     //! \brief controller

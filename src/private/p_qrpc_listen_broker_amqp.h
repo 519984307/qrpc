@@ -21,7 +21,7 @@ public:
     //!
     //! \brief ~QRPCListenBrokerAMQP
     //!
-    Q_INVOKABLE ~QRPCListenBrokerAMQP();
+    ~QRPCListenBrokerAMQP();
 private:
     void*p=nullptr;
 };

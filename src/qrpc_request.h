@@ -29,7 +29,7 @@ public:\
 public:\
     Q_INVOKABLE explicit classBase(QObject *parent=nullptr):QRpc::QRPCRequest(parent){\
     }\
-    Q_INVOKABLE ~classBase(){\
+    ~classBase(){\
     }
 
 #define QRPC_DECLARE_REQUEST_CLASS(classBase,ContentType,route)\

@@ -26,7 +26,7 @@ public:
         fileTemp.setAutoRemove(false);
     }
 
-    Q_INVOKABLE ~QRPCRequestJobHttp(){
+    ~QRPCRequestJobHttp(){
         if(this->fileTemp.isOpen())
             this->fileTemp.close();
         if(this->nam!=nullptr)

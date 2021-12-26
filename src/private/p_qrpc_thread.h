@@ -21,7 +21,7 @@ public:
     //!
     //! \brief ~QRPCThread
     //!
-    Q_INVOKABLE ~QRPCThread();
+    ~QRPCThread();
 
     //!
     //! \brief run

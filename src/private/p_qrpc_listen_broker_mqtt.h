@@ -20,7 +20,7 @@ public:
     //!
     //! \brief ~QRPCListenBrokerMQTT
     //!
-    Q_INVOKABLE ~QRPCListenBrokerMQTT();
+    ~QRPCListenBrokerMQTT();
 private:
     void*p=nullptr;
 };

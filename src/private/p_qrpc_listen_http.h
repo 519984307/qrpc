@@ -12,7 +12,7 @@ class Q_RPC_EXPORT QRPCListenHTTP:public QRPCListen{
 public:
 
     Q_INVOKABLE explicit QRPCListenHTTP(QObject*parent=nullptr);
-    Q_INVOKABLE ~QRPCListenHTTP();
+    ~QRPCListenHTTP();
 
     //!
     //! \brief start

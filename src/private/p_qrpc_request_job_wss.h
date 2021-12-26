@@ -19,7 +19,7 @@ public:
     Q_INVOKABLE explicit QRPCRequestJobWSS(QObject*parent):QRPCRequestJobProtocol(parent){
     }
 
-    Q_INVOKABLE ~QRPCRequestJobWSS(){
+    ~QRPCRequestJobWSS(){
     }
 
     QRPCRequestJobResponse*response=nullptr;

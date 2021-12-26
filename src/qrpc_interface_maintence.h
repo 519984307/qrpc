@@ -24,7 +24,7 @@ class QRPCInterfaceMaintence : public QRPCInterfaceCheck
     QRPC_DECLARE_ROUTE(QRPCInterfaceCheck,"v1/maintence")
 public:
     Q_INVOKABLE explicit QRPCInterfaceMaintence(QObject *parent = nullptr);
-    Q_INVOKABLE ~QRPCInterfaceMaintence();
+    ~QRPCInterfaceMaintence();
 
     /**
      * @brief serverStart

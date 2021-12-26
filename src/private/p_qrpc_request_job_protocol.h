@@ -18,7 +18,7 @@ public:
         QObject::connect(this, &QRPCRequestJobProtocol::____verify, this, &QRPCRequestJobProtocol::____on_verify);
     }
 
-    Q_INVOKABLE ~QRPCRequestJobProtocol(){
+    ~QRPCRequestJobProtocol(){
     }
 
     virtual bool call(QRPCRequestJobResponse*response){

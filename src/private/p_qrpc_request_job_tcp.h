@@ -15,7 +15,7 @@ public:
     Q_INVOKABLE explicit QRPCRequestJobTcp(QObject*parent):QRPCRequestJobProtocol(parent){
     }
 
-    Q_INVOKABLE ~QRPCRequestJobTcp(){
+    ~QRPCRequestJobTcp(){
     }
 
     QRPCRequestJobResponse*response=nullptr;

@@ -22,7 +22,7 @@ class QRPCInterfaceRecord : public QRpc::QRPCController
     Q_RPC_DECLARE_INTERFACE_METHOD_CHECK()
 public:
     Q_INVOKABLE explicit QRPCInterfaceRecord(QObject *parent = nullptr);
-    Q_INVOKABLE ~QRPCInterfaceRecord();
+    ~QRPCInterfaceRecord();
 
     Q_INVOKABLE virtual QVariant get();
     Q_INVOKABLE virtual QVariant set();

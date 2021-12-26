@@ -41,7 +41,7 @@ public:
     //!
     //! \brief ~QRPCListenColletions
     //!
-    Q_INVOKABLE ~QRPCListenColletions();
+    ~QRPCListenColletions();
 
     //!
     //! \brief protocol

@@ -15,7 +15,7 @@ class Q_RPC_EXPORT QRPCListenTCP:public QRPCListen{
 public:
 
     explicit QRPCListenTCP(QObject*parent=nullptr);
-    Q_INVOKABLE ~QRPCListenTCP();
+    ~QRPCListenTCP();
 
     //!
     //! \brief start

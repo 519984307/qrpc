@@ -73,7 +73,7 @@ public:
     /**
      * @brief ~QRPCListenRequestCode
      */
-    Q_INVOKABLE ~QRPCListenRequestCode();
+    ~QRPCListenRequestCode();
 
     /**
      * @brief operator =

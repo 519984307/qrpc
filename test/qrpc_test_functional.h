@@ -16,7 +16,7 @@ namespace QRpc {
     public:
         Q_INVOKABLE explicit Server(QObject *parent = nullptr):QRpc::QRPCServer(parent){
         }
-        Q_INVOKABLE ~Server(){
+        ~Server(){
         }
     private:
         void*p=nullptr;
@@ -32,7 +32,7 @@ namespace QRpc {
     public:
         Q_INVOKABLE explicit Q_RPC_Interface(QObject *parent=nullptr):QRpc::QRPCController(parent){
         }
-        Q_INVOKABLE ~Q_RPC_Interface(){
+        ~Q_RPC_Interface(){
         }
         Q_INVOKABLE QVariant check_header(){
             QRPC_METHOD_CHECK_HEADER();

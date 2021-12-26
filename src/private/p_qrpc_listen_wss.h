@@ -19,7 +19,7 @@ public:
     //!
     //! \brief ~QRPCListenWebSocket
     //!
-    Q_INVOKABLE ~QRPCListenWebSocket();
+    ~QRPCListenWebSocket();
 
     //!
     //! \brief start

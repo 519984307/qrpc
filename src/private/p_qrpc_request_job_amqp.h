@@ -20,7 +20,7 @@ public:
         connect(&this->___pool(), &AMQPPool::dispatcher, this, &QRPCRequestJobAMQP::service);
     }
 
-    Q_INVOKABLE ~QRPCRequestJobAMQP(){
+    ~QRPCRequestJobAMQP(){
     }
 
     bool call(QRPCRequestJobResponse*response){

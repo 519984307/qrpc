@@ -21,7 +21,7 @@ public:
     //!
     //! \brief ~QRPCListenBrokerKAFKA
     //!
-    Q_INVOKABLE ~QRPCListenBrokerKAFKA();
+    ~QRPCListenBrokerKAFKA();
 private:
     void*p=nullptr;
 };

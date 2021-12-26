@@ -31,7 +31,7 @@ public:
 public:    
     Q_INVOKABLE explicit ServiceSetting(QObject*parent=nullptr):QStm::SettingBase(parent){
     }
-    Q_INVOKABLE ~ServiceSetting(){
+    ~ServiceSetting(){
     }
     QVariant url()const;
 };
