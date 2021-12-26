@@ -1,11 +1,11 @@
 #pragma once
 
 #include "./qrpc_test.h"
-#include "./qrpc_server.h"
-#include "./qrpc_types.h"
-#include "./qrpc_request.h"
-#include "./qrpc_listen_protocol.h"
-#include "./qrpc_interface_check.h"
+#include "../src/qrpc_server.h"
+#include "../src/qrpc_types.h"
+#include "../src/qrpc_request.h"
+#include "../src/qrpc_listen_protocol.h"
+#include "../src/qrpc_interface_check.h"
 
 namespace QRpc {
 
@@ -14,9 +14,11 @@ namespace QRpc {
         Q_OBJECT
         Q_DECLARE_INSTANCE(Server)
     public:
-        Q_INVOKABLE explicit Server(QObject *parent = nullptr):QRpc::QRPCServer(parent){
+        Q_INVOKABLE explicit Server(QObject *parent = nullptr):QRpc::QRPCServer(parent)
+        {
         }
-        ~Server(){
+        ~Server()
+        {
         }
     private:
         void*p=nullptr;

@@ -10,7 +10,7 @@
 #include <QLocale>
 #include <QJsonDocument>
 #include <gtest/gtest.h>
-#include "./qstm_types.h"
+#include "../../qstm/src/qstm_types.h"
 
 namespace QRpc {
 
