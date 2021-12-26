@@ -156,7 +156,7 @@ static const QHash<int,QString>&makeStateCodes()
     state_codes[501]=qsl("(Not Implemented)");
     state_codes[502]=qsl("(Bad Gateway Error)");
     return state_codes;
-};
+}
 
 static const auto&stateCodes=makeStateCodes();
 
@@ -198,7 +198,7 @@ static QMap<QNetworkReply::NetworkError, QString>&makeStaticError(){
     staticError[QNetworkReply::UnknownServerError]=qsl("UnknownServerError");
 
     return staticError;
-};
+}
 
 const static auto&staticErrors=makeStaticError();
 

@@ -84,7 +84,7 @@ namespace QRpc {
         }
     }
 
-    Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir);
+    Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir)
 
 #define dPvt()\
     auto&p =*reinterpret_cast<QRPCRequestPvt*>(this->p)

@@ -9,19 +9,57 @@
 #include "./qrpc_macro.h"
 
 namespace QRpc {
-namespace Util {
-    const QString routeParser(const QVariant&vRouteBase);
 
-    const QByteArray routeExtractMethod(const QString&routeBase);
+namespace Util{
+//!
+//! \brief routeParser
+//! \param vRouteBase
+//! \return
+//!
+const QString routeParser(const QVariant&vRouteBase);
 
-    const QByteArray routeExtract(const QString&routeBase);
+//!
+//! \brief routeExtractMethod
+//! \param routeBase
+//! \return
+//!
+const QByteArray routeExtractMethod(const QString&routeBase);
 
-    const QString headerFormatName(const QString&name);
+//!
+//! \brief routeExtract
+//! \param routeBase
+//! \return
+//!
+const QByteArray routeExtract(const QString&routeBase);
 
-    const QString parseQueryItem(const QVariant&v);
+//!
+//! \brief headerFormatName
+//! \param name
+//! \return
+//!
+const QString headerFormatName(const QString&name);
 
-    const QVariantHash toMapResquest(int method, const QVariant&request_url, const QString&request_body, const QVariantHash &request_parameters, const QString&response_body, const QVariantHash&request_header, const QDateTime&request_start, const QDateTime&request_finish);
+//!
+//! \brief parseQueryItem
+//! \param v
+//! \return
+//!
+const QString parseQueryItem(const QVariant&v);
 
-};
+//!
+//! \brief toMapResquest
+//! \param method
+//! \param request_url
+//! \param request_body
+//! \param request_parameters
+//! \param response_body
+//! \param request_header
+//! \param request_start
+//! \param request_finish
+//! \return
+//!
+const QVariantHash toMapResquest(int method, const QVariant&request_url, const QString&request_body, const QVariantHash &request_parameters, const QString&response_body, const QVariantHash&request_header, const QDateTime&request_start, const QDateTime&request_finish);
+
+}
 
 }
