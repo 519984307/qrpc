@@ -22,6 +22,7 @@ public:
     QRPCListenQRPC*listenQRPC=nullptr;
     QList<const QMetaObject*> listenQRPCControllers;
     QList<const QMetaObject*> listenQRPCParserRequest;
+
     explicit QRPCListenQRPCSlotPvt(QRPCListenQRPCSlot*slot, QRPCListenQRPC*listenQRPC) : QObject(slot)
     {
         QObject::connect(slot, &QRPCListenQRPCSlot::requestInvoke, this, &QRPCListenQRPCSlotPvt::onRequestInvoke);
@@ -30,6 +31,7 @@ public:
         this->listenQRPCParserRequest=listenQRPC->server()->parsers();
         this->controllerRouter=QRPCControllerRouter::newRouter(this);
     }
+
     virtual ~QRPCListenQRPCSlotPvt()
     {
     }
