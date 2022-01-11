@@ -254,6 +254,7 @@ public:
      */
     virtual QRPCHttpResponse&download(QString &fileName);
     virtual QRPCHttpResponse&download(const QString &route, QString&fileName);
+    virtual QRPCHttpResponse&download(const QVariant &route, QString&fileName, const QVariant &parameter);
     virtual QRPCHttpResponse&download(const QUrl&route, QString&fileName);
 
     /**
