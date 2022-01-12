@@ -9,10 +9,12 @@ namespace QRpc {
 class ConstsQRPCControllerRouter{
 public:
     QList<const QMetaObject*> defaultRouters;
-    explicit ConstsQRPCControllerRouter(){
+    explicit ConstsQRPCControllerRouter()
+    {
         defaultRouters<<&QRPCControllerRouter::staticMetaObject;
     }
-    virtual ~ConstsQRPCControllerRouter(){
+    virtual ~ConstsQRPCControllerRouter()
+    {
     }
 };
 Q_GLOBAL_STATIC_WITH_ARGS(ConstsQRPCControllerRouter, __constsQRPCControllerRouter, (ConstsQRPCControllerRouter()))

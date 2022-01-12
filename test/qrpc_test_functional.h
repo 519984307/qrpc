@@ -66,8 +66,8 @@ namespace QRpc {
         QByteArray server_protocol="http";
         QByteArray server_hostname="localhost";
         QByteArray server_broker_database_driver="QPSQL";
-        QByteArray server_broker_database_username="magmav1";
-        QByteArray server_broker_database_password="magmav1";
+        QByteArray server_broker_database_username="erpv1";
+        QByteArray server_broker_database_password="erpv1";
         int server_broker_database_port=5432;
     };
 

@@ -443,15 +443,14 @@ QRPCHttpResponse &QRPCRequest::upload(const QString &route, const QByteArray &bu
     e.setRoute(route);
     e.setMethod(QRpc::Post);
     QTemporaryFile file;
+    //file.setAutoRemove(false);
     if(!file.open())
         return this->response();
-    else{
-        file.write(buffer);
-        file.flush();
-        p.upload(e.route(), file.fileName());
-        file.close();
-        return this->response();
-    }
+    file.write(buffer);
+    file.flush();
+    p.upload(e.route(), file.fileName());
+    file.close();
+    return this->response();
 }
 
 QRPCHttpResponse &QRPCRequest::upload(const QString &route, QFile &file)
@@ -484,6 +483,31 @@ QRPCHttpResponse &QRPCRequest::download(const QString &route, QString &fileName)
     return this->download(QUrl(route), _fileName);
 }
 
+QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName, const QVariant &parameter)
+{
+    dPvt();
+
+    QString _route;
+    auto typeId=qTypeId(route);
+    switch (typeId) {
+    case QMetaType_QUrl:
+        _route=route.toUrl().toString();
+        break;
+    default:
+        _route=route.toString();
+    }
+    auto _fileName=p.parseFileName(fileName);
+    auto&e=p.exchange.call();
+    e.setRoute(_route);
+    e.setMethod(QRpc::Get);
+    this->setBody(parameter);
+    auto&response=p.download(e.route(), _fileName);
+    if(response)
+        fileName=_fileName;
+    return response;
+}
+
+
 QRPCHttpResponse &QRPCRequest::download(const QUrl &route, QString &fileName)
 {
     dPvt();
@@ -496,6 +520,7 @@ QRPCHttpResponse &QRPCRequest::download(const QUrl &route, QString &fileName)
         fileName=_fileName;
     return response;
 }
+
 
 QRPCRequest &QRPCRequest::autoSetCookie()
 {
