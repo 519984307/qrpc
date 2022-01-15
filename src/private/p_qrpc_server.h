@@ -51,7 +51,8 @@ public:
     //! \param v
     //! \return
     //!
-    static QByteArray toMd5(const QVariant&v){
+    static QByteArray toMd5(const QVariant&v)
+    {
         if(!v.isValid())
             return QByteArray();
 
@@ -89,7 +90,8 @@ public:
         return false;
     }
 
-    bool v_load(const QVariant&v){
+    bool v_load(const QVariant&v)
+    {
         auto typeId=qTypeId(v);
         if(QStmTypesVariantList.contains(typeId))
             return this->load(v.toStringList());
@@ -98,7 +100,8 @@ public:
         return this->load(v.toString());
     }
 
-    bool load(const QStringList&settingsFileName){
+    bool load(const QStringList&settingsFileName)
+    {
         QVariantList vList;
         auto&p=*this;
         p.settingsFileName.clear();
@@ -140,13 +143,13 @@ public:
             }
 
 
-            auto map=doc.object().toVariantHash();
-            if(!map.isEmpty())
-                vList<<map;
+            auto vHash=doc.object().toVariantHash();
+            if(!vHash.isEmpty())
+                vList<<vHash;
         }
         Q_DECLARE_VU;
-        auto vMap=vu.vMerge(vList).toHash();
-        if(p.load(vMap))
+        auto vHash=vu.vMerge(vList).toHash();
+        if(p.load(vHash))
             p.settingsFileName=settingsFileName;
         else
             p.settingsFileName.clear();
@@ -197,8 +200,9 @@ public:
         return this->load(vMap);
     }
 
-    virtual bool load(const QVariantHash&settings)const{
-        if(!settings.contains("protocol")){
+    virtual bool load(const QVariantHash&settings)const
+    {
+        if(!settings.contains(qsl("protocol"))){
 #if Q_RPC_LOG
             sWarning()<<tr("Json property [protocol] not detected");
 #endif

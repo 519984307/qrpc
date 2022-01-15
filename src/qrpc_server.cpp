@@ -119,6 +119,12 @@ QVariant QRPCServer::settingsFileName()
     return p.settingsFileName;
 }
 
+bool QRPCServer::setSettingsFileName(const QString &fileName)
+{
+    dPvt();
+    return p.v_load(qvsl{fileName});
+}
+
 bool QRPCServer::setSettings(const QVariant &settings)const
 {
     dPvt();
