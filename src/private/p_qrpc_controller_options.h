@@ -30,33 +30,38 @@ public:
 
 
 
-    explicit ControllerOptionsPrv(ControllerOptions*parent):settingsDefault(parent){
+    explicit ControllerOptionsPrv(ControllerOptions*parent):settingsDefault(parent)
+    {
         this->parent=parent;
         this->init();
     }
-    virtual ~ControllerOptionsPrv(){
+
+    virtual ~ControllerOptionsPrv()
+    {
         this->clear();
     }
 
-    void init(){
+    void init()
+    {
     }
 
-    bool isLoaded(){
+    bool isLoaded()
+    {
         QHashIterator<QString, ControllerSetting*> i(this->settings);
         while (i.hasNext()) {
             i.next();
             if(i.key().trimmed().isEmpty())
                 continue;
-            else{
-                auto&v=i.value();
-                if(v->isValid())
-                    return true;
-            }
+
+            auto&v=i.value();
+            if(v->isValid())
+                return true;
         }
         return false;
     }
 
-    bool isEmpty(){
+    bool isEmpty()
+    {
         QHashIterator<QString, ControllerSetting*> i(this->settings);
         while (i.hasNext()) {
             i.next();
@@ -67,13 +72,15 @@ public:
         return true;
     }
 
-    void clear(){
+    void clear()
+    {
         auto _detail=this->settings.values();
         this->settings.clear();
         qDeleteAll(_detail);
     }
 
-    QVariantHash toHash(){
+    QVariantHash toHash()
+    {
         QVariantHash vSettings;
         auto vList=QList<ControllerSetting*>()<<&this->settingsDefault;
         vList=vList+this->settings.values();
@@ -82,8 +89,8 @@ public:
         return vSettings;
     }
 
-    ControllerSetting&settingGetCheck(const QString&settingName){
-
+    ControllerSetting&settingGetCheck(const QString&settingName)
+    {
         const auto p1=settingName.toLower().trimmed();
         for(auto&setting:this->settings){
             if(setting->macth(p1)){
@@ -124,34 +131,43 @@ public:
         return*this->parent;
     }
 
-    bool v_load(const QVariant &v){
-        if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList)
+    bool v_load(const QVariant &v)
+    {
+        switch (qTypeId(v)) {
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
             return this->load(v.toStringList());
-        if(qTypeId(v)==QMetaType_QVariantMap || qTypeId(v)==QMetaType_QVariantHash)
+        case QMetaType_QVariantHash:
+        case QMetaType_QVariantMap:
             return this->load(v.toHash());
-
-        return this->load(v.toString());
+        default:
+            return this->load(v.toString());
+        }
     }
 
     bool load(QObject *settingsObject)
     {
         auto&p=*this;
-        if(settingsObject!=nullptr){
-            auto metaObject=settingsObject->metaObject();
-            for(int methodIndex = 0; methodIndex < metaObject->methodCount(); ++methodIndex) {
-                auto metaMethod = metaObject->method(methodIndex);
-                if(metaMethod.parameterCount()==0){
-                    auto methodName=QString(metaMethod.name()).toLower().trimmed();
-                    auto staticNames=QStringList{qsl("settingsfilename"),qsl("settings_server"),qsl("settingsserver")};
-                    if(staticNames.contains(methodName)){
-                        QVariant invokeReturn;
-                        auto argReturn=Q_RETURN_ARG(QVariant, invokeReturn);
-                        if(metaMethod.invoke(settingsObject, argReturn)){
-                            return p.v_load(invokeReturn);
-                        }
-                    }
-                }
-            }
+        if(settingsObject==nullptr)
+            return false;
+
+        auto metaObject=settingsObject->metaObject();
+        for(int methodIndex = 0; methodIndex < metaObject->methodCount(); ++methodIndex) {
+            auto metaMethod = metaObject->method(methodIndex);
+            if(metaMethod.parameterCount()>0)
+                continue;
+
+            auto methodName=QString(metaMethod.name()).toLower().trimmed();
+            auto staticNames=QStringList{qsl("settingsfilename"),qsl("settings_server"),qsl("settingsserver")};
+            if(!staticNames.contains(methodName))
+                continue;
+
+            QVariant invokeReturn;
+            auto argReturn=Q_RETURN_ARG(QVariant, invokeReturn);
+            if(!metaMethod.invoke(settingsObject, argReturn))
+                continue;
+
+            return p.v_load(invokeReturn);
         }
         return false;
     }
@@ -199,8 +215,8 @@ public:
             }
         }
         Q_DECLARE_VU;
-        auto vMap=vu.vMerge(vList).toHash();
-        if(p.load(vMap))
+        auto vHash=vu.vMerge(vList).toHash();
+        if(p.load(vHash))
             this->settingsFileName=settingsFileName;
         else
             this->settingsFileName.clear();
@@ -250,7 +266,6 @@ public:
         return false;
     }
 
-
     bool load(const QVariantHash &settings)
     {
         auto&p=*this;
@@ -258,13 +273,10 @@ public:
 
         auto arguments=settings.value(qsl("arguments"));
 
-        if(qTypeId(arguments)==QMetaType_QVariantHash || qTypeId(arguments)==QMetaType_QVariantMap){
-            Q_V_HASH_ITERATOR (arguments.toHash()){
-                i.next();
-                p.arguments[i.key().toLower()]=i.value();
-            }
-        }
-        else if(qTypeId(arguments)==QMetaType_QVariantList || qTypeId(arguments)==QMetaType_QStringList){
+        switch (qTypeId(arguments)) {
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
+        {
             for(auto&v:arguments.toList()){
                 auto l=v.toString().split(qsl("="));
                 if(l.isEmpty()){
@@ -282,7 +294,21 @@ public:
                     p.arguments[key]=value;
                 }
             }
+            break;
         }
+        case QMetaType_QVariantHash:
+        case QMetaType_QVariantMap:
+        {
+            Q_V_HASH_ITERATOR (arguments.toHash()){
+                i.next();
+                p.arguments[i.key().toLower()]=i.value();
+            }
+            break;
+        }
+        default:
+            break;
+        }
+
 
         QVariantHash defaultVariables{{qsl("hostName") , qsl("SERVICE_HOST")}};
         QVariantHash defaultValues;
@@ -304,34 +330,34 @@ public:
 
         if(settings.contains(qsl("hostName")) && settings.contains(qsl("port"))){
             this->insert(settings);
+            return this->isLoaded();
         }
-        else{
-            Q_V_HASH_ITERATOR (settings){
+
+        Q_V_HASH_ITERATOR (settings){
+            i.next();
+            auto value=i.value().toHash();
+            value.insert(qsl("name"), i.key().trimmed());
+
+            {
+                Q_V_HASH_ITERATOR (defaultValues){
                 i.next();
-                auto value=i.value().toHash();
-                value.insert(qsl("name"), i.key().trimmed());
-
-                {
-                    Q_V_HASH_ITERATOR (defaultValues){
-                        i.next();
-                        if(!value.contains(i.key()))
-                            value.insert(i.key(), i.value());
-                    }
+                if(!value.contains(i.key()))
+                    value.insert(i.key(), i.value());
                 }
-
-                {
-                    Q_V_HASH_ITERATOR (defaultSetting){
-                        i.next();
-                        if(!value.contains(i.key()))
-                            value.insert(i.key(), i.value());
-                    }
-                }
-
-                this->insert(value);
-
             }
+
+            {
+                Q_V_HASH_ITERATOR (defaultSetting){
+                    i.next();
+                    if(!value.contains(i.key()))
+                        value.insert(i.key(), i.value());
+                }
+            }
+            this->insert(value);
         }
+
         return this->isLoaded();
+
     }
 
 };

@@ -23,7 +23,7 @@ public:
     //!
     //! \brief ~QRPCListenRequestCache
     //!
-    Q_INVOKABLE virtual ~QRPCListenRequestCache();
+    ~QRPCListenRequestCache();
 
     //!
     //! \brief clear

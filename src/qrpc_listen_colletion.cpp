@@ -33,33 +33,37 @@ public:
     QRPCServer*server=nullptr;
     QVariantHash settings;
 
-    QRPCListenColletions *collections(){
+    QRPCListenColletions *collections()
+    {
         auto collections=dynamic_cast<QRPCListenColletions*>(this->parent());
         return collections;
     }
 
-    explicit QRPCListenColletionsPvt(QRPCServer*server, const QVariantHash&settings, QRPCListenColletions*parent):QObject(parent){
+    explicit QRPCListenColletionsPvt(QRPCServer*server, const QVariantHash&settings, QRPCListenColletions*parent):QObject(parent)
+    {
         this->server=server;
         this->settings=settings;
         this->makeListens();
     }
 
-    ~QRPCListenColletionsPvt(){
+    ~QRPCListenColletionsPvt()
+    {
     }
 
-    void setSettings(const QVariantHash&settings){
+    void setSettings(const QVariantHash&settings)
+    {
         this->settings=settings;
         this->loadSettings();
     }
 
-    void loadSettings(){
+    void loadSettings()
+    {
         auto settingsDefault = this->settings.value(qsl("default")).toHash();
         for(auto&v : this->listenProtocol){
             auto optionName=v->optionName();
             auto settings = this->settings.value(optionName).toHash();
-            if(!settings.isEmpty()){
+            if(!settings.isEmpty())
                 v->setSettings(settings, settingsDefault);
-            }
         }
 
         auto list=this->listenProtocol.value(0);
@@ -67,7 +71,8 @@ public:
             list->setEnabled(true);
     }
 
-    void makeListens(){
+    void makeListens()
+    {
         this->makeOption(0, QRPCListenQRPC::staticMetaObject);
         this->makeOption(QRPCProtocol::TcpSocket, QRPCListenTCP::staticMetaObject);
         this->makeOption(QRPCProtocol::UdpSocket, QRPCListenUDP::staticMetaObject);
@@ -81,63 +86,68 @@ public:
         this->loadSettings();
     }
 
-    bool makeOption(int protocol, const QMetaObject&metaObject){
+    bool makeOption(int protocol, const QMetaObject&metaObject)
+    {
         QMutexLOCKER locker(&this->lockMake);
         if(this->listenProtocol.contains(protocol))
             return true;
-        else{
-            auto option = new QRPCListenProtocol(protocol, metaObject, this->parent());
-            option->setObjectName(qsl("set_%1").arg(QString::fromUtf8(option->protocolName())));
-            this->listenProtocol.insert(option->protocol(), option);
-            return true;
-        }
+
+        auto option = new QRPCListenProtocol(protocol, metaObject, this->parent());
+        option->setObjectName(qsl("set_%1").arg(QString::fromUtf8(option->protocolName())));
+        this->listenProtocol.insert(option->protocol(), option);
+        return true;
     }
 
 
-    void listenClear(){
-        if(!this->listensActive.isEmpty()){
-            auto aux=this->listensActive.values();
-            this->listensActive.clear();
-            for(auto&listen:aux){
-                if(listen->isRunning()){
-                    listen->quit();
-                    listen->wait();
-                    listen->deleteLater();
-                }
-            }
+    void listenClear()
+    {
+        if(this->listensActive.isEmpty())
+            return;
+
+        auto aux=this->listensActive.values();
+        this->listensActive.clear();
+        for(auto&listen:aux){
+            if(!listen->isRunning())
+                continue;
+
+            listen->quit();
+            listen->wait();
+            listen->deleteLater();
         }
     }
 
-    void listenStart(){
+    void listenStart()
+    {
         this->listenClear();
         auto listenProtocol=this->listenProtocol.values();
         for(auto&protocol:listenProtocol){
-            if(protocol->enabled()){
-                auto listen=protocol->makeListen();
-                if(listen!=nullptr){
-                    listen->setServer(this->server);
-                    listen->setColletions(this->collections());
-                    this->listensActive.insert(protocol->protocol(), listen);
-                }
-            }
+            if(!protocol->enabled())
+                continue;
+
+            auto listen=protocol->makeListen();
+            if(listen==nullptr)
+                continue;
+
+            listen->setServer(this->server);
+            listen->setColletions(this->collections());
+            this->listensActive.insert(protocol->protocol(), listen);
         }
 
         auto listenPool=this->collections()->listenPool();
         if(listenPool==nullptr){
             qFatal("invalid pool");
         }
-        else{
-            for(auto&listen:this->listensActive){
-                listenPool->registerListen(listen);
-                listen->setServer(this->server);
-                listen->setColletions(this->collections());
-            }
+
+        for(auto&listen:this->listensActive){
+            listenPool->registerListen(listen);
+            listen->setServer(this->server);
+            listen->setColletions(this->collections());
         }
 
         for(auto&listen:this->listensActive){
-            if(listen!=nullptr){
-                listen->start();
-            }
+            if(listen==nullptr)
+                continue;
+            listen->start();
         }
         if(!this->lockWaitRun.tryLock(10))
             this->lockWaitRun.unlock();
@@ -145,7 +155,8 @@ public:
             this->lockWaitRun.unlock();
     }
 
-    void listenQuit(){
+    void listenQuit()
+    {
         this->listenClear();
         this->lockRunning.tryLock(1);
         this->lockRunning.unlock();
@@ -237,11 +248,12 @@ QRPCListenQRPC *QRPCListenColletions::listenPool()
     QHashIterator<int, QRPCListen*> i(p.listensActive);
     while (i.hasNext()) {
         i.next();
-        if(i.value()!=nullptr){
-            auto listen = dynamic_cast<QRPCListenQRPC*>(i.value());
-            if(listen!=nullptr)
-                return listen;
-        }
+        if(i.value()==nullptr)
+            continue;
+
+        auto listen = dynamic_cast<QRPCListenQRPC*>(i.value());
+        if(listen!=nullptr)
+            return listen;
     }
     return nullptr;
 }

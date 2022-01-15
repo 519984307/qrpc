@@ -15,15 +15,18 @@ public:
      * @brief listen
      * @return
      */
-    QRPCListen&listen(){
+    QRPCListen&listen()
+    {
         auto _listen=dynamic_cast<QRPCListen*>(this->parent());
         return*_listen;
     }
 
-    explicit ServerUDPSocket(QObject*parent):QObject(parent){
+    explicit ServerUDPSocket(QObject*parent):QObject(parent)
+    {
     }
 
-    bool start(){
+    bool start()
+    {
 
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::UdpSocket);
         this->stop();
@@ -31,7 +34,7 @@ public:
         if(!protocol.enabled())
             return false;
 
-        bool RETURN=true;
+        bool __return=true;
         for(auto&sport:protocol.port()){
             auto port=sport.toInt();
             if(port<=0)
@@ -41,56 +44,59 @@ public:
             connect(server, &QUdpSocket::readyRead, this, &ServerUDPSocket::onClientConnected);
             if(server->bind(QHostAddress::LocalHost, port))
                 continue;
-            RETURN=false;
+            __return=false;
             break;
         }
 
-        if(!RETURN)
+        if(!__return)
             this->stop();
 
-        return RETURN;
+        return __return;
 
     }
 
-    bool stop(){
+    bool stop()
+    {
         for(auto&server:this->servers){
-            if(server!=nullptr){
-                server->disconnect();
-                delete server;
-                server=nullptr;
-            }
+            if(server==nullptr)
+                continue;
+            server->disconnect();
+            delete server;
+            server=nullptr;
         }
         return true;
     };
 
 public slots:
 
-    void sendRequest(const QByteArray&body){
+    void sendRequest(const QByteArray&body)
+    {
         QVariantHash request;
         request.insert("protocol","udp");
         request.insert("body",body);
         emit this->listen().rpcRequest(request, QVariant());
     }
 
-    void onClientConnected(){
+    void onClientConnected()
+    {
         QByteArray body;
         auto server=dynamic_cast<QUdpSocket*>(QObject::sender());
-        if(server!=nullptr){
-            while (server->hasPendingDatagrams()) {
-                auto datagram = server->receiveDatagram();
-                body.append(datagram.data());
-            }
-            this->sendRequest(body);
-            server->close();
+        if(server==nullptr)
+            return;
+
+        while (server->hasPendingDatagrams()) {
+            auto datagram = server->receiveDatagram();
+            body.append(datagram.data());
         }
+        this->sendRequest(body);
+        server->close();
     }
 
     void onClientDisconnected()
     {
         auto socket = qobject_cast<QUdpSocket*>(QObject::sender());
-        if (socket!=nullptr) {
+        if (socket!=nullptr)
             socket->deleteLater();
-        }
     }
 
 };
@@ -102,10 +108,13 @@ class QRPCListenUDPPvt:public QObject{
 public:
     ServerUDPSocket*_listenServer=nullptr;
 
-    explicit QRPCListenUDPPvt(QRPCListenUDP*parent):QObject(parent){
+    explicit QRPCListenUDPPvt(QRPCListenUDP*parent):QObject(parent)
+    {
         this->_listenServer = new ServerUDPSocket(parent);
     }
-    virtual ~QRPCListenUDPPvt(){
+
+    virtual ~QRPCListenUDPPvt()
+    {
         this->_listenServer->stop();
         delete this->_listenServer;
         this->_listenServer=nullptr;

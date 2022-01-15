@@ -12,10 +12,12 @@ class QRPCRequestJobTcp : public QRPCRequestJobProtocol
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit QRPCRequestJobTcp(QObject*parent):QRPCRequestJobProtocol(parent){
+    Q_INVOKABLE explicit QRPCRequestJobTcp(QObject*parent):QRPCRequestJobProtocol(parent)
+    {
     }
 
-    ~QRPCRequestJobTcp(){
+    ~QRPCRequestJobTcp()
+    {
     }
 
     QRPCRequestJobResponse*response=nullptr;
@@ -23,7 +25,8 @@ public:
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response)override{
+    virtual bool call(QRPCRequestJobResponse*response)override
+    {
         this->response=response;
         if(m_socket!=nullptr)
             delete m_socket;
@@ -45,7 +48,8 @@ public:
 
 private slots:
 
-    void onConnected(){
+    void onConnected()
+    {
         this->buffer.clear();
         if(!m_socket->waitForConnected(response->activityLimit)){
             response->response_qt_status_code=QNetworkReply::TimeoutError;
@@ -73,11 +77,13 @@ private slots:
         this->onFinish();
     };
 
-    void onClosed(){
+    void onClosed()
+        {
         //emit this->callback(QVariant());
     };
 
-    void onReplyError(QAbstractSocket::SocketError e){
+    void onReplyError(QAbstractSocket::SocketError e)
+    {
         Q_UNUSED(e)
         if(e!=QAbstractSocket::SocketError::RemoteHostClosedError){
             response->response_qt_status_code=QNetworkReply::UnknownServerError;

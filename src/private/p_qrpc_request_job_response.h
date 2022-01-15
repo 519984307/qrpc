@@ -19,6 +19,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCRequestJobResponse class
+//!
 class QRPCRequestJobResponse:public QObject{
     Q_OBJECT
 public:
@@ -40,9 +43,11 @@ public:
     QNetworkReply::NetworkError response_qt_status_code = QNetworkReply::NoError;
     QHash<QString, QVariant> responseHeader;
 
-    Q_INVOKABLE explicit QRPCRequestJobResponse(QObject*parent):QObject(parent){
+    Q_INVOKABLE explicit QRPCRequestJobResponse(QObject*parent):QObject(parent)
+    {
     }
-    explicit QRPCRequestJobResponse(const QVariantHash&request_header, const QVariant&vUrl, QRPCRequest&request, QObject*parent):QObject(parent){
+    explicit QRPCRequestJobResponse(const QVariantHash&request_header, const QVariant&vUrl, QRPCRequest&request, QObject*parent):QObject(parent)
+    {
         this->request_url = vUrl;
         this->request_header = request_header;
         this->request_body = request.body().body().toByteArray();
@@ -51,15 +56,12 @@ public:
         this->request_exchange = request.exchange();
     }
 
-    Q_INVOKABLE  virtual ~QRPCRequestJobResponse(){
+    ~QRPCRequestJobResponse()
+    {
     }
 
-    /**
-     * @brief operator =
-     * @param v
-     * @return
-     */
-    QRPCRequestJobResponse &operator =(QRPCRequestJobResponse &e){
+    QRPCRequestJobResponse &operator =(QRPCRequestJobResponse &e)
+    {
         this->request_exchange=e.request_exchange;
         this->qrpcRequest=e.qrpcRequest;
         this->request_url=e.request_url;
@@ -75,12 +77,14 @@ public:
         return*this;
     }
 
-    QVariantHash toMapResquest(){
+    QVariantHash toMapResquest()
+    {
         auto method=this->request_exchange.call().method();
         return Util::toMapResquest(method,request_url,request_body,request_parameters,response_body,request_header,request_start,request_finish);
     }
 
-    QVariantHash toMapResponse(){
+    QVariantHash toMapResponse()
+    {
         QVariantHash map;
         Q_DECLARE_VU;
         map.insert(qsl("finish"), QDateTime::currentDateTime());
@@ -92,7 +96,8 @@ public:
         return map;
     }
 
-    QVariantHash toVariant(){
+    QVariantHash toVariant()
+    {
         auto rpclog = QVariantList{qvh{{qsl("resquest"), this->toMapResquest()}},qvh{ {qsl("response"), this->toMapResponse()}}};
         ///*{"openapi", this->toMapOpenAPI()}*,/
         return qvh({{qsl("rpclog"), rpclog}});

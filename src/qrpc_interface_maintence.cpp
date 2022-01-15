@@ -4,7 +4,7 @@
 
 namespace QRpc {
 
-QRPCInterfaceMaintence::QRPCInterfaceMaintence(QObject *parent) : QRPCInterfaceCheck(parent)
+QRPCInterfaceMaintence::QRPCInterfaceMaintence(QObject *parent) : QRpc::QRPCController(parent)
 {
     this->setEnabled(true);
 }

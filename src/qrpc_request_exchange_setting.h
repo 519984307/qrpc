@@ -6,6 +6,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCRequestExchangeSetting class
+//!
 class Q_RPC_EXPORT QRPCRequestExchangeSetting: public QObject
 {
     Q_OBJECT
@@ -23,22 +26,32 @@ public:
     Q_PROPERTY(QString      topic            READ topic              WRITE setTopic               )
     Q_PROPERTY(QVariant     activityLimit    READ activityLimit      WRITE setActivityLimit       )
 
+    //!
+    //! \brief QRPCRequestExchangeSetting
+    //! \param parent
+    //!
     Q_INVOKABLE explicit QRPCRequestExchangeSetting(QObject *parent=nullptr);
-    explicit QRPCRequestExchangeSetting(QRPCRequestExchangeSetting&e, QObject *parent=nullptr);
-    Q_INVOKABLE virtual ~QRPCRequestExchangeSetting();
 
-    /**
-     * @brief operator =
-     * @param v
-     * @return
-     */
+    //!
+    //! \brief QRPCRequestExchangeSetting
+    //! \param e
+    //! \param parent
+    //!
+    explicit QRPCRequestExchangeSetting(QRPCRequestExchangeSetting&e, QObject *parent=nullptr);
+    ~QRPCRequestExchangeSetting();
+
+    //!
+    //! \brief operator =
+    //! \param e
+    //! \return
+    //!
     QRPCRequestExchangeSetting&operator=(const QRPCRequestExchangeSetting&e);
     QRPCRequestExchangeSetting&operator=(const QVariantHash&e);
 
-    /**
-     * @brief toMap
-     * @return
-     */
+    //!
+    //! \brief toMap
+    //! \return
+    //!
     virtual QVariantMap toMap() const;
 
     /**
@@ -47,118 +60,123 @@ public:
      */
     virtual QVariantHash toHash() const;
 
-    /**
-     * @brief url
-     * @return
-     */
+    //!
+    //! \brief url
+    //! \return
+    //!
     virtual QString url() const;
 
-    /**
-     * @brief isValid
-     * @return
-     */
+    //!
+    //! \brief isValid
+    //! \return
+    //!
     virtual bool isValid() const;
 
-    /**
-     * @brief print
-     * @return
-     */
+    //!
+    //! \brief print
+    //! \param output
+    //! \return
+    //!
     virtual QRPCRequestExchangeSetting&print(const QString&output=QString());
 
-    /**
-     * @brief printOut
-     * @param output
-     * @return
-     */
+    //!
+    //! \brief printOut
+    //! \param output
+    //! \return
+    //!
     virtual QStringList printOut(const QString&output=QString());
 
-    /**
-     * @brief method
-     * @return
-     */
+    //!
+    //! \brief method
+    //! \return
+    //!
     virtual QRPCRequestMethod method() const;
     virtual void setMethod(const int&value);
     virtual void setMethod(const QString&value);
+
+    //!
+    //! \brief methodName
+    //! \return
+    //!
     virtual QString methodName() const;
 
-    /**
-     * @brief protocol
-     * @return
-     */
+    //!
+    //! \brief protocol
+    //! \return
+    //!
     virtual QRPCProtocol protocol() const;
     virtual QString protocolName() const;
     virtual QString protocolUrlName() const;
     virtual void setProtocol(const QRPCProtocol &value);
     virtual void setProtocol(const QVariant&value);
 
-    /**
-     * @brief driver
-     * @return
-     */
+    //!
+    //! \brief driver
+    //! \return
+    //!
     virtual QString driver() const;
     virtual void setDriver(const QString &value);
 
-    /**
-     * @brief hostName
-     * @return
-     */
+    //!
+    //! \brief hostName
+    //! \return
+    //!
     virtual QString hostName() const;
     virtual void setHostName(const QString &value);
 
-    /**
-     * @brief vHost
-     * @return
-     */
+    //!
+    //! \brief vHost
+    //! \return
+    //!
     virtual QString vHost() const;
     virtual void setVHost(const QString &value);
 
-    /**
-     * @brief userName
-     * @return
-     */
+    //!
+    //! \brief userName
+    //! \return
+    //!
     virtual QString userName() const;
     virtual void setUserName(const QString &value);
 
-    /**
-     * @brief passWord
-     * @return
-     */
+    //!
+    //! \brief passWord
+    //! \return
+    //!
     virtual QString passWord() const;
     virtual void setPassWord(const QString &value);
 
-    /**
-     * @brief route
-     * @return
-     */
+    //!
+    //! \brief route
+    //! \return
+    //!
     virtual QString &route() const;
     virtual void setRoute(const QVariant &value);
 
-
-    /**
-     * @brief topic
-     * @return
-     */
+    //!
+    //! \brief topic
+    //! \return
+    //!
     virtual QString topic() const;
     virtual void setTopic(const QString &value);
 
-    /**
-     * @brief port
-     * @return
-     */
+    //!
+    //! \brief port
+    //! \return
+    //!
     virtual int port() const;
     virtual void setPort(int port);
 
-    /**
-     * @brief activityLimit
-     * @return
-     */
+    //!
+    //! \brief activityLimit
+    //! \return
+    //!
     virtual qlonglong activityLimit() const;
     virtual void setActivityLimit(const QVariant &value);
 
-    /**
-     * @brief parameter
-     * @return
-     */
+    //!
+    //! \brief parameter
+    //! \return
+    //!
     virtual QVariantHash parameter() const;
     virtual void setParameter(const QVariantHash &parameter);
 

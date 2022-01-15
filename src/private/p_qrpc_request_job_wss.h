@@ -12,14 +12,19 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCRequestJobWSS class
+//!
 class QRPCRequestJobWSS : public QRPCRequestJobProtocol
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit QRPCRequestJobWSS(QObject*parent):QRPCRequestJobProtocol(parent){
+    Q_INVOKABLE explicit QRPCRequestJobWSS(QObject*parent):QRPCRequestJobProtocol(parent)
+    {
     }
 
-    ~QRPCRequestJobWSS(){
+    ~QRPCRequestJobWSS()
+    {
     }
 
     QRPCRequestJobResponse*response=nullptr;
@@ -27,7 +32,8 @@ public:
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response)override{
+    virtual bool call(QRPCRequestJobResponse*response)override
+    {
 
         this->response=response;
 
@@ -70,23 +76,27 @@ public:
 
 private slots:
 
-    void onConnected(){
+    void onConnected()
+    {
         QRPCListenRequest request(response->request_body);
         auto body=request.toJson();
         m_socket->sendBinaryMessage(body);
     };
 
-    void onClosed(){
+    void onClosed()
+        {
         //emit this->callback(QVariant());
     };
 
-    void onReplyError(QAbstractSocket::SocketError e){
+    void onReplyError(QAbstractSocket::SocketError e)
+    {
         Q_UNUSED(e)
         response->response_qt_status_code=QNetworkReply::UnknownServerError;
         emit this->callback(QVariant());
     };
 
-    void onBinaryMessageReceived(const QByteArray &message){
+    void onBinaryMessageReceived(const QByteArray &message)
+    {
         auto socket=dynamic_cast<QWebSocket*>(QObject::sender());
         if(socket!=nullptr){
             Q_UNUSED(message)
@@ -96,12 +106,14 @@ private slots:
     };
 
 
-    void onReplyTimeout(){
+    void onReplyTimeout()
+    {
         response->response_qt_status_code=QNetworkReply::TimeoutError;
         emit this->callback(QVariant());
     };
 
-    void onReplyPong(quint64 elapsedTime, const QByteArray &payload){
+    void onReplyPong(quint64 elapsedTime, const QByteArray &payload)
+    {
         Q_UNUSED(elapsedTime)
         Q_UNUSED(payload)
     }
@@ -112,7 +124,8 @@ private slots:
         this->onFinish();
     };
 
-    void onFinish(){
+    void onFinish()
+    {
         QRPCListenRequest request(this->buffer);
         if(!request.isValid()){
             response->response_qt_status_code=QNetworkReply::InternalServerError;

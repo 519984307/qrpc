@@ -14,17 +14,15 @@
 
 namespace QRpc {
 
-class LocalSocketServer:public QObject{
-    //Q_OBJECT
+class LocalSocketServer:public QObject
+{
+
 public:
     QHash<QString,QLocalServer*> servers;
 
     QList<QLocalServer*> clients;
     QMap<QUuid, QLocalSocket*> clientsMap;
-    /**
-     * @brief listen
-     * @return
-     */
+
     QRPCListenLocalSocket&listen()
     {
         auto _listen=dynamic_cast<QRPCListenLocalSocket*>(this->parent());
@@ -37,7 +35,6 @@ public:
 
     bool start()
     {
-
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::WebSocket);
 
         this->stop();
@@ -45,7 +42,7 @@ public:
         if(!protocol.enabled())
             return false;
 
-        bool RETURN=false;
+        bool __return=false;
         for(auto&sport:protocol.port()){
             auto port=sport.toString().trimmed();
             if(port.isEmpty())
@@ -69,28 +66,26 @@ public:
                 continue;
             }
 
-            RETURN=true;
+            __return=true;
             sDebug()<<QString("LocalSocketServer: Listening on port %1").arg(port);
             this->servers.insert(port, server);
         }
 
-        if(!RETURN){
+        if(!__return)
             this->stop();
-        }
 
-        return RETURN;
+        return __return;
 
     }
 
     bool stop()
     {
-        {
-            auto aux=this->clientsMap.values();
-            this->clientsMap.clear();
-            for(auto&client:aux){
-                client->close();
-            }
+        auto aux=this->clientsMap.values();
+        this->clientsMap.clear();
+        for(auto&client:aux){
+            client->close();
         }
+
         for(auto&server:this->servers){
             if(server!=nullptr){
                 server->disconnect();
@@ -103,15 +98,17 @@ public:
 
     void onRpcFinish(QRPCListenRequest&request)
     {
-        if(request.isValid()){
-            auto socket = this->clientsMap.value(request.requestUuid());
-            if(socket!=nullptr){
-                socket->write(request.toJson());
-                socket->flush();
-                //socket->close();//NO CLOSE
-            }
-            emit request.finish();
-        }
+        if(!request.isValid())
+            return;
+
+        auto socket = this->clientsMap.value(request.requestUuid());
+        if(socket==nullptr)
+            return;
+
+        socket->write(request.toJson());
+        socket->flush();
+        //socket->close();//NO CLOSE
+        emit request.finish();
     }
 
     void onRpcRequest(QRPCListenRequest&request)
@@ -122,21 +119,19 @@ public:
             return;
         }
         emit this->listen().rpcRequest(request.toHash(), QVariant());
-
     }
 
 public slots:
 
-
-
     void onRpcResponse(QUuid uuid, QVariantHash vRequest)
     {
         auto&request=this->listen().cacheRequest()->toRequest(uuid);
-        if(request.isValid()){
-            if(!request.fromResponseMap(vRequest))
-                request.co().setInternalServerError();
-            onRpcFinish(request);
-        }
+        if(!request.isValid())
+            return;
+
+        if(!request.fromResponseMap(vRequest))
+            request.co().setInternalServerError();
+        onRpcFinish(request);
     }
 
     void onServerNewConnection()
@@ -168,7 +163,8 @@ public slots:
     }
 
 
-    void onClientDisconnected()    {
+    void onClientDisconnected()
+    {
         auto socket = qobject_cast<QLocalSocket*>(QObject::sender());
         if (socket==nullptr)
             return;
@@ -189,10 +185,12 @@ class QRPCListenLocalSocketPvt:public QObject{
 public:
     LocalSocketServer*_listenServer=nullptr;
 
-    explicit QRPCListenLocalSocketPvt(QRPCListenLocalSocket*parent):QObject(parent){
+    explicit QRPCListenLocalSocketPvt(QRPCListenLocalSocket*parent):QObject(parent)
+    {
         this->_listenServer = new LocalSocketServer(parent);
     }
-    virtual ~QRPCListenLocalSocketPvt(){
+    virtual ~QRPCListenLocalSocketPvt()
+    {
         this->_listenServer->stop();
         delete this->_listenServer;
         this->_listenServer=nullptr;

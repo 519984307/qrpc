@@ -98,7 +98,8 @@ public:
         qDeleteAll(aux);
     }
 
-    QRPCListenHTTP*listen(){
+    QRPCListenHTTP*listen()
+    {
         auto _listen=dynamic_cast<QRPCListenHTTP*>(this->parent());
         return _listen;
     }
@@ -282,9 +283,10 @@ public slots:
         auto&request=this->listen()->cacheRequest()->toRequest(uuid);
         if(!request.isValid())
             return;
-        if(!request.fromResponseMap(vRequest)){
+
+        if(!request.fromResponseMap(vRequest))
             request.co().setInternalServerError();
-        }
+
         emit request.finish();
     }
 };
@@ -307,7 +309,8 @@ public:
     {
     }
 
-    bool start(){
+    bool start()
+    {
         auto&p=*this;
         p._listenServer = new HttpServer3drparty(this->parent);
         QObject::connect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3drparty::onRpcResponse);

@@ -26,65 +26,69 @@
 
 namespace QRpc {
 
-    static bool static_log_register=false;
-    static QString static_log_dir;
+static bool static_log_register=false;
+static QString static_log_dir;
 
-    static void static_log_dir_clear(const QString&ormLogDir){
-        QStringList dir_found;
-        QStringList dir_rm_file;
-        dir_found.append(ormLogDir);
-        while(!dir_found.isEmpty()){
-            auto scanDir = dir_found.takeFirst();
-            dir_rm_file.append(scanDir);
-            QDir dir(scanDir);
-            if(dir.exists(scanDir)){
-                dir.setFilter(QDir::AllDirs);
-                for(auto&scanInDir:dir.entryList()){
-                    if(scanInDir==qsl(".") || scanInDir==qsl(".."))
-                        continue;
-                    else{
-                        auto dir=qsl("%1/%2").arg(scanDir, scanInDir);
-                        dir_rm_file.append(dir);
-                        dir_found.append(dir);
-                    }
-                }
-            }
-        }
+static void static_log_dir_clear(const QString&ormLogDir)
+{
+    QStringList dir_found;
+    QStringList dir_rm_file;
+    dir_found.append(ormLogDir);
+    while(!dir_found.isEmpty()){
+        auto scanDir = dir_found.takeFirst();
+        dir_rm_file.append(scanDir);
 
-        auto ext=QStringList{qsl("*.*")};
-        for(auto&sdir:dir_rm_file){
-            QDir scanDir(sdir);
-            if(scanDir.exists()){
-                scanDir.setFilter(QDir::Drives | QDir::Files);
-                scanDir.setNameFilters(ext);
-                auto list=scanDir.entryList();
-                for(auto&dirFile : list){
-                    auto fileName=sdir+qsl("/")+dirFile;
-                    QFile::remove(fileName);
-                }
-            }
+        QDir dir(scanDir);
+        if(!dir.exists(scanDir))
+            continue;
+
+        dir.setFilter(QDir::AllDirs);
+        for(auto&scanInDir:dir.entryList()){
+            if(scanInDir==qsl(".") || scanInDir==qsl(".."))
+                continue;
+
+            auto dir=qsl("%1/%2").arg(scanDir, scanInDir);
+            dir_rm_file.append(dir);
+            dir_found.append(dir);
         }
     }
 
-    static void static_log_init_dir(){
-        auto env = QString(getenv(qbl("Q_LOG_ENABLED"))).trimmed();
-    #ifdef QT_DEBUG
-        static_log_register = env.isEmpty()?true :QVariant(env).toBool();
-    #else
-        static_log_register = env.isEmpty()?false:QVariant(env).toBool();
-    #endif
-        if(static_log_register){
-            static const auto log_local_name=QString(__PRETTY_FUNCTION__).split(qsl("::")).first().replace(qsl("void "),qsl_null).split(qsl_space).last();
-            static_log_dir=qsl("%1/%2/%3").arg(QDir::homePath(), log_local_name, qApp->applicationName());
-            QDir dir(static_log_dir);
-            if(!dir.exists(static_log_dir))
-                dir.mkpath(static_log_dir);
-            if(dir.exists(static_log_dir))
-                static_log_dir_clear(static_log_dir);
+    auto ext=QStringList{qsl("*.*")};
+    for(auto&sdir:dir_rm_file){
+        QDir scanDir(sdir);
+        if(!scanDir.exists())
+            continue;
+        scanDir.setFilter(QDir::Drives | QDir::Files);
+        scanDir.setNameFilters(ext);
+        auto list=scanDir.entryList();
+        for(auto&dirFile : list){
+            auto fileName=sdir+qsl("/")+dirFile;
+            QFile::remove(fileName);
         }
     }
+}
 
-    Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir)
+static void static_log_init_dir()
+{
+    auto env = QString(getenv(qbl("Q_LOG_ENABLED"))).trimmed();
+#ifdef QT_DEBUG
+    static_log_register = env.isEmpty()?true :QVariant(env).toBool();
+#else
+    static_log_register = env.isEmpty()?false:QVariant(env).toBool();
+#endif
+    if(!static_log_register)
+        return;
+
+    static const auto log_local_name=QString(__PRETTY_FUNCTION__).split(qsl("::")).first().replace(qsl("void "),qsl_null).split(qsl_space).last();
+    static_log_dir=qsl("%1/%2/%3").arg(QDir::homePath(), log_local_name, qApp->applicationName());
+    QDir dir(static_log_dir);
+    if(!dir.exists(static_log_dir))
+        dir.mkpath(static_log_dir);
+    if(dir.exists(static_log_dir))
+        static_log_dir_clear(static_log_dir);
+}
+
+Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir)
 
 #define dPvt()\
     auto&p =*reinterpret_cast<QRPCRequestPvt*>(this->p)
@@ -129,7 +133,8 @@ public:
         this->qrpcBody.p=this;
     }
 
-    virtual ~QRPCRequestPvt(){
+    virtual ~QRPCRequestPvt()
+    {
     }
 
     void setSettings(const ServiceSetting &setting)
@@ -145,7 +150,8 @@ public:
     }
 
 
-    QString parseFileName(const QString&fileName){
+    QString parseFileName(const QString&fileName)
+    {
         auto _fileName=fileName.trimmed();
         if(_fileName.isEmpty()){
             QTemporaryFile file;
@@ -156,25 +162,28 @@ public:
         return _fileName;
     }
 
-    void writeLog(QRPCRequestJobResponse&response, const QVariant&request){
-        if(static_log_register){
-            if(request.isValid()){
-                QFile file(this->fileLog);
-                if (file.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text)){
-                    QTextStream outText(&file);
-                    auto&e=response.request_exchange.call();
-                    outText << QRPCRequestMethodName[e.method()]<<qsl(": ")<<response.request_url.toString()<<qsl("\n");
-                    outText << QJsonDocument::fromVariant(request).toJson(QJsonDocument::Indented);
-                    outText << qsl("\n");
-                    outText << qsl("\n");
-                    file.flush();
-                    file.close();
-                }
-            }
-        }
+    void writeLog(QRPCRequestJobResponse&response, const QVariant&request)
+    {
+        if(!static_log_register)
+            return;
+        if(!request.isValid())
+            return;
+        QFile file(this->fileLog);
+        if (!file.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text))
+            return;
+
+        QTextStream outText(&file);
+        auto&e=response.request_exchange.call();
+        outText << QRPCRequestMethodName[e.method()]<<qsl(": ")<<response.request_url.toString()<<qsl("\n");
+        outText << QJsonDocument::fromVariant(request).toJson(QJsonDocument::Indented);
+        outText << qsl("\n");
+        outText << qsl("\n");
+        file.flush();
+        file.close();
     }
 
-    QRPCHttpResponse &upload(const QString &route, const QString&fileName){
+    QRPCHttpResponse &upload(const QString &route, const QString&fileName)
+    {
         this->qrpcLastError.clear();
 
         {//configuracao do contentType pela extencao
@@ -242,7 +251,8 @@ public:
         return this->qrpcResponse;
     }
 
-    QRPCHttpResponse &download(const QString &route, const QString&fileName){
+    QRPCHttpResponse &download(const QString &route, const QString&fileName)
+    {
 
         if(!this->qrpcHeader.contentType().isValid())
             this->qrpcHeader.setContentType(QRpc::AppOctetStream);
@@ -325,7 +335,8 @@ public:
         return this->qrpcResponse;
     }
 
-    QRPCHttpResponse&call(const QRPCRequestMethod&method, const QVariant &vRoute, const QVariant &body){
+    QRPCHttpResponse&call(const QRPCRequestMethod&method, const QVariant &vRoute, const QVariant &body)
+    {
         this->qrpcLastError.clear();
 
         auto vBody=body;

@@ -218,7 +218,8 @@ public:
     }
 
 private slots:
-    void onRequestInvoke(QVariantHash vRequestMap, const QVariant&uploadedFiles){
+    void onRequestInvoke(QVariantHash vRequestMap, const QVariant&uploadedFiles)
+    {
         if(this->listenQRPC==nullptr){
             qFatal("listen pool is nullptr");
         }

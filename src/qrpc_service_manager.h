@@ -7,6 +7,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The ServiceManager class
+//!
 class Q_RPC_EXPORT ServiceManager : public QStm::SettingManager
 {
     Q_OBJECT

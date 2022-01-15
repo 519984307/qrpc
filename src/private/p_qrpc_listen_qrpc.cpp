@@ -34,6 +34,7 @@ public:
         if(this->listenQRPC!=nullptr)
             this->server = this->listenQRPC->server();
     }
+
     virtual ~QRPCListenQRPCPvt()
     {
         auto list=listenSlotCache.values();
@@ -54,7 +55,8 @@ public:
     }
 
 public slots:
-    void onRpcRequest(QVariantHash vRequest, const QVariant&uploadedFiles){
+    void onRpcRequest(QVariantHash vRequest, const QVariant&uploadedFiles)
+    {
         QRPCListenRequest request;
         if(!request.fromHash(vRequest)){
             if(request.co().isOK())

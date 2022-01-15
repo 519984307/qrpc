@@ -12,21 +12,24 @@
 
 namespace QRpc {
 
+//!
+//! \brief The ServiceThread class
+//!
 class ServiceThread : public QThread
 {
     Q_OBJECT
 public:
 
-    /**
-     * @brief The State enum
-     */
+    //!
+    //! \brief The State enum
+    //!
     enum State{
         Success=0, Error=1, Discarted=2, Canceled=3
     };
 
-    /**
-     * @brief The Stats struct
-     */
+    //!
+    //! \brief The Stats struct
+    //!
     struct Stats{
     public:
         QDateTime started=QDateTime::currentDateTime();
@@ -43,34 +46,37 @@ public:
         ServiceThread*service=nullptr;
     };
 
+    //!
+    //! \brief ServiceThread
+    //! \param parent
+    //!
     Q_INVOKABLE explicit ServiceThread(QObject *parent = nullptr);
-    Q_INVOKABLE explicit ServiceThread(const QString&serviceName, QObject *parent = nullptr);
+    explicit ServiceThread(const QString&serviceName, QObject *parent = nullptr);
     explicit ServiceThread(const ServiceManager&manager,QObject *parent = nullptr);
     explicit ServiceThread(const ServiceManager&manager, const QString&serviceName, QObject *parent = nullptr);
     ~ServiceThread();
 
-    /**
-     * @brief setting
-     * @return
-     */
+    //!
+    //! \brief setting
+    //! \return
+    //!
     virtual QRpc::ServiceSetting &setting();
 
-    /**
-     * @brief manager
-     * @return
-     */
+    //!
+    //! \brief manager
+    //! \return
+    //!
     virtual QRpc::ServiceManager&manager();
 
-    /**
-     * @brief run
-     */
+    //!
+    //! \brief run
+    //!
     void run() override;
 
-    /**
-     * @brief start
-     * @param manager
-     * @return
-     */
+    //!
+    //! \brief start
+    //! \return
+    //!
     virtual bool start();
     virtual bool start(const ServiceManager &manager);
 
@@ -80,107 +86,107 @@ public:
      */
     virtual bool stop();
 
-    /**
-     * @brief stats
-     * @return
-     */
+    //!
+    //! \brief stats
+    //! \return
+    //!
     virtual Stats &stats() const;
 
-    /**
-     * @brief toMap
-     * @return
-     */
+    //!
+    //! \brief toMap
+    //! \return
+    //!
     virtual QVariantHash toMap() const;
 
 
-    /**
-     * @brief serviceName
-     * @return
-     */
+    //!
+    //! \brief serviceName
+    //! \return
+    //!
     QString serviceName() const;
 
-    /**
-     * @brief setServiceName
-     * @param value
-     */
+    //!
+    //! \brief setServiceName
+    //! \param value
+    //!
     void setServiceName(const QString &value);
 
-    /**
-     * @brief received
-     * @param settings
-     * @param uuid
-     * @param v
-     */
+    //!
+    //! \brief received
+    //! \param uuid
+    //! \param v
+    //!
     virtual void received(const QUuid &uuid, const QVariant&v);
 
-    /**
-     * @brief request_send
-     * @param uuid
-     * @param v
-     */
+    //!
+    //! \brief dispatcher
+    //! \param uuid
+    //! \param v
+    //!
     void dispatcher(const QUuid &uuid, const QVariant&v);
 
 signals:
-    /**
-     * @brief service_started
-     * @param thread
-     */
+
+    //!
+    //! \brief service_started
+    //! \param thread
+    //!
     void service_started(QRpc::ServiceThread*thread);
 
-    /**
-     * @brief service_terminate
-     * @param thread
-     */
+    //!
+    //! \brief service_terminate
+    //! \param thread
+    //!
     void service_terminate(QRpc::ServiceThread*thread);
 
-    /**
-     * @brief request_send
-     * @param uuid
-     * @param v
-     */
+    //!
+    //! \brief request_send
+    //! \param uuid
+    //! \param v
+    //!
     void request_send(const QUuid &uuid, const QVariant&v);
 
-    /**
-     * @brief request_received
-     * @param uuid
-     * @param v
-     */
+    //!
+    //! \brief request_received
+    //! \param uuid
+    //! \param v
+    //!
     void request_received(const QUuid &uuid, const QVariant&v);
 
-    /**
-     * @brief request_success
-     * @param uuid
-     * @param detail
-     */
+    //!
+    //! \brief request_success
+    //! \param uuid
+    //! \param detail
+    //!
     void request_success(const QUuid &uuid, const QVariant&detail);
 
-    /**
-     * @brief request_error
-     * @param uuid
-     * @param detail
-     */
+    //!
+    //! \brief request_error
+    //! \param uuid
+    //! \param detail
+    //!
     void request_error(const QUuid &uuid, const QVariant&detail);
 
-    /**
-     * @brief request_discated
-     * @param uuid
-     * @param detail
-     */
+    //!
+    //! \brief request_discated
+    //! \param uuid
+    //! \param detail
+    //!
     void request_discated(const QUuid &uuid, const QVariant&detail);
 
-    /**
-     * @brief request_canceled
-     * @param uuid
-     * @param detail
-     */
+    //!
+    //! \brief request_canceled
+    //! \param uuid
+    //! \param detail
+    //!
     void request_canceled(const QUuid&uuid, const QVariant&detail);
 
-    /**
-     * @brief request_state
-     * @param uuid
-     * @param state
-     * @param detail
-     */
+    //!
+    //! \brief request_state
+    //! \param uuid
+    //! \param state
+    //! \param detail
+    //!
     void request_state(const QUuid &uuid, const QRpc::ServiceThread::State state, const QVariant&detail);
 private:
     void*p=nullptr;

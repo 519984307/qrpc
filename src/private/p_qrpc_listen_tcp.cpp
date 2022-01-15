@@ -25,15 +25,18 @@ public:
      * @brief listen
      * @return
      */
-    QRPCListen&listen(){
+    QRPCListen&listen()
+    {
         auto _listen=dynamic_cast<QRPCListen*>(this->parent());
         return*_listen;
     }
 
-    explicit ServerTCPSocket(QObject*parent):QObject(parent){
+    explicit ServerTCPSocket(QObject*parent):QObject(parent)
+    {
     }
 
-    bool start(){
+    bool start()
+    {
 
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::TcpSocket);
         this->stop();
@@ -41,7 +44,7 @@ public:
         if(!protocol.enabled())
             return false;
 
-        bool RETURN=false;
+        bool __return=false;
         for(auto&sport:protocol.port()){
             auto port=sport.toInt();
             if(port<=0)
@@ -57,7 +60,7 @@ public:
             }
 
             if(server->isListening()){
-                RETURN=true;
+                __return=true;
                 sDebug()<<QString("TcpsocketListener: Listening on port %i").arg(port);
                 this->servers.insert(port, server);
                 continue;
@@ -69,35 +72,35 @@ public:
             continue;
         }
 
-        if(!RETURN){
+        if(!__return)
             this->stop();
-        }
 
-        return RETURN;
+        return __return;
 
     }
 
-    bool stop(){
-        {
-            auto aux=this->clientsMap.values();
-            this->clientsMap.clear();
-            for(auto&client:aux){
-                client->close();
-            }
+    bool stop()
+    {
+        auto aux=this->clientsMap.values();
+        this->clientsMap.clear();
+        for(auto&client:aux){
+            client->close();
         }
+
         for(auto&server:this->servers){
-            if(server!=nullptr){
-                server->disconnect();
-                delete server;
-                server=nullptr;
-            }
+            if(server==nullptr)
+                continue;
+            server->disconnect();
+            delete server;
+            server=nullptr;
         }
         return true;
-    };
+    }
 
 public slots:
 
-    void onRpcFinish(QRpc::QRPCListenRequest*request){
+    void onRpcFinish(QRpc::QRPCListenRequest*request)
+    {
         Q_UNUSED(request)
         if(request->isValid()){
             auto socket = this->clientsMap.value(request->requestUuid());
@@ -111,7 +114,8 @@ public slots:
         }
     }
 
-    void onRpcResponse(const QUuid&uuid, const QVariantHash&vRequest){
+    void onRpcResponse(const QUuid&uuid, const QVariantHash&vRequest)
+    {
         auto&request=this->listen().cacheRequest()->toRequest(uuid);
         if(request.isValid()){
             if(!request.fromResponseMap(vRequest))
@@ -120,33 +124,34 @@ public slots:
         }
     }
 
-    void onRpcRequest(QRpc::QRPCListenRequest*request){
+    void onRpcRequest(QRpc::QRPCListenRequest*request)
+    {
         Q_UNUSED(request)
         if(!request->isValid()){
             request->co().setBadRequest();
             this->onRpcFinish(request);
+            return;
         }
-        else{
-            emit this->listen().rpcRequest(request->toHash(), QVariant());
-        }
+        emit this->listen().rpcRequest(request->toHash(), QVariant());
     }
 
-    void onServerNewConnection(){
+    void onServerNewConnection()
+    {
         auto server=dynamic_cast<QTcpServer*>(QObject::sender());
-        if(server!=nullptr){
-            auto socket = server->nextPendingConnection();
-            connect(socket, &QTcpSocket::disconnected, this, &ServerTCPSocket::deleteLater);
-            connect(socket, &QTcpSocket::disconnected, this, &ServerTCPSocket::onClientDisconnected);
-            while(socket->waitForReadyRead()){
-                this->buffer.append(socket->readAll());
-                QRPCListenRequest request;
-                if(request.fromJson(this->buffer))
-                    break;
-            }
-            auto&request=this->listen().cacheRequest()->createRequest(this->buffer);
-            this->clientsMap.insert(request.requestUuid(), socket);
-            this->onRpcRequest(&request);
+        if(server==nullptr)
+            return;
+        auto socket = server->nextPendingConnection();
+        connect(socket, &QTcpSocket::disconnected, this, &ServerTCPSocket::deleteLater);
+        connect(socket, &QTcpSocket::disconnected, this, &ServerTCPSocket::onClientDisconnected);
+        while(socket->waitForReadyRead()){
+            this->buffer.append(socket->readAll());
+            QRPCListenRequest request;
+            if(request.fromJson(this->buffer))
+                break;
         }
+        auto&request=this->listen().cacheRequest()->createRequest(this->buffer);
+        this->clientsMap.insert(request.requestUuid(), socket);
+        this->onRpcRequest(&request);
     }
 
     void onClientDisconnected()
@@ -169,10 +174,12 @@ class QRPCListenTCPPvt:public QObject{
 public:
     ServerTCPSocket*_listenServer=nullptr;
 
-    explicit QRPCListenTCPPvt(QRPCListenTCP*parent):QObject(parent){
+    explicit QRPCListenTCPPvt(QRPCListenTCP*parent):QObject(parent)
+    {
         this->_listenServer = new ServerTCPSocket(parent);
     }
-    virtual ~QRPCListenTCPPvt(){
+    virtual ~QRPCListenTCPPvt()
+    {
         this->_listenServer->stop();
         delete this->_listenServer;
         this->_listenServer=nullptr;

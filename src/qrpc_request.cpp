@@ -23,22 +23,20 @@ bool QRPCRequest::startsWith(const QString &requestPath, const QVariant &request
             requestPathBase=requestPathBase.split(qsl("*")).first();
         }
 
-
         auto route=qsl("/%1/").arg(requestPathBase.trimmed().toLower());
         auto path=qsl("/%1/").arg(requestPath.trimmed().toLower());
+
         while(route.contains(qsl("//")))
             route=route.replace(qsl("//"),qsl("/"));
+
         while(path.contains(qsl("//")))
             path=path.replace(qsl("//"),qsl("/"));
 
-        if(startWith){
-            if(path.startsWith(route))
-                return true;
-        }
-        else{
-            if((path==route))
-                return true;
-        }
+        if(startWith && path.startsWith(route))
+            return true;
+
+        if(path==route)
+            return true;
 
     }
 
@@ -113,6 +111,7 @@ QString QRPCRequest::url(const QString &path) const
     spath=qsl("/%1").arg(spath);
     while(spath.contains(qsl("//")))
         spath=spath.replace(qsl("//"),"/");
+
     if(path.isEmpty())
         return qsl("%1://%2:%3").arg(rq.protocolName(),rq.hostName(),rq.port().toString());
 
@@ -254,15 +253,23 @@ QRPCRequest &QRPCRequest::setPort(const QVariant &value)
     dPvt();
 
     QVariant v;
-     if(qTypeId(value)==QMetaType_QStringList || qTypeId(value)==QMetaType_QVariantList){
+    auto type=qTypeId(value);
+    switch (type) {
+    case QMetaType_QStringList:
+    case QMetaType_QVariantList:
+    {
         auto l=value.toList();
         v=l.isEmpty()?0:l.last().toInt();
+        break;
     }
-    else if(qTypeId(value)==QMetaType_QVariantMap || qTypeId(value)==QMetaType_QVariantHash){
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
+    {
         auto l=value.toHash().values();
         v=l.isEmpty()?0:l.last().toInt();
+        break;
     }
-    else{
+    default:
         v=value.toInt();
     }
     p.exchange.setPort(v.toInt());
@@ -529,12 +536,12 @@ QRPCRequest &QRPCRequest::autoSetCookie()
     auto cookies=this->header().cookies().toStringList();
     while (i.hasNext()){
         i.next();
-        if(i.key().toLower().startsWith(qsl("set-cookie"))){
-            auto cookieList=i.value().toString().split(qsl(";"));
-            for(auto&cookie:cookieList){
-                if(!cookies.contains(cookie))
-                    cookies.append(cookie);
-            }
+        if(!i.key().toLower().startsWith(qsl("set-cookie")))
+            continue;
+        auto cookieList=i.value().toString().split(qsl(";"));
+        for(auto&cookie:cookieList){
+            if(!cookies.contains(cookie))
+                cookies.append(cookie);
         }
     }
     this->header().setCookies(cookies);
@@ -613,10 +620,15 @@ QString QRPCRequest::Body::toString()const
 {
     dPvt();
     auto type=qTypeId(p.request_body);
-    if(type==QMetaType_QVariantList || type==QMetaType_QStringList || type==QMetaType_QVariantMap || type==QMetaType_QVariantHash)
+    switch (type) {
+    case QMetaType_QStringList:
+    case QMetaType_QVariantList:
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
         return QJsonDocument::fromVariant(p.request_body).toJson();
-
-    return p.request_body.toString();
+    default:
+        return p.request_body.toString();
+    }
 }
 
 QVariantMap QRPCRequest::Body::toMap() const
@@ -628,20 +640,30 @@ QVariantHash QRPCRequest::Body::toHash()const
 {
     dPvt();
     auto type=qTypeId(p.request_body);
-    if(type==QMetaType_QVariantList || type==QMetaType_QStringList || type==QMetaType_QVariantMap || type==QMetaType_QVariantHash)
+    switch (type) {
+    case QMetaType_QStringList:
+    case QMetaType_QVariantList:
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
         return QJsonDocument::fromVariant(p.request_body).object().toVariantHash();
-
-    return QJsonDocument::fromJson(p.request_body.toByteArray()).object().toVariantHash();
+    default:
+        return QJsonDocument::fromJson(p.request_body.toByteArray()).object().toVariantHash();
+    }
 }
 
 QVariantList QRPCRequest::Body::toList() const
 {
     dPvt();
     auto type=qTypeId(p.request_body);
-    if(type==QMetaType_QVariantList || type==QMetaType_QStringList || type==QMetaType_QVariantMap || type==QMetaType_QVariantHash)
+    switch (type) {
+    case QMetaType_QStringList:
+    case QMetaType_QVariantList:
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
         return QJsonDocument::fromVariant(p.request_body).array().toVariantList();
-
-    return QJsonDocument::fromJson(p.request_body.toByteArray()).array().toVariantList();
+    default:
+        return QJsonDocument::fromJson(p.request_body.toByteArray()).array().toVariantList();
+    }
 }
 
 QRPCRequest &QRPCRequest::Body::rq()

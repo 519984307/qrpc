@@ -33,6 +33,7 @@ public:
     {
         Q_UNUSED(parent)
     }
+
     virtual ~QRPCListenRequestParserPvt()
     {
     }
@@ -143,12 +144,14 @@ bool QRPCListenRequestParser::parse(const QMetaMethod&metaMethod)
     bool returnVariant=false;
     auto argReturn=Q_RETURN_ARG(bool, returnVariant);
     const auto&className=this->metaObject()->className();
+
     if(!metaMethod.invoke(this, Qt::DirectConnection, argReturn)){
 #if Q_RPC_LOG
         sWarning()<<"Parser not valid "<<className;
 #endif
         return this->rq().co().setInternalServerError().isOK();
     }
+
     if(!returnVariant){//Unauthorized
 #if Q_RPC_LOG
         sWarning()<<"Parser validation error "<<className;
