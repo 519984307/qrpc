@@ -29,10 +29,12 @@ public:
     QNetworkReply::NetworkError response_qt_status_code=QNetworkReply::NoError;
     QString response_reason_phrase;
     QByteArray response_body;
-    explicit QRPCHttpResponsePvt(QRPCHttpResponse*parent): response_header(parent){
+    explicit QRPCHttpResponsePvt(QRPCHttpResponse*parent): response_header(parent)
+    {
     }
 
-    virtual ~QRPCHttpResponsePvt(){
+    virtual ~QRPCHttpResponsePvt()
+    {
     }
 };
 
@@ -57,8 +59,14 @@ QRPCHttpHeaders &QRPCHttpResponse::header() const
 void QRPCHttpResponse::setBody(const QVariant &vBody)
 {
     dPvt();
-    auto t=qTypeId(vBody);
-    if(t==QMetaType_QVariantMap || t==QMetaType_QVariantHash || t==QMetaType_QVariantList || t==QMetaType_QString){
+    auto typeId=qTypeId(vBody);
+    switch (typeId) {
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
+    case QMetaType_QVariantList:
+    case QMetaType_QString:
+    case QMetaType_QByteArray:
+    {
         if(this->header().isContentType(AppJson)){
             auto doc=QJsonDocument::fromVariant(vBody);
             p.response_body=doc.toJson(doc.Compact);
@@ -71,8 +79,9 @@ void QRPCHttpResponse::setBody(const QVariant &vBody)
             auto doc=QJsonDocument::fromVariant(vBody);
             p.response_body=doc.toJson(doc.Compact);
         }
+        break;
     }
-    else{
+    default:
         p.response_body=vBody.toByteArray();
     }
 }
@@ -147,13 +156,15 @@ QVariantList QRPCHttpResponse::bodyArray() const
 QVariantList QRPCHttpResponse::bodyToList() const
 {
     auto v=this->bodyVariant();
-    if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList)
+    switch (qTypeId(v)) {
+    case QMetaType_QVariantList:
+    case QMetaType_QStringList:
         return v.toList();
-
-    if(v.isValid())
-        return QVariantList{v};
-
-    return {};
+    default:
+        if(v.isValid())
+            return QVariantList{v};
+        return {};
+    }
 }
 
 int &QRPCHttpResponse::statusCode() const
@@ -243,22 +254,20 @@ bool QRPCHttpResponse::isUnAuthorized() const
 QRPCHttpResponse &QRPCHttpResponse::setResponse(QObject *objectResponse)
 {
     dPvt();
-    if(objectResponse!=nullptr){
-        if(QRpc::QRPCRequestJobResponse::staticMetaObject.cast(objectResponse)){
-            auto&response=*dynamic_cast<QRpc::QRPCRequestJobResponse*>(objectResponse);
-            p.response_header.setRawHeader(response.responseHeader);
-            p.response_status_code=response.response_status_code;
-            p.response_qt_status_code=response.response_qt_status_code;
-            p.response_reason_phrase=response.response_status_reason_phrase;
-            p.response_body=response.response_body;
-        }
+    if(objectResponse!=nullptr && QRpc::QRPCRequestJobResponse::staticMetaObject.cast(objectResponse)){
+        auto&response=*dynamic_cast<QRpc::QRPCRequestJobResponse*>(objectResponse);
+        p.response_header.setRawHeader(response.responseHeader);
+        p.response_status_code=response.response_status_code;
+        p.response_qt_status_code=response.response_qt_status_code;
+        p.response_reason_phrase=response.response_status_reason_phrase;
+        p.response_body=response.response_body;
     }
     return*this;
 }
 
 QString QRPCHttpResponse::toString() const
 {
-    dPvt();\
+    dPvt();
     auto&response=*this;
     auto qt_text=QRPCListenRequestCode::qt_network_error_phrase(p.response_qt_status_code);
     auto msg=qsl("QtStatus: Status:%1, %2, %3").arg(QString::number(response.qtStatusCode()), response.reasonPhrase(),qt_text);

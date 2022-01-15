@@ -1,24 +1,13 @@
 #pragma once
 
-#include "./qrpc_interface_check.h"
+#include "./qrpc_controller.h"
 
 namespace QRpc {
 
-/**
- * @brief The QRPCInterfaceMaintence class
- *
- * GET
- * http://localhost:80/serverStats
- *
- * POST/PUT
- * http://localhost/v1/maintence/serverStart
- * http://localhost/v1/maintence/serverStop
- * http://localhost/v1/maintence/serverRestart
- * http://localhost/v1/maintence/servicesCheck
- * http://localhost/v1/maintence/applicationQuit
- *
- */
-class QRPCInterfaceMaintence : public QRPCInterfaceCheck
+//!
+//! \brief The QRPCInterfaceMaintence class
+//!
+class QRPCInterfaceMaintence : public QRpc::QRPCController
 {
     Q_OBJECT
     QRPC_DECLARE_ROUTE(QRPCInterfaceCheck,"v1/maintence")
@@ -26,34 +15,35 @@ public:
     Q_INVOKABLE explicit QRPCInterfaceMaintence(QObject *parent = nullptr);
     ~QRPCInterfaceMaintence();
 
-    /**
-     * @brief serverStart
-     * @return
-     */
+    //!
+    //! \brief serverStart
+    //! \return
+    //!
     Q_INVOKABLE virtual QVariant serverStart();
 
-    /**
-     * @brief serverStop
-     * @return
-     */
+    //!
+    //! \brief serverStop
+    //! \return
+    //!
     Q_INVOKABLE virtual QVariant serverStop();
 
-    /**
-     * @brief serverRestart
-     * @return
-     */
+
+    //!
+    //! \brief serverRestart
+    //! \return
+    //!
     Q_INVOKABLE virtual QVariant serverRestart();
 
-    /**
-     * @brief servicesCheck
-     * @return
-     */
+    //!
+    //! \brief servicesCheck
+    //! \return
+    //!
     Q_INVOKABLE virtual QVariant servicesCheck();
 
-    /**
-     * @brief applicationQuit
-     * @return
-     */
+    //!
+    //! \brief applicationQuit
+    //! \return
+    //!
     Q_INVOKABLE virtual QVariant applicationQuit();
 signals:
 

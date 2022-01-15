@@ -12,6 +12,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCRequestJobDataBase class
+//!
 class QRPCRequestJobDataBase : public QRPCRequestJobProtocol
 {
     Q_OBJECT
@@ -26,7 +29,8 @@ public:
     QString responsePath;
     QSqlDriver*sqlDriver=nullptr;
 
-    Q_INVOKABLE explicit QRPCRequestJobDataBase(QObject*parent):QRPCRequestJobProtocol(parent), listen_request(this), listen_response(this){
+    Q_INVOKABLE explicit QRPCRequestJobDataBase(QObject*parent):QRPCRequestJobProtocol(parent), listen_request(this), listen_response(this)
+    {
     }
 
     ~QRPCRequestJobDataBase(){
@@ -48,46 +52,53 @@ public:
 
         auto configureHeaders=[&requestHeader, &response](){
 
-            if(!response->request_header.isEmpty()){
-                QHashIterator<QString, QVariant> i(response->request_header);
-                while (i.hasNext()) {
-                    i.next();
-                    const auto k=i.key().toLower();
-                    if(removeHeaders.contains(k))
-                        continue;
+            if(response->request_header.isEmpty())
+                return;
 
-                    if(ignoreHeaders.contains(k))
-                        continue;
+            QHashIterator<QString, QVariant> i(response->request_header);
+            while (i.hasNext()) {
+                i.next();
+                const auto k=i.key().toLower();
+                if(removeHeaders.contains(k))
+                    continue;
 
-                    {
-                        auto v=i.value();
-                        QStringList headerValues;
-                        if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList){
-                            auto vList=v.toList();
-                            for(auto&r:vList){
-                                headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
-                            }
-                        }
-                        else if(qTypeId(v)==QMetaType_QVariantHash || qTypeId(v)==QMetaType_QVariantMap){
-                            auto vMap=v.toHash();
-                            QHashIterator<QString, QVariant> i(vMap);
-                            while (i.hasNext()) {
-                                i.next();
-                                auto r=qsl("%1=%2").arg(i.value().toString(), v.toString()).replace(qsl("\n"), qsl(";"));
-                                headerValues<<r;
-                            }
-                        }
-                        else{
-                            headerValues<<v.toString();
-                        }
-                        v=headerValues.join(qsl("; "));
-                        auto k=i.key().toUtf8().trimmed();
-                        requestHeader[k]=v;
-#if Q_RPC_LOG_SUPER_VERBOSE
-                        sInfo()<<":request.setRawHeader("<<i.key()<<", "<<i.value()<<")";
-#endif
+                if(ignoreHeaders.contains(k))
+                    continue;
+
+                auto v=i.value();
+                QStringList headerValues;
+
+                switch (qTypeId(v)) {
+                case QMetaType_QVariantList:
+                case QMetaType_QStringList:
+                {
+                    auto vList=v.toList();
+                    for(auto&r:vList){
+                        headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                     }
+                    break;
                 }
+                case QMetaType_QVariantHash:
+                case QMetaType_QVariantMap:
+                {
+                    auto vMap=v.toHash();
+                    QHashIterator<QString, QVariant> i(vMap);
+                    while (i.hasNext()) {
+                        i.next();
+                        auto r=qsl("%1=%2").arg(i.value().toString(), v.toString()).replace(qsl("\n"), qsl(";"));
+                        headerValues<<r;
+                    }
+                    break;
+                }
+                default:
+                    headerValues<<v.toString();
+                }
+                v=headerValues.join(qsl("; "));
+                auto key=i.key().toUtf8().trimmed();
+                requestHeader[key]=v;
+#if Q_RPC_LOG_SUPER_VERBOSE
+                sInfo()<<":request.setRawHeader("<<i.key()<<", "<<i.value()<<")";
+#endif
             }
         };
 
@@ -116,7 +127,8 @@ public:
         return this->listen_request;
     }
 
-    void connectionClose(){
+    void connectionClose()
+    {
         auto cnn=QSqlDatabase::database(this->sqlConnectionName);
         if(cnn.isValid()){
             cnn.close();
@@ -129,7 +141,8 @@ public:
     }
 
 
-    bool connectionMake(QSqlDatabase&outConnection){
+    bool connectionMake(QSqlDatabase&outConnection)
+    {
         this->connectionClose();
 
         auto&exchange_call=this->response->request_exchange.call();
@@ -186,7 +199,8 @@ public:
         return outConnection.isOpen();
     }
 
-    virtual bool call(QRPCRequestJobResponse*response)override{
+    virtual bool call(QRPCRequestJobResponse*response)override
+    {
         this->response=response;
         auto&request=this->requestMake(response);
         QSqlDatabase __connection;
@@ -256,13 +270,15 @@ private slots:
         this->onFinish();
     };
 
-    void onBrokerError(const QString&error){
+    void onBrokerError(const QString&error)
+    {
         response->response_qt_status_code=QNetworkReply::InternalServerError;
         response->response_status_reason_phrase=error.toUtf8();
         this->onFinish();
     };
 
-    void onFinish(){
+    void onFinish()
+    {
         QObject::disconnect(this->sqlDriver, QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &QRPCRequestJobDataBase::onReceiveBroker);
         auto __connection=QSqlDatabase::database(this->sqlConnectionName);
         if(__connection.isValid()){

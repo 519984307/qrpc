@@ -31,7 +31,7 @@ public:
     //!
     //! \brief ~QRPCListen
     //!
-    Q_INVOKABLE virtual ~QRPCListen();
+    ~QRPCListen();
 
     //!
     //! \brief uuid

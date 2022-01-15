@@ -218,12 +218,16 @@ QRPCListenRequestCode &QRPCListenRequestCode::operator=(const QVariant &v)
 {
     QVariant code;
     QVariant phrase;
-    if(qTypeId(v)==QMetaType_QVariantMap || qTypeId(v)==QMetaType_QVariantHash){
+    switch (qTypeId(v)) {
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
+    {
         auto vv=v.toHash();
         code=vv.value(qsl("code")).toInt();
         phrase=vv.value(qsl("phrase")).toString();
+        break;
     }
-    else {
+    default:
         code=v.toInt();
     }
     if(code.toInt()>0)

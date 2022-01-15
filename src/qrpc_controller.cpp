@@ -70,7 +70,8 @@ static auto&staticRegisterInterfaceMetaObject=PrivateCPP::makeMetaMethodVector()
 static auto&staticParserRequestMetaObjects=PrivateCPP::makeParserRequestMetaObjects();
 static auto&staticControllerMethodBlackList=PrivateCPP::makeControllerMethodBlackList();
 
-static void initQRPCRoutes(){
+static void initQRPCParserRoutes()
+{
     for(auto&metaObject:staticParserRequestMetaObjects)
         QRPCListenRequestParser::makeRoute(*metaObject);
 }
@@ -91,8 +92,9 @@ static void initQRPCController()
     }
 }
 
-static void init(){
-    initQRPCRoutes();
+static void init()
+{
+    initQRPCParserRoutes();
     initQRPCController();
 }
 

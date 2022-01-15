@@ -44,16 +44,17 @@ public:
         auto&option=colletions->protocol(QRPCProtocol::DataBase);
         for(auto&v:option.port()){
             auto port=v.toInt();
-            if(port>0){
-                if(!this->realMessageOnException)
-                    this->realMessageOnException=option.realMessageOnException();
-                auto settings=option.makeSettingsHash();
-                settings[qsl("port")]=port;
-                auto connection = queueMake(settings);
-                if(connection.isValid() && connection.isOpen()){
-                    this->listenersQSqlDatabase.insert(connection.connectionName(),connection);
-                    this->listenersQSqlDrivers.insert(connection.connectionName(),connection.driver());
-                }
+            if(port<=0)
+                continue;
+
+            if(!this->realMessageOnException)
+                this->realMessageOnException=option.realMessageOnException();
+            auto settings=option.makeSettingsHash();
+            settings[qsl("port")]=port;
+            auto connection = queueMake(settings);
+            if(connection.isValid() && connection.isOpen()){
+                this->listenersQSqlDatabase.insert(connection.connectionName(),connection);
+                this->listenersQSqlDrivers.insert(connection.connectionName(),connection.driver());
             }
         }
         this->queueCheck();
@@ -293,15 +294,18 @@ public:
     DataBaseListenerServer*_listenServer=nullptr;
     QRPCListenBrokerDataBase*parent=nullptr;
 
-    explicit QRPCListenBrokerDataBasePvt(QRPCListenBrokerDataBase*parent):QObject(parent){
+    explicit QRPCListenBrokerDataBasePvt(QRPCListenBrokerDataBase*parent):QObject(parent)
+    {
         this->parent=parent;
     }
 
-    virtual ~QRPCListenBrokerDataBasePvt(){
+    virtual ~QRPCListenBrokerDataBasePvt()
+    {
         this->stop();
     }
 
-    bool start(){
+    bool start()
+    {
         auto&p=*this;
         p._listenServer = new DataBaseListenerServer(this->parent);
         QObject::connect(this->parent, &QRPCListenBrokerDataBase::rpcResponse, p._listenServer, &DataBaseListenerServer::onRpcResponse);
@@ -315,7 +319,8 @@ public:
         return p._listenServer->queueStart();
     }
 
-    bool stop(){
+    bool stop()
+    {
         auto&p=*this;
         if(p._listenServer!=nullptr){
             p._listenServer->queueStop();

@@ -37,7 +37,7 @@ public:
     //!
     //! \brief ~QRPCController
     //!
-    Q_INVOKABLE virtual ~QRPCController();
+    ~QRPCController();
 
     //!
     //! \brief route

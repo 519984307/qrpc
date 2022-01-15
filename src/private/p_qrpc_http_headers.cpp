@@ -35,15 +35,18 @@ public:
             i.next();
             if(i.key().trimmed().toLower()==vkey){
                 auto&v=i.value();
-                if(qTypeId(v)==QMetaType_QStringList){
+                switch (qTypeId(v)) {
+                case QMetaType_QStringList:
                     vList=v.toStringList();
-                }
-                else if(qTypeId(v)==QMetaType_QVariantList){
+                    break;
+                case QMetaType_QVariantList:
+                {
                     for(auto&v:v.toList()){
                         vList<<v.toString();
                     }
+                    break;
                 }
-                else{
+                default:
                     vList<<v.toString();
                 }
             }
@@ -94,18 +97,21 @@ QVariant QRPCHttpHeaders::rawHeader(const QString &headername)const
     QHashIterator<QString, QVariant> i(p.header);
     while (i.hasNext()) {
         i.next();
-        if(i.key().toLower()==headername.toLower()){
-            auto&v=i.value();
-            QStringList vList;
-            if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList){
-                vList=v.toStringList();
-            }
-            else{
-                vList=v.toString().split(qsl(";"));
-            }
-            for(auto&header:vList)
-                returnList<<header;
+        if(i.key().toLower()!=headername.toLower())
+            continue;
+
+        auto&v=i.value();
+        QStringList vList;
+        switch (qTypeId(v)) {
+        case QMetaType_QStringList:
+        case QMetaType_QVariantList:
+            vList=v.toStringList();
+            break;
+        default:
+            vList=v.toString().split(qsl(";"));
         }
+        for(auto&header:vList)
+            returnList<<header;
     }
     return QVariant(returnList);
 }
@@ -128,15 +134,15 @@ QRPCHttpHeaders &QRPCHttpHeaders::setRawHeader(const QVariantHash &rawHeader)
 QRPCHttpHeaders &QRPCHttpHeaders::setRawHeader(const QString &header, const QVariant &value)
 {
     QVariantList list;
-    if(qTypeId(value)==QMetaType_QStringList){
-        for(auto&v:value.toStringList())
-            list<<v;
-    }
-    else if(qTypeId(value)==QMetaType_QVariantList){
+    switch (qTypeId(value)) {
+    case QMetaType_QStringList:
+    case QMetaType_QVariantList:
+    {
         for(auto&v:value.toList())
             list<<v;
+        break;
     }
-    else{
+    default:
         list<<value;
     }
 
@@ -146,10 +152,11 @@ QRPCHttpHeaders &QRPCHttpHeaders::setRawHeader(const QString &header, const QVar
     vList.clear();
     for(auto&v:list){
         auto vv=v.toByteArray().trimmed();
-        if(!vv.isEmpty()){
-            if(!vList.contains(vv))
-                vList<<vv.trimmed();
-        }
+        if(vv.isEmpty())
+            continue;
+
+        if(!vList.contains(vv))
+            vList<<vv.trimmed();
     }
 
     for(auto&v:vList){
@@ -181,15 +188,15 @@ QRPCHttpHeaders &QRPCHttpHeaders::addRawHeader(const QVariantHash &rawHeader)
 QRPCHttpHeaders &QRPCHttpHeaders::addRawHeader(const QString &header, const QVariant &value)
 {
     QVariantList list;
-    if(qTypeId(value)==QMetaType_QStringList){
-        for(auto&v:value.toStringList())
-            list<<v;
-    }
-    else if(qTypeId(value)==QMetaType_QVariantList){
+    switch (qTypeId(value)) {
+    case QMetaType_QStringList:
+    case QMetaType_QVariantList:
+    {
         for(auto&v:value.toList())
             list<<v;
+        break;
     }
-    else{
+    default:
         list<<value;
     }
 
@@ -281,9 +288,12 @@ QVariant QRPCHttpHeaders::contentDisposition() const
 
 QRPCHttpHeaders &QRPCHttpHeaders::setAuthorization(const QString &authorization, const QString &type, const QVariant &credentials)
 {
-
     QString scredentials;
-    if(qTypeId(credentials)==QMetaType_QVariantMap){
+
+    switch (qTypeId(scredentials)) {
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantList:
+    {
         QStringList params;
         QHashIterator<QString, QVariant> i(credentials.toHash());
         while (i.hasNext()) {
@@ -291,17 +301,9 @@ QRPCHttpHeaders &QRPCHttpHeaders::setAuthorization(const QString &authorization,
             params<<qsl("%1=%2").arg(i.key(),i.value().toString());
         }
         scredentials=params.join(qsl_space);
+        break;
     }
-    else if(qTypeId(credentials)==QMetaType_QVariantHash){
-        QStringList params;
-        QHashIterator<QString, QVariant> i(credentials.toHash());
-        while (i.hasNext()) {
-            i.next();
-            params<<qsl("%1=%2").arg(i.key(),i.value().toString());
-        }
-        scredentials=params.join(' ');
-    }
-    else{
+    default:
         scredentials=credentials.toString().trimmed();
     }
 
@@ -313,20 +315,31 @@ QRPCHttpHeaders &QRPCHttpHeaders::setAuthorization(const QString &authorization,
 QRPCHttpHeaders &QRPCHttpHeaders::setAuthorization(const QString &authorization, const AuthorizationType &type, const QVariant &credentials)
 {
     QString stype;
-    if(type==Basic)
+    switch (type) {
+    case Basic:
         stype=qsl("Basic");
-    else if(type==Bearer)
+        break;
+    case Bearer:
         stype=qsl("Bearer");
-    else if(type==Digest)
+        break;
+    case Digest:
         stype=qsl("Digest");
-    else if(type==HOBA)
+        break;
+    case HOBA:
         stype=qsl("HOBA");
-    else if(type==Mutual)
+        break;
+    case Mutual:
         stype=qsl("Mutual");
-    else if(type==AWS4_HMAC_SHA256)
+        break;
+    case AWS4_HMAC_SHA256:
         stype=qsl("AWS4_HMAC_SHA256");
-    else if(type==Service)
+        break;
+    case Service:
         stype=qsl("Service");
+        break;
+    default:
+        break;
+    }
 
     if(type!=Basic)
         return this->setAuthorization(authorization, stype, credentials);
@@ -388,26 +401,30 @@ QVariant QRPCHttpHeaders::authorization(const QString &authorization, const QStr
     QHashIterator<QString, QVariant> i(p.header);
     while (i.hasNext()) {
         i.next();
-        if(i.key().toLower()==authorization.toLower()){
-            auto list=i.value().toString().split(qsl_space);
-            if(list.size()<=1){
+        if(i.key().toLower()!=authorization.toLower())
+            continue;
+        auto list=i.value().toString().split(qsl_space);
+        if(list.size()<=1)
+            continue;
+
+
+        if(type.toLower()!=list.first())
+            continue;
+
+        list.takeFirst();
+        for(auto&v:list){
+            if(v.contains(qsl("="))){
+                auto sp=v.split(qsl("="));
+                QVariantHash map;
+                map.insert(sp.at(0),sp.at(1));
+                returnList<<map;
                 continue;
             }
-            else if(type.toLower()==list.first()){
-                list.takeFirst();
-                for(auto&v:list){
-                    if(v.contains(qsl("="))){
-                        auto sp=v.split(qsl("="));
-                        QVariantHash map;
-                        map.insert(sp.at(0),sp.at(1));
-                        returnList<<map;
-                    }
-                    else if(!returnList.contains(v)){
-                        returnList<<v;
-                    }
-                }
-            }
 
+            if(!returnList.contains(v)){
+                returnList<<v;
+                continue;
+            }
         }
     }
     return returnList.size()==1?returnList.first():returnList;
@@ -416,18 +433,28 @@ QVariant QRPCHttpHeaders::authorization(const QString &authorization, const QStr
 QVariant QRPCHttpHeaders::authorization(const QString &authorization, const AuthorizationType &type)
 {
     QString stype;
-    if(type==Basic)
+    switch (type) {
+    case Basic:
         stype=qsl("Basic");
-    else if(type==Bearer)
+        break;
+    case Bearer:
         stype=qsl("Bearer");
-    else if(type==Digest)
+        break;
+    case Digest:
         stype=qsl("Digest");
-    else if (type==HOBA)
+        break;
+    case HOBA:
         stype=qsl("HOBA");
-    else if(type==Mutual)
+        break;
+    case Mutual:
         stype=qsl("Mutual");
-    else if(type==AWS4_HMAC_SHA256)
+        break;
+    case AWS4_HMAC_SHA256:
         stype=qsl("AWS4_HMAC_SHA256");
+        break;
+    default:
+        break;
+    }
     return this->authorization(authorization, stype);
 }
 
@@ -473,10 +500,10 @@ QStringList QRPCHttpHeaders::printOut(const QString &output)
     auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
     QStringList __return;
     Q_DECLARE_VU;
-    auto vMap=this->rawHeader();
-    if(!vMap.isEmpty()){
+    auto vHash=this->rawHeader();
+    if(!vHash.isEmpty()){
         __return<<qsl("%1%2 headers").arg(space, output).trimmed();
-        QHashIterator<QString, QVariant> i(vMap);
+        QHashIterator<QString, QVariant> i(vHash);
         while (i.hasNext()){
             i.next();
             __return<<qsl("%1     %2:%3").arg(space, i.key(), vu.toStr(i.value()));
@@ -489,22 +516,30 @@ QRPCHttpHeaders &QRPCHttpHeaders::operator=(const QVariant &v)
 {
     dPvt();
     p.header.clear();
-    QVariantHash vMap;
-    if(qTypeId(v)==QMetaType_QString || qTypeId(v)==QMetaType_QByteArray)
-        vMap=QJsonDocument::fromJson(v.toByteArray()).toVariant().toHash();
-    else
-        vMap=v.toHash();
-    return this->setRawHeader(vMap);
+    QVariantHash vHash;
+    switch (qTypeId(v)) {
+    case QMetaType_QString:
+    case QMetaType_QByteArray:
+        vHash=QJsonDocument::fromJson(v.toByteArray()).toVariant().toHash();
+        break;
+    default:
+        vHash=v.toHash();
+    }
+    return this->setRawHeader(vHash);
 }
 
 QRPCHttpHeaders &QRPCHttpHeaders::operator<<(const QVariant &v)
 {
-    QVariantHash vMap;
-    if(qTypeId(v)==QMetaType_QString || qTypeId(v)==QMetaType_QByteArray)
-        vMap=QJsonDocument::fromJson(v.toByteArray()).toVariant().toHash();
-    else
-        vMap=v.toHash();
-    QHashIterator<QString, QVariant> i(vMap);
+    QVariantHash vHash;
+    switch (qTypeId(v)) {
+    case QMetaType_QString:
+    case QMetaType_QByteArray:
+        vHash=QJsonDocument::fromJson(v.toByteArray()).toVariant().toHash();
+        break;
+    default:
+        vHash=v.toHash();
+    }
+    QHashIterator<QString, QVariant> i(vHash);
     while (i.hasNext()) {
         i.next();
         this->addRawHeader(i.key(), i.value());

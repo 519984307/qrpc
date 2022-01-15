@@ -25,19 +25,23 @@ public:
     int port=8080;
     QVariant activityLimit=defaultLimit;
     QRPCRequestExchangeSetting*parent=nullptr;
-    explicit QRPCRequestExchangeSettingPvt(QRPCRequestExchangeSetting*parent){
+    explicit QRPCRequestExchangeSettingPvt(QRPCRequestExchangeSetting*parent)
+    {
         this->parent=parent;
     }
 
-    virtual ~QRPCRequestExchangeSettingPvt(){
+    virtual ~QRPCRequestExchangeSettingPvt()
+    {
     }
 
-    QString protocolName()const{
+    QString protocolName()const
+    {
         const auto&v=QRPCProtocolName.value(this->protocol);
         return v;
     }
 
-    QString protocolUrlName()const{
+    QString protocolUrlName()const
+    {
         const auto&v=QRPCProtocolUrlName.value(this->protocol);
         return v;
     }
@@ -82,11 +86,10 @@ QVariantMap QRPCRequestExchangeSetting::toMap() const
         auto property=e.metaObject()->property(i);
         if(QByteArray(property.name()) == qbl("objectName"))
             continue;
-        else{
-            auto v=property.read(&e);
-            if(v.isValid())
-                map.insert(property.name(), v);
-        }
+
+        auto v=property.read(&e);
+        if(v.isValid())
+            map.insert(property.name(), v);
     }
     return map;
 }
@@ -99,11 +102,10 @@ QVariantHash QRPCRequestExchangeSetting::toHash() const
         auto property=e.metaObject()->property(i);
         if(QByteArray(property.name()) == qbl("objectName"))
             continue;
-        else{
-            auto v=property.read(&e);
-            if(v.isValid())
-                map.insert(property.name(), v);
-        }
+
+        auto v=property.read(&e);
+        if(v.isValid())
+            map.insert(property.name(), v);
     }
     return map;
 }
@@ -122,8 +124,7 @@ bool QRPCRequestExchangeSetting::isValid() const
 {
     if(this->protocol()==QRpc::Amqp && !this->topic().isEmpty())
         return true;
-    else
-        return false;
+    return false;
 
 }
 
@@ -136,19 +137,21 @@ QRPCRequestExchangeSetting &QRPCRequestExchangeSetting::print(const QString &out
 
 QStringList QRPCRequestExchangeSetting::printOut(const QString &output)
 {
-    auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
-    QStringList out;
     Q_DECLARE_VU;
+
+    auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
     auto vMap=this->toHash();
-    if(!vMap.isEmpty()){
-        out<<qsl("%1%2 attributes").arg(space, output).trimmed();
-        QHashIterator<QString, QVariant> i(vMap);
-        while (i.hasNext()){
-            i.next();
-            if(i.key().toLower()==qsl("password"))
-                continue;
-            out<<qsl("%1%2     %2:%3").arg(space, output, i.key(), vu.toStr(i.value()));
-        }
+    if(vMap.isEmpty())
+        return {};
+
+    QStringList out;
+    out<<qsl("%1%2 attributes").arg(space, output).trimmed();
+    QHashIterator<QString, QVariant> i(vMap);
+    while (i.hasNext()){
+        i.next();
+        if(i.key().toLower()==qsl("password"))
+            continue;
+        out<<qsl("%1%2     %2:%3").arg(space, output, i.key(), vu.toStr(i.value()));
     }
     return out;
 }

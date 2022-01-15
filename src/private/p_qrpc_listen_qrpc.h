@@ -23,7 +23,7 @@ public:
     //!
     //! \brief ~QRPCListenQRPC
     //!
-    Q_INVOKABLE virtual ~QRPCListenQRPC();
+    ~QRPCListenQRPC();
 
     //!
     //! \brief run

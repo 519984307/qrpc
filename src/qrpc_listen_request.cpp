@@ -76,15 +76,18 @@ public:
     int _requestTimeout=0;
     void*_data=nullptr;
     QRPCListenRequest*parent=nullptr;
-    explicit QRPCListenRequestPvt(QRPCListenRequest*parent):QObject(parent), listenCode(parent){
+    explicit QRPCListenRequestPvt(QRPCListenRequest*parent):QObject(parent), listenCode(parent)
+    {
         this->parent=parent;
         QObject::connect(parent, &QRPCListenRequest::finish, this, &QRPCListenRequestPvt::onRequestFinish);
     }
-    virtual ~QRPCListenRequestPvt(){
+    virtual ~QRPCListenRequestPvt()
+    {
         this->freeFiles();
     }
 
-    void mergeMap(const QVariant&v){
+    void mergeMap(const QVariant&v)
+    {
         Q_DECLARE_VU;
         auto&r=*this->parent;
         r.mergeMap(vu.toMap(v));
@@ -105,7 +108,8 @@ public:
         }
     }
 
-    QVariantHash&requestParamCache(){
+    QVariantHash&requestParamCache()
+    {
         auto requestBodyHash=this->parent->requestBodyHash();
         if(!requestBodyHash.isEmpty())
             this->_requestParamCache=requestBodyHash;
@@ -115,7 +119,8 @@ public:
     }
 
     template<class T>
-    T toVMap() const{
+    T toVMap() const
+    {
         T map;
         const QMetaObject* metaObject = parent->metaObject();
         for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
@@ -132,7 +137,8 @@ public:
         return map;
     }
 
-    void freeFiles(){
+    void freeFiles()
+    {
         for(auto&v:this->uploadedFiles){
             v->close();
             delete v;
@@ -140,14 +146,16 @@ public:
         this->uploadedFiles.clear();
     }
 
-    void makeUuid(){
+    void makeUuid()
+    {
         if(this->_requestUuid.isNull()){
             auto uuidNs = QUuid::createUuid();
             this->_requestUuid=QUuid::createUuidV5(uuidNs, baseUuid);
         }
     }
 
-    void clear(){
+    void clear()
+    {
         this->eventLoop.quit();
         this->_listenUuid=QUuid();
         this->_data=nullptr;
@@ -157,14 +165,16 @@ public:
         this->clearResponse();
     }
 
-    void clearRequest(){
+    void clearRequest()
+    {
         this->_requestUuid=QUuid();
         this->_requestHeader=QVariantHash();
         this->_requestParameter=QVariantHash();
         this->_requestBody=QVariant();
     }
 
-    void clearResponse(){
+    void clearResponse()
+    {
         this->_responseHeader=QVariantHash();
         this->_responseBody=QVariant();
         this->_responseCode=0;
@@ -172,7 +182,8 @@ public:
         this->_data=nullptr;
     }
 
-    void setRequestHeader(const QVariantHash &value){
+    void setRequestHeader(const QVariantHash &value)
+    {
         this->_requestHeader=value;
         this->_requestContentType=QRpc::AppXwwwForm;
         static auto headerName=ContentTypeName.toLower();
@@ -181,15 +192,16 @@ public:
             i.next();
             auto key=i.key().toLower();
             auto value=i.value().toString().toLower().trimmed();
-            if(key.toLower()==headerName){
-                QHashIterator<QString, ContentType> i(ContentTypeHeaderToHeaderType);
-                while (i.hasNext()) {
-                    i.next();
-                    if(value.contains(i.key())){
-                        this->_requestContentType=i.value();
-                        break;
-                    }
-                }
+            if(key.toLower()!=headerName)
+                continue;
+
+            QHashIterator<QString, ContentType> i(ContentTypeHeaderToHeaderType);
+            while (i.hasNext()) {
+                i.next();
+                if(!value.contains(i.key()))
+                    continue;
+                this->_requestContentType=i.value();
+                break;
             }
         }
     }
@@ -448,12 +460,14 @@ bool QRPCListenRequest::mergeMap(const QVariantMap &vRequest)
         auto key = property.name();
         auto vVal= property.read(this);
         auto vNew=vRequest.value(key);
-        auto type=qTypeId(property);
         if(!vNew.isValid() || vNew.isNull()){
             continue;
         }
-
-        if(type==QMetaType_QVariantMap || type==QMetaType_QVariantHash){
+        auto type=qTypeId(property);
+        switch (type) {
+        case QMetaType_QVariantMap:
+        case QMetaType_QVariantHash:
+        {
             auto vMap=vVal.toHash();
             if(!vMap.isEmpty()){
                 auto mNew=vNew.toHash();
@@ -466,11 +480,13 @@ bool QRPCListenRequest::mergeMap(const QVariantMap &vRequest)
             }
             if(!property.write(this, vNew)){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_QVariantList || type==QMetaType_QStringList){
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
+        {
             auto vLst=vVal.toList();
             if(!vLst.isEmpty()){
                 auto mNew=vNew.toList();
@@ -484,57 +500,67 @@ bool QRPCListenRequest::mergeMap(const QVariantMap &vRequest)
             }
             if(!property.write(this, vNew)){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_QUuid){
+        case QMetaType_QUuid:
+        {
             if(!property.write(this, vNew.toUuid())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_QUrl){
+        case QMetaType_QUrl:
+        {
             if(!property.write(this, vNew.toUrl())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_UInt || type==QMetaType_Int){
+        case QMetaType_UInt:
+        case QMetaType_Int:
+        {
             if(!property.write(this, vNew.toInt())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_ULongLong || type==QMetaType_LongLong){
+        case QMetaType_ULongLong:
+        case QMetaType_LongLong:
+        {
             if(!property.write(this, vNew.toLongLong())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
 
-        if(type==QMetaType_Double){
+        case QMetaType_Double:
+        {
             if(!property.write(this, vNew.toDouble())){
                 this->clear();
+                return this->isValid();
+            }
+            break;
+        }
+        default:
+            if(!property.write(this, vNew)){
+                if(type!=QMetaType_User){
+                    this->clear();
+                    return this->isValid();
+                }
+
+                if(!property.write(this, vNew.toInt())){
+                    this->clear();
+                    return this->isValid();
+                }
                 break;
             }
         }
-
-        if(!property.write(this, vNew)){
-            if(type!=QMetaType_User){
-                this->clear();
-                break;
-            }
-
-            if(!property.write(this, vNew.toInt())){
-                this->clear();
-                break;
-            }
-        }
-
     }
     return this->isValid();
 }
@@ -554,12 +580,14 @@ bool QRPCListenRequest::mergeHash(const QVariantHash &vRequest)
         auto key = property.name();
         auto vVal= property.read(this);
         auto vNew=vRequest.value(key);
-        auto type=qTypeId(property);
         if(!vNew.isValid() || vNew.isNull()){
             continue;
         }
-
-        if(type==QMetaType_QVariantMap || type==QMetaType_QVariantHash){
+        auto type=qTypeId(property);
+        switch (type) {
+        case QMetaType_QVariantMap:
+        case QMetaType_QVariantHash:
+        {
             auto vMap=vVal.toHash();
             if(!vMap.isEmpty()){
                 auto mNew=vNew.toHash();
@@ -572,11 +600,13 @@ bool QRPCListenRequest::mergeHash(const QVariantHash &vRequest)
             }
             if(!property.write(this, vNew)){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_QVariantList || type==QMetaType_QStringList){
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
+        {
             auto vLst=vVal.toList();
             if(!vLst.isEmpty()){
                 auto mNew=vNew.toList();
@@ -590,57 +620,67 @@ bool QRPCListenRequest::mergeHash(const QVariantHash &vRequest)
             }
             if(!property.write(this, vNew)){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_QUuid){
+        case QMetaType_QUuid:
+        {
             if(!property.write(this, vNew.toUuid())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_QUrl){
+        case QMetaType_QUrl:
+        {
             if(!property.write(this, vNew.toUrl())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_UInt || type==QMetaType_Int){
+        case QMetaType_UInt:
+        case QMetaType_Int:
+        {
             if(!property.write(this, vNew.toInt())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
-
-        if(type==QMetaType_ULongLong || type==QMetaType_LongLong){
+        case QMetaType_ULongLong:
+        case QMetaType_LongLong:
+        {
             if(!property.write(this, vNew.toLongLong())){
                 this->clear();
-                break;
+                return this->isValid();
             }
+            break;
         }
 
-        if(type==QMetaType_Double){
+        case QMetaType_Double:
+        {
             if(!property.write(this, vNew.toDouble())){
                 this->clear();
+                return this->isValid();
+            }
+            break;
+        }
+        default:
+            if(!property.write(this, vNew)){
+                if(type!=QMetaType_User){
+                    this->clear();
+                    return this->isValid();
+                }
+
+                if(!property.write(this, vNew.toInt())){
+                    this->clear();
+                    return this->isValid();
+                }
                 break;
             }
         }
-
-        if(!property.write(this, vNew)){
-            if(type!=QMetaType_User){
-                this->clear();
-                break;
-            }
-
-            if(!property.write(this, vNew.toInt())){
-                this->clear();
-                break;
-            }
-        }
-
     }
     return this->isValid();
 }
@@ -653,44 +693,66 @@ bool QRPCListenRequest::fromResponseMap(const QVariantHash &vRequest)
     for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
         auto property = metaObject->property(i);
         auto key = QByteArray(property.name());
-        if(key.startsWith(qbl("requestUuid")) || key.startsWith(qbl("response"))){
-            auto value=vRequest.value(key);
-            if(!property.write(this, value)){
-                auto t=qTypeId(property);
-                //TODO UTILIZAR switch () {}
-                if(t==QMetaType_QByteArray)
-                    value=value.toByteArray();
-                else if(t==QMetaType_QString)
-                    value=value.toString();
-                else if(t==QMetaType_QChar)
-                    value=value.toChar();
-                else if(t==QMetaType_QBitArray)
-                    value=value.toByteArray();
-                else if(t==QMetaType_LongLong || t==QMetaType_ULongLong)
-                    value=value.toLongLong();
-                else if(t==QMetaType_Int || t==QMetaType_UInt)
-                    value=value.toInt();
-                else if(t==QMetaType_Double)
-                    value=value.toDouble();
-                else if(t==QMetaType_Bool)
-                    value=value.toBool();
-                else if(t==QMetaType_QDateTime)
-                    value=value.toDateTime();
-                else if(t==QMetaType_QDate)
-                    value=value.toDate();
-                else if(t==QMetaType_QTime)
-                    value=value.toTime();
-                else if(t==QMetaType_QVariantMap || t==QMetaType_QVariantHash)
-                    value=value.toHash();
-                else if(t==QMetaType_QVariantList)
-                    value=value.toList();
-                else if(t==QMetaType_QStringList)
-                    value=value.toList();
-                else if(t==QMetaType_QUuid)
-                    value=value.toUuid();
-                else if(t==QMetaType_QUrl)
-                    value=value.toUrl();
-            }
+        if(!key.startsWith(qbl("requestUuid")) && !key.startsWith(qbl("response")))
+            continue;
+
+        auto value=vRequest.value(key);
+        if(property.write(this, value))
+            continue;
+
+        auto typeId=qTypeId(property);
+        switch (typeId) {
+        case QMetaType_QByteArray:
+            value=value.toByteArray();
+            break;
+        case QMetaType_QString:
+            value=value.toString();
+            break;
+        case QMetaType_QChar:
+            value=value.toChar();
+            break;
+        case QMetaType_QBitArray:
+            value=value.toByteArray();
+            break;
+        case QMetaType_LongLong:
+        case QMetaType_ULongLong:
+            value=value.toLongLong();
+            break;
+        case QMetaType_Int:
+        case QMetaType_UInt:
+            value=value.toInt();
+            break;
+        case QMetaType_Double:
+            value=value.toDouble();
+            break;
+        case QMetaType_Bool:
+            value=value.toBool();
+            break;
+        case QMetaType_QDateTime:
+            value=value.toDateTime();
+            break;
+        case QMetaType_QDate:
+            value=value.toDate();
+            break;
+        case QMetaType_QTime:
+            value=value.toTime();
+            break;
+        case QMetaType_QVariantMap:
+        case QMetaType_QVariantHash:
+            value=value.toHash();
+            break;
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
+            value=value.toList();
+            break;
+        case QMetaType_QUuid:
+            value=value.toUuid();
+            break;
+        case QMetaType_QUrl:
+            value=value.toUrl();
+            break;
+        default:
+            break;
         }
     }
     return this->isValid();
@@ -704,44 +766,66 @@ bool QRPCListenRequest::fromResponseHash(const QVariantHash &vRequest)
     for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
         auto property = metaObject->property(i);
         auto key = QByteArray(property.name());
-        //TODO UTILIZAR switch () {}
-        if(key.startsWith(qbl("requestUuid")) || key.startsWith(qbl("response"))){
-            auto value=vRequest.value(key);
-            if(!property.write(this, value)){
-                auto t=qTypeId(property);
-                if(t==QMetaType_QByteArray)
-                    value=value.toByteArray();
-                else if(t==QMetaType_QString)
-                    value=value.toString();
-                else if(t==QMetaType_QChar)
-                    value=value.toChar();
-                else if(t==QMetaType_QBitArray)
-                    value=value.toByteArray();
-                else if(t==QMetaType_LongLong || t==QMetaType_ULongLong)
-                    value=value.toLongLong();
-                else if(t==QMetaType_Int || t==QMetaType_UInt)
-                    value=value.toInt();
-                else if(t==QMetaType_Double)
-                    value=value.toDouble();
-                else if(t==QMetaType_Bool)
-                    value=value.toBool();
-                else if(t==QMetaType_QDateTime)
-                    value=value.toDateTime();
-                else if(t==QMetaType_QDate)
-                    value=value.toDate();
-                else if(t==QMetaType_QTime)
-                    value=value.toTime();
-                else if(t==QMetaType_QVariantMap || t==QMetaType_QVariantHash)
-                    value=value.toHash();
-                else if(t==QMetaType_QVariantList)
-                    value=value.toList();
-                else if(t==QMetaType_QStringList)
-                    value=value.toList();
-                else if(t==QMetaType_QUuid)
-                    value=value.toUuid();
-                else if(t==QMetaType_QUrl)
-                    value=value.toUrl();
-            }
+        if(!key.startsWith(qbl("requestUuid")) && !key.startsWith(qbl("response")))
+            continue;
+
+        auto value=vRequest.value(key);
+        if(property.write(this, value))
+            continue;
+
+        auto typeId=qTypeId(property);
+        switch (typeId) {
+        case QMetaType_QByteArray:
+            value=value.toByteArray();
+            break;
+        case QMetaType_QString:
+            value=value.toString();
+            break;
+        case QMetaType_QChar:
+            value=value.toChar();
+            break;
+        case QMetaType_QBitArray:
+            value=value.toByteArray();
+            break;
+        case QMetaType_LongLong:
+        case QMetaType_ULongLong:
+            value=value.toLongLong();
+            break;
+        case QMetaType_Int:
+        case QMetaType_UInt:
+            value=value.toInt();
+            break;
+        case QMetaType_Double:
+            value=value.toDouble();
+            break;
+        case QMetaType_Bool:
+            value=value.toBool();
+            break;
+        case QMetaType_QDateTime:
+            value=value.toDateTime();
+            break;
+        case QMetaType_QDate:
+            value=value.toDate();
+            break;
+        case QMetaType_QTime:
+            value=value.toTime();
+            break;
+        case QMetaType_QVariantMap:
+        case QMetaType_QVariantHash:
+            value=value.toHash();
+            break;
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
+            value=value.toList();
+            break;
+        case QMetaType_QUuid:
+            value=value.toUuid();
+            break;
+        case QMetaType_QUrl:
+            value=value.toUrl();
+            break;
+        default:
+            break;
         }
     }
     return this->isValid();
@@ -886,24 +970,32 @@ QVariant &QRPCListenRequest::requestBody() const
 QVariantMap QRPCListenRequest::requestBodyMap() const
 {
     dPvt();
-    if(qTypeId(p._requestBody)==QMetaType_QVariantMap || qTypeId(p._requestBody)==QMetaType_QVariantHash)
+    switch (qTypeId(p._requestBody))
+    {
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
         return p._requestBody.toMap();
-
-    if(this->isMethodGet() || this->isMethodDelete())
-        return QVariant(p._requestParameter).toMap();
-
-    return {};
+        break;
+    default:
+        if(this->isMethodGet() || this->isMethodDelete())
+            return QVariant(p._requestParameter).toMap();
+        return {};
+    }
 }
 
 QVariantHash QRPCListenRequest::requestBodyHash() const
 {
     dPvt();
-    if(qTypeId(p._requestBody)==QMetaType_QVariantMap || qTypeId(p._requestBody)==QMetaType_QVariantHash)
+    switch (qTypeId(p._requestBody))
+    {
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
         return p._requestBody.toHash();
-
-    if(this->isMethodGet() || this->isMethodDelete())
-        return p._requestParameter;
-
+        break;
+    default:
+        if(this->isMethodGet() || this->isMethodDelete())
+            return QVariant(p._requestParameter).toHash();
+    }
     return {};
 }
 
@@ -919,32 +1011,6 @@ bool QRPCListenRequest::requestParserBodyMap()
 
 bool QRPCListenRequest::requestParserBodyMap(const QVariant &property)
 {
-    dPvt();
-    if(property.isValid()){
-        p._requestParserProperty.clear();
-        if(qTypeId(property)==QMetaType_QVariantList){
-            for(auto&v:property.toList()){
-                auto s=v.toString().toLower().trimmed();
-                if(!p._requestParserProperty.contains(s))
-                    p._requestParserProperty<<s;
-            }
-        }
-        else if(qTypeId(property)==QMetaType_QStringList){
-            for(auto&v:property.toStringList()){
-                auto s=v.toLower().trimmed();
-                if(!p._requestParserProperty.contains(s))
-                    p._requestParserProperty<<s;
-            }
-        }
-        else if(qTypeId(property)==QMetaType_QVariantMap || qTypeId(property)==QMetaType_QVariantHash){
-            auto vKeys=property.toHash().keys();
-            for(auto&v:vKeys){
-                auto s=v.toLower().trimmed();
-                if(!p._requestParserProperty.contains(s))
-                    p._requestParserProperty<<s;
-            }
-        }
-    }
     QVariantMap body;
     return this->requestParserBodyMap(property, body);
 }
@@ -955,29 +1021,31 @@ bool QRPCListenRequest::requestParserBodyMap(const QVariant &property, QVariantM
     bool __return=true;
     if(property.isValid()){
         p._requestParserProperty.clear();
-        if(qTypeId(property)==QMetaType_QVariantList){
+        switch (qTypeId(property)) {
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
+        {
             for(auto&v:property.toList()){
                 auto s=v.toString().toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
             }
+            break;
         }
-        else if(qTypeId(property)==QMetaType_QStringList){
-            for(auto&v:property.toStringList()){
-                auto s=v.toLower().trimmed();
-                if(!p._requestParserProperty.contains(s))
-                    p._requestParserProperty<<s;
-            }
-        }
-        else if(qTypeId(property)==QMetaType_QVariantMap || qTypeId(property)==QMetaType_QVariantHash){
+        case QMetaType_QVariantMap:
+        case QMetaType_QVariantHash:
+        {
             auto vKeys=property.toHash().keys();
             for(auto&v:vKeys){
                 auto s=v.toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
             }
+            break;
         }
-
+        default:
+            break;
+        }
         if(!p._requestParserProperty.isEmpty()){
             auto vBody=p.requestParamCache();
             QVariantList vPropBody;
@@ -994,6 +1062,7 @@ bool QRPCListenRequest::requestParserBodyMap(const QVariant &property, QVariantM
             body=this->requestBodyMap();
         }
     }
+
     return __return;
 }
 
@@ -1003,33 +1072,31 @@ bool QRPCListenRequest::requestParserBodyHash(const QVariant &property, QVariant
     bool __return=true;
     if(property.isValid()){
         p._requestParserProperty.clear();
-
-        //TODO UTILIZAR switch () {}
-        if(qTypeId(property)==QMetaType_QVariantList){
+        switch (qTypeId(property)) {
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
+        {
             for(auto&v:property.toList()){
                 auto s=v.toString().toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
             }
+            break;
         }
-
-        if(qTypeId(property)==QMetaType_QStringList){
-            for(auto&v:property.toStringList()){
-                auto s=v.toLower().trimmed();
-                if(!p._requestParserProperty.contains(s))
-                    p._requestParserProperty<<s;
-            }
-        }
-
-        if(qTypeId(property)==QMetaType_QVariantMap || qTypeId(property)==QMetaType_QVariantHash){
+        case QMetaType_QVariantMap:
+        case QMetaType_QVariantHash:
+        {
             auto vKeys=property.toHash().keys();
             for(auto&v:vKeys){
                 auto s=v.toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
             }
+            break;
         }
-
+        default:
+            break;
+        }
         if(!p._requestParserProperty.isEmpty()){
             auto vBody=this->requestParamMap();
             QVariantList vPropBody;
@@ -1046,6 +1113,7 @@ bool QRPCListenRequest::requestParserBodyHash(const QVariant &property, QVariant
             body=this->requestBodyHash();
         }
     }
+
     return __return;
 }
 
@@ -1064,8 +1132,7 @@ QVariantMap QRPCListenRequest::requestParamMap()const
 {
     if(this->isMethodPost() || this->isMethodPut())
         return this->requestBodyMap();
-    else
-        return QVariant(this->requestParameter()).toMap();
+    return QVariant(this->requestParameter()).toMap();
 }
 
 QVariant QRPCListenRequest::requestParamHash(const QByteArray &key) const
@@ -1079,11 +1146,16 @@ QVariant QRPCListenRequest::requestParamHash(const QByteArray &key) const
         auto bKey=i.key().trimmed().toLower().toUtf8();
         if(akey==bKey){
             auto&v=i.value();
-            if(v.isValid() && (qTypeId(v)==QMetaType_QString || qTypeId(v)==QMetaType_QByteArray ||  qTypeId(v)==QMetaType_QChar ||  qTypeId(v)==QMetaType_QBitArray)){
+            switch (qTypeId(p._requestBody)) {
+            case QMetaType_QString:
+            case QMetaType_QByteArray:
+            {
                 auto s=v.toByteArray();
                 return(s.isEmpty())?QVariant():s;
             }
-            return v;
+            default:
+                return v;
+            }
         }
     }
 
@@ -1099,37 +1171,54 @@ QVariantHash QRPCListenRequest::requestParamHash() const
 QVariantList QRPCListenRequest::requestBodyList() const
 {
     dPvt();
-    if(qTypeId(p._requestBody)==QMetaType_QVariantList || qTypeId(p._requestBody)==QMetaType_QStringList)
+    switch (qTypeId(p._requestBody)) {
+    case QMetaType_QVariantList:
+    case QMetaType_QStringList:
         return p._requestBody.toList();
-
-    return QVariantList{p._requestParameter};
-
+    default:
+        return QVariantList{p._requestParameter};
+    }
 }
 
 void QRPCListenRequest::setRequestBody(const QVariant &value)
 {
     dPvt();
     QVariant _body;
-    if(qTypeId(value)==QMetaType_QVariantList || qTypeId(value)==QMetaType_QStringList)
+    switch (qTypeId(value)) {
+    case QMetaType_QVariantList:
+    case QMetaType_QStringList:
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
         _body=value;
-    else if(qTypeId(value)==QMetaType_QVariantMap|| qTypeId(value)==QMetaType_QVariantHash)
-        _body=value.toHash();
-    else if(p._requestContentType==AppJson)
-        _body=QJsonDocument::fromJson(value.toByteArray()).toVariant();
-    else if(p._requestContentType==AppCBOR || p._requestContentType==AppOctetStream)
-        _body=QCborValue::fromVariant(value).toVariant();
-    else{
-        _body=QVariant();
-        if(!_body.isValid())
+        break;
+    default:
+        switch (p._requestContentType) {
+        case AppJson:
             _body=QJsonDocument::fromJson(value.toByteArray()).toVariant();
-        if(!_body.isValid())
+            break;
+        case AppCBOR:
+        case AppOctetStream:
             _body=QCborValue::fromVariant(value).toVariant();
-        if(!_body.isValid())
-            _body=value;
+            break;
+        default:
+            _body=QVariant();
+            if(!_body.isValid())
+                _body=QJsonDocument::fromJson(value.toByteArray()).toVariant();
+            if(!_body.isValid())
+                _body=QCborValue::fromVariant(value).toVariant();
+            if(!_body.isValid())
+                _body=value;
+        }
     }
     if(this->isMethodGet() || this->isMethodDelete()){
-        if(qTypeId(_body)==QMetaType_QVariantHash || qTypeId(_body)==QMetaType_QVariantMap)
+        switch (qTypeId(_body)) {
+        case QMetaType_QVariantMap:
+        case QMetaType_QVariantHash:
             p._requestParameter=_body.toHash();
+            break;
+        default:
+            break;
+        }
     }
     p._requestParamCache.clear();
     p._requestBody=_body;
@@ -1196,7 +1285,8 @@ void QRPCListenRequest::setResponseHeader(const QVariantHash &value)
     Q_V_HASH_ITERATOR(value){
         i.next();
         auto&v=i.value();
-        auto s=(qTypeId(v)==QMetaType_QStringList || qTypeId(v)==QMetaType_QVariantList)?v.toStringList().join(' '):v.toString();
+        auto typeId=qTypeId(v);
+        auto s=(typeId==QMetaType_QStringList || typeId==QMetaType_QVariantList)?v.toStringList().join(' '):v.toString();
         p._responseHeader.insert(i.key(), s);
     }
 }
@@ -1229,7 +1319,13 @@ QByteArray QRPCListenRequest::responseBodyBytes() const
     dPvt();
     QVariant v;
     const auto &response = p._responseBody;
-    if(qTypeId(response)==QMetaType_QVariantList || qTypeId(response)==QMetaType_QStringList || qTypeId(response)==QMetaType_QVariantMap || qTypeId(response)==QMetaType_QVariantHash){
+    auto typeId=qTypeId(response);
+    switch (typeId) {
+    case QMetaType_QVariantList:
+    case QMetaType_QStringList:
+    case QMetaType_QVariantMap:
+    case QMetaType_QVariantHash:
+    {
         //TODO UTILIZAR switch () {}
         if(p._requestContentType==AppJson)
             v=QJsonDocument::fromVariant(response).toJson(QJsonDocument::Compact);
@@ -1241,42 +1337,56 @@ QByteArray QRPCListenRequest::responseBodyBytes() const
             v=QCborValue::fromVariant(response).toCbor();
         else
             v=QJsonDocument::fromVariant(response).toJson(QJsonDocument::Compact);
+        break;
     }
-    else{
+    default:
         v=QVariant::fromValue(response);
     }
 
     if(v.isValid()){
         QString body;
-        //TODO UTILIZAR switch () {}
-        if(qTypeId(v)==QMetaType_QDate)
+        switch (qTypeId(v)) {
+        case QMetaType_QDate:
             body=v.toDate().toString(Qt::ISODate);
-        else if(qTypeId(v)==QMetaType_QTime)
+            break;
+        case QMetaType_QTime:
             body=v.toTime().toString(Qt::ISODateWithMs);
-        else if(qTypeId(v)==QMetaType_QDateTime)
+            break;
+        case QMetaType_QDateTime:
             body=v.toDateTime().toString(Qt::ISODateWithMs);
-        else if(qTypeId(v)==QMetaType_QUuid)
+            break;
+        case QMetaType_QUuid:
             body=v.toUuid().toString();
-        else if(qTypeId(v)==QMetaType_QUrl)
+            break;
+        case QMetaType_QUrl:
             body=v.toUrl().toString();
-        else
+            break;
+        default:
             body=v.toString();
+        }
         return body.toUtf8();
     }
 
-    return QByteArray();
+    return {};
 }
 
 void QRPCListenRequest::setResponseBody(const QVariant &value)
 {
     dPvt();
-    if(qTypeId(value)==QMetaType_QByteArray || qTypeId(value)==QMetaType_QString || qTypeId(value)==QMetaType_QChar){
+    switch (qTypeId(value)) {
+    case QMetaType_QByteArray:
+    case QMetaType_QString:
+    case QMetaType_QChar:
+    {
         if(value.toString().trimmed().isEmpty()){
             p._responseBody=QVariant();
             return;
         }
+        break;
     }
-    p._responseBody=value;
+    default:
+        p._responseBody=value;
+    }
 }
 
 int QRPCListenRequest::responseCode(int code) const

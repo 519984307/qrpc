@@ -8,6 +8,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCRequestJobHttp class
+//!
 class QRPCRequestJobHttp : public QRPCRequestJobProtocol
 {
     Q_OBJECT
@@ -22,18 +25,21 @@ public:
     QNetworkReply *reply = nullptr;
     QNetworkAccessManager*nam = nullptr;    
 
-    Q_INVOKABLE explicit QRPCRequestJobHttp(QObject*parent):QRPCRequestJobProtocol(parent){
+    Q_INVOKABLE explicit QRPCRequestJobHttp(QObject*parent):QRPCRequestJobProtocol(parent)
+    {
         fileTemp.setAutoRemove(false);
     }
 
-    ~QRPCRequestJobHttp(){
+    ~QRPCRequestJobHttp()
+    {
         if(this->fileTemp.isOpen())
             this->fileTemp.close();
         if(this->nam!=nullptr)
             this->nam->deleteLater();
     }
 
-    virtual bool call(QRPCRequestJobResponse*response)override{
+    virtual bool call(QRPCRequestJobResponse*response)override
+    {
         static const QVector<QString> removeHeaders={{qsl("host")},{qsl("content-length")}};
         static const QVector<QString> ignoreHeaders={{ContentDispositionName}, {ContentTypeName}, {ContentDispositionName.toLower()}, {ContentTypeName.toLower()}};
 
@@ -235,7 +241,8 @@ public:
         }
     }
 
-    void timeout_stop(){
+    void timeout_stop()
+    {
         auto timer=this->__timeout;
         this->__timeout=nullptr;
         if(timer!=nullptr){
@@ -247,14 +254,16 @@ public:
 
 private slots:
 
-    void onReplyError(QNetworkReply::NetworkError e){
+    void onReplyError(QNetworkReply::NetworkError e)
+    {
         if(response->response_qt_status_code==QNetworkReply::NoError){
             response->response_qt_status_code=e;
         }
         this->onFinish();
     };
 
-    void onReplyFinish(){
+    void onReplyFinish()
+    {
         QMutexLOCKER locker(&mutexRequestFinished);
         if(this->reply!=nullptr){
             if(response->response_qt_status_code==QNetworkReply::NoError){
@@ -265,7 +274,8 @@ private slots:
         }
 
     };
-    void onReplyTimeout(){
+    void onReplyTimeout()
+    {
         {
             QMutexLOCKER locker(&mutexRequestFinished);
             if(response->response_qt_status_code==QNetworkReply::NoError){
@@ -282,16 +292,19 @@ private slots:
         emit this->callback(QVariant());
     };
 
-    void onReplyDelete(){
+    void onReplyDelete()
+    {
         this->reply=nullptr;
     };
 
-    void onReplyProgressUpload(qint64 bytesSent, qint64 bytesTotal){
+    void onReplyProgressUpload(qint64 bytesSent, qint64 bytesTotal)
+    {
         Q_UNUSED(bytesSent)
         Q_UNUSED(bytesTotal)
     }
 
-    void onReplyProgressDownload(qint64 bytesReceived, qint64 bytesTotal)    {
+    void onReplyProgressDownload(qint64 bytesReceived, qint64 bytesTotal)
+    {
         Q_UNUSED(bytesReceived)
         Q_UNUSED(bytesTotal)
         if(this->reply!=nullptr){
@@ -301,7 +314,8 @@ private slots:
     }
 
 
-    void onFinish(){
+    void onFinish()
+    {
         this->timeout_stop();
 
         response->request_finish=QDateTime::currentDateTime();

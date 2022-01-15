@@ -11,6 +11,7 @@ class QRPCThreadPvt{
 public:
     QMutex lockRunWait;
     QMutex mutexRunning;
+
     explicit QRPCThreadPvt()
     {
     }
@@ -61,9 +62,7 @@ bool QRPCThread::start()
         p.lockRunWait.unlock();
         return this->isRunning();
     }
-    else{
-        return false;
-    }
+    return false;
 }
 
 bool QRPCThread::stop()

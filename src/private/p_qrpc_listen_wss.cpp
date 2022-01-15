@@ -28,15 +28,18 @@ public:
      * @brief listen
      * @return
      */
-    QRPCListenWebSocket&listen(){
+    QRPCListenWebSocket&listen()
+    {
         auto _listen=dynamic_cast<QRPCListenWebSocket*>(this->parent());
         return*_listen;
     }
 
-    explicit WebSocketServer(QObject*parent=nullptr):QObject(parent){
+    explicit WebSocketServer(QObject*parent=nullptr):QObject(parent)
+    {
     }
 
-    bool start(){
+    bool start()
+    {
 
         auto&protocol=this->listen().colletions()->protocol(QRPCProtocol::WebSocket);
 
@@ -45,7 +48,7 @@ public:
         if(!protocol.enabled())
             return false;
 
-        bool RETURN=false;
+        bool __return=false;
         for(auto&sport:protocol.port()){
             auto port=sport.toInt();
             if(port<=0)
@@ -75,8 +78,8 @@ public:
 
             auto server = new QWebSocketServer(qsl("SSL QRpcServer"),  QWebSocketServer::NonSecureMode, this);
 
-            connect(server, &QWebSocketServer::newConnection,this, &WebSocketServer::onServerNewConnection);
-            connect(server, &QWebSocketServer::closed, this, &WebSocketServer::onServerClosed);
+            QObject::connect(server, &QWebSocketServer::newConnection,this, &WebSocketServer::onServerNewConnection);
+            QObject::connect(server, &QWebSocketServer::closed, this, &WebSocketServer::onServerClosed);
 
             if (!server->listen(QHostAddress(QHostAddress::LocalHost), port)) {
                 sWarning()<<tr("LocalServerListener: Cannot bind on port %1: %2").arg(port).arg(server->errorString());
@@ -91,27 +94,27 @@ public:
                 server->deleteLater();
                 continue;
             }
-            RETURN=true;
+
+            __return=true;
             sDebug()<<QString("LocalServerListener: Listening on port %1").arg(port);
             this->servers.insert(port, server);
         }
 
-        if(!RETURN){
+        if(!__return)
             this->stop();
-        }
 
-        return RETURN;
+        return __return;
 
     }
 
-    bool stop(){
-        {
-            auto aux=this->clientsMap.values();
-            this->clientsMap.clear();
-            for(auto&client:aux){
-                client->close();
-            }
+    bool stop()
+    {
+        auto aux=this->clientsMap.values();
+        this->clientsMap.clear();
+        for(auto&client:aux){
+            client->close();
         }
+
         for(auto&server:this->servers){
             if(server==nullptr)
                 continue;
@@ -144,7 +147,6 @@ public:
             return;
         }
         emit this->listen().rpcRequest(request.toHash(), QVariant());
-
     }
 
 public slots:

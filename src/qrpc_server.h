@@ -31,7 +31,7 @@ public:
     //!
     //! \brief ~QRPCServer
     //!
-    Q_INVOKABLE virtual ~QRPCServer();
+    ~QRPCServer();
 
     //!
     //! \brief controllerOptions

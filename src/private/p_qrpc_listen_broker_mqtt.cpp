@@ -1,5 +1,4 @@
 #include "./p_qrpc_listen_broker_mqtt.h"
-#include <QCryptographicHash>
 
 namespace QRpc {
 

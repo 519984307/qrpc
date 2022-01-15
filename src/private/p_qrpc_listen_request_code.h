@@ -5,11 +5,16 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCListenRequestCode class
+//!
 class Q_RPC_EXPORT QRPCListenRequestCode : public QObject
 {
     Q_OBJECT
 public:
-
+    //!
+    //! \brief The Code enum
+    //!
     enum Code{//https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Status
         //Respostas de informação (100-199),
          ssContinue                     = 100
@@ -63,71 +68,70 @@ public:
         ,ssHTTPVersionNotSupported      = 505
     };
 
-
-    /**
-     * @brief QRPCListenRequestCode
-     * @param parent
-     */
+    //!
+    //! \brief QRPCListenRequestCode
+    //! \param parent
+    //!
     Q_INVOKABLE explicit QRPCListenRequestCode(QObject *parent = nullptr);
 
-    /**
-     * @brief ~QRPCListenRequestCode
-     */
     ~QRPCListenRequestCode();
 
-    /**
-     * @brief operator =
-     * @param v
-     * @return
-     */
+    //!
+    //! \brief operator =
+    //! \param v
+    //! \return
+    //!
     QRPCListenRequestCode&operator=(const QVariant&v);
 
-    /**
-     * @brief emptyData
-     * @return
-     */
+    //!
+    //! \brief emptyData
+    //! \return
+    //!
     virtual QVariant emptyData();
 
-    /**
-     * @brief isOK
-     * @return
-     */
+    //!
+    //! \brief isOK
+    //! \return
+    //!
     bool isOK();
 
-    /**
-     * @brief code
-     * @return
-     */
+    //!
+    //! \brief code
+    //! \return
+    //!
     int code();
     int code(const QVariant &code);
-
-    /**
-     * @brief setCode
-     * @return
-     */
     QRPCListenRequestCode&setCode();
 
-    /**
-     * @brief reasonPhrase
-     * @return
-     */
+    //!
+    //! \brief reasonPhrase
+    //! \return
+    //!
     QString reasonPhrase();
 
-    /**
-     * @brief reasonPhrase
-     * @param stateCode
-     * @return
-     */
+    //!
+    //! \brief reasonPhrase
+    //! \param stateCode
+    //! \return
+    //!
     static const QString reasonPhrase(const int stateCode);
 
-    /**
-     * @brief qt_network_message
-     * @param stateCode
-     * @return
-     */
+    //!
+    //! \brief qt_network_error_phrase
+    //! \param networkError
+    //! \return
+    //!
     static const QString qt_network_error_phrase(const QNetworkReply::NetworkError networkError);
 
+    //!
+    //! \brief setCode
+    //! \param code
+    //! \param phrase
+    //! \return
+    //!
     QRPCListenRequestCode&setCode(QVariant code, const QString&phrase=QString());
+
+
     QRPCListenRequestCode&setContinue(const QString&phrase=QString());
     QRPCListenRequestCode&setSwitchingProtocols(const QString&phrase=QString());
     QRPCListenRequestCode&setOK(const QString&phrase=QString());

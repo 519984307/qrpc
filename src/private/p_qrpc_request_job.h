@@ -17,6 +17,9 @@
 
 namespace QRpc {
 
+//!
+//! \brief The QRPCRequestJob class
+//!
 class QRPCRequestJob : public QThread
 {
     Q_OBJECT
@@ -59,7 +62,8 @@ public:
         }
     }
 
-    ~QRPCRequestJob(){
+    ~QRPCRequestJob()
+    {
         QHashIterator<int, QRPCRequestJobProtocol*> i(_requestJobProtocolMap);
         while (i.hasNext()){
             i.next();
@@ -67,11 +71,13 @@ public:
         }
     }
 
-    void run()override{
+    void run()override
+    {
         this->exec();
     }
 
-    auto start(){
+    auto start()
+    {
         QThread::start();
         while(this->eventDispatcher()==nullptr){
             QThread::msleep(1);
@@ -91,7 +97,8 @@ public:
 
 public slots:
 
-    void onRunJob(const QSslConfiguration*sslConfiguration, const QVariantHash&headers, const QVariant&vUrl, const QString&fileName, QRpc::QRPCRequest*request){
+    void onRunJob(const QSslConfiguration*sslConfiguration, const QVariantHash&headers, const QVariant&vUrl, const QString&fileName, QRpc::QRPCRequest*request)
+    {
         this->sslConfiguration=QSslConfiguration(*sslConfiguration);
         auto url=vUrl.toUrl();
         this->action_fileName=fileName;
@@ -100,12 +107,14 @@ public slots:
         this->onRun();
     }
 
-    void onRunCallback(const QVariant&v){
+    void onRunCallback(const QVariant&v)
+    {
         Q_UNUSED(v)
         this->quit();
     }
 
-    void onRun(){
+    void onRun()
+    {
 
         const auto&e=this->response().request_exchange.call();
         const auto iprotocol=e.protocol();
@@ -115,13 +124,13 @@ public slots:
             this->response().response_qt_status_code = QNetworkReply::ProtocolUnknownError;
             this->response().response_status_code = QNetworkReply::ProtocolUnknownError;
             this->quit();
+            return;
         }
-        else{
-            protocol->sslConfiguration=this->sslConfiguration;
-            protocol->action=this->action;
-            protocol->action_fileName=this->action_fileName;
-            protocol->call(&this->response());
-        }
+
+        protocol->sslConfiguration=this->sslConfiguration;
+        protocol->action=this->action;
+        protocol->action_fileName=this->action_fileName;
+        protocol->call(&this->response());
     }
 };
 

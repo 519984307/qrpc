@@ -5,17 +5,21 @@
 #include <QTcpSocket>
 #include <QUrl>
 
-
 namespace QRpc {
 
+//!
+//! \brief The QRPCRequestJobLocalSocket class
+//!
 class QRPCRequestJobLocalSocket : public QRPCRequestJobProtocol
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit QRPCRequestJobLocalSocket(QObject*parent):QRPCRequestJobProtocol(parent){
+    Q_INVOKABLE explicit QRPCRequestJobLocalSocket(QObject*parent):QRPCRequestJobProtocol(parent)
+    {
     }
 
-    ~QRPCRequestJobLocalSocket(){
+    ~QRPCRequestJobLocalSocket()
+    {
     }
 
     QRPCRequestJobResponse*response=nullptr;
@@ -23,7 +27,8 @@ public:
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response)override{
+    virtual bool call(QRPCRequestJobResponse*response)override
+    {
         this->response=response;
         if(m_socket!=nullptr)
             delete m_socket;
@@ -44,7 +49,8 @@ public:
 
 private slots:
 
-    void onConnected(){
+    void onConnected()
+    {
         this->buffer.clear();
         if(!m_socket->waitForConnected(response->activityLimit)){
             response->response_qt_status_code=QNetworkReply::TimeoutError;
@@ -72,7 +78,8 @@ private slots:
         this->onFinish();
     };
 
-    void onReplyError(QAbstractSocket::SocketError e){
+    void onReplyError(QAbstractSocket::SocketError e)
+    {
         Q_UNUSED(e)
         if(e!=QAbstractSocket::SocketError::RemoteHostClosedError){
             response->response_qt_status_code=QNetworkReply::UnknownServerError;
@@ -81,7 +88,8 @@ private slots:
         }
     };
 
-    void onFinish(){
+    void onFinish()
+    {
         QRPCListenRequest request(this->buffer);
         if(!request.isValid()){
             response->response_qt_status_code=QNetworkReply::InternalServerError;

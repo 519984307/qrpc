@@ -44,11 +44,14 @@ public:
     QByteArray sslKeyFile  ;
     QByteArray sslCertFile ;
     bool realMessageOnException=false;
-    explicit QRPCListenProtocolPvt(QObject*parent):QObject(parent){
+
+    explicit QRPCListenProtocolPvt(QObject*parent):QObject(parent)
+    {
         this->settings=new QSettings(nullptr);
     }
 
-    ~QRPCListenProtocolPvt(){
+    ~QRPCListenProtocolPvt()
+    {
         delete this->settings;
     }
 
@@ -160,7 +163,6 @@ QRPCListen*QRPCListenProtocol::makeListen()
     auto listen=dynamic_cast<QRPCListen*>(object);
     if(listen==nullptr){
         delete object;
-        object=nullptr;
         return nullptr;
     }
 

@@ -5,9 +5,9 @@
 
 namespace QRpc {
 
-/**
- * @brief The ServiceSetting struct
- */
+//!
+//! \brief The ServiceSetting class
+//!
 class Q_RPC_EXPORT ServiceSetting:public QStm::SettingBase{
     Q_OBJECT
     SETTING_OBJECT(ServiceSetting)
@@ -28,11 +28,23 @@ public:
     Q_PROPERTY(QVariant     cacheInterval           READ cacheInterval        WRITE setCacheInterval           )
     Q_PROPERTY(bool         cacheCleanup            READ cacheCleanup         WRITE setCacheCleanup            )
     Q_PROPERTY(QVariant     cacheCleanupInterval    READ cacheCleanupInterval WRITE setCacheCleanupInterval    )
-public:    
-    Q_INVOKABLE explicit ServiceSetting(QObject*parent=nullptr):QStm::SettingBase(parent){
+public:
+    //!
+    //! \brief ServiceSetting
+    //! \param parent
+    //!
+    Q_INVOKABLE explicit ServiceSetting(QObject*parent=nullptr):QStm::SettingBase(parent)
+    {
     }
-    ~ServiceSetting(){
+
+    ~ServiceSetting()
+    {
     }
+
+    //!
+    //! \brief url
+    //! \return
+    //!
     QVariant url()const;
 };
 
