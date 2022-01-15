@@ -6,8 +6,10 @@
 ## Working architecture
 
 >## Support
-> HTTP/REST, LocalSocket, TCP, UPD, WebSocket 
-> Brokers Database, AMQP, MQTT, KAFKA
+>>## Request
+>> HTTP/REST, LocalSocket, TCP, UPD, WebSocket 
+>>## Streaming
+>> Brokers Database, AMQP, MQTT, KAFKA
 
 ```mermaid
 graph TD;
