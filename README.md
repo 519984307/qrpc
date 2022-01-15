@@ -93,8 +93,7 @@ C[QRPCListenQRPC]--> CA[QRPCListenQRPCSlot] --> CAA[QRPCController]
 
 ## Resource settings
 
->Settings in setting.json in settings.qrc
->Settings to http/rest server
+>Settings http/rest server saved in setting.json and included in settings.qrc
 >```json
 >{
 >   "arguments":["ws"],
