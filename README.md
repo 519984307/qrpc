@@ -220,12 +220,13 @@ C[QRPCListenQRPC]--> CA[QRPCListenQRPCSlot] --> CAA[QRPCController]
 > curl -i http://localhost:8888/listObjects?limit=1
 > ```
 >```bash
-      >HTTP/1.1 200 (OK)
-      >Vary: Accept-Encoding, Origin
-      >Date: Sat Jan 15 18:50:02 2022
-      >Content-Length: 59
-      >Server: Undef
+>HTTP/1.1 200 (OK)
+>Vary: Accept-Encoding, Origin
+>Date: Sat Jan 15 18:50:02 2022
+>Content-Length: 59
+>Server: Undef
 >```
+>
 >```json
 >[{"index":1,"uuid":"ba01138f-f7b0-4874-a879-caa591ab9e55"}]
 >```
