@@ -5,6 +5,10 @@
 
 ## Working architecture
 
+>## Support
+> HTTP/REST, LocalSocket, TCP, UPD, WebSocket 
+> Brokers Database, AMQP, MQTT, KAFKA
+
 ```mermaid
 graph TD;
 A[QRPCServer] 
