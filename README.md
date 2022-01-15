@@ -21,8 +21,17 @@ B --> BI(QRPCListenBrokerMQTT)--> C
 C[QRPCListenQRPC]--> CA[QRPCListenQRPCSlot] --> CAA[QRPCController]
 ```
 
-## CMake Build information
+## Prerequisits
+>```bash
+> mkdir myproject;
+> cd myproject;
+> git clone git@github.com:flaviomarcio/qstm.git;
+> git clone git@github.com:flaviomarcio/qrpc.git;
+>```
+>Check example in QRpc/example/server-rest
 
+
+## CMake Build information
 
 >```
 >## initial CMake parameters 
@@ -56,22 +65,76 @@ C[QRPCListenQRPC]--> CA[QRPCListenQRPCSlot] --> CAA[QRPCController]
 > ls -l;
 >```
 
-## Lib in you qmake application
-
->Check example in ../example/localcache
-
-## Source in you application
-
->Check example in ../example/localcache
-
-
-## Clients Connectors  
+## QMake project
 
 >```c++
-> auto client=QCrossCache::clientForLocal(nullptr);
-> auto client=QCrossCache::clientForMemcached(nullptr);
-> auto client=QCrossCache::clientForMongoDb(nullptr);
-> auto client=QCrossCache::clientForRedis(nullptr);
+>QT -= gui
+>
+>CONFIG += c++17 console silent
+>CONFIG -= app_bundle
+>
+># You can make your code fail to compile if it uses deprecated APIs.
+># In order to do so, uncomment the following line.
+>#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+>
+>include($$PWD/../../../qstm/qstm.pri)
+>include($$PWD/../../qrpc.pri)
+>
+>SOURCES += \
+>        controllerMethods.cpp \
+>        main.cpp
+>
+>RESOURCES += \
+>    settings.qrc
+>
+>HEADERS += \
+>    controllerMethods.h
+>```
+
+## Resource settings
+
+> Settings in setting.json in settings.qrc
+>```json
+>{
+>   "arguments":["ws"],
+>   "protocol":{
+>      "default":{
+>         "minThreads":1,
+>         "maxThreads":2000,
+>         "cleanupInterval":1000,
+>         "readTimeout":60000,
+>         "maxRequestSize":104857600,
+>         "maxMultiPartSize":1048576000,
+>         "enabled":false,
+>         "sslKeyFile":"",
+>         "sslCertFile":""
+>      },
+>      "http":{
+>        "enabled":true,"port":[8888]
+>      }
+>   },
+>   "connection":{
+>       "secret": "YzUxNDFhMDA5",
+>       "enviroment" : "debug",
+>       "paramaters" : {
+>           "debug":{
+>               "driver":"QPSQL",
+>               "hostName":"localhost",
+>               "userName":"localuser",
+>               "password":"localuser",
+>               "port":5432,
+>               "dataBaseName":"public",
+>               "schemaNames":"public"
+>           }
+>       }
+>   }
+>}
+>```
+
+## HTTP/REST Server
+
+>Check example in QRpc/example/server-rest
+>```c++
 > 
 >//main implementation
 >#include <QCoreApplication>
