@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>settings.release.json</file>
-        <file>settings.debug.json</file>
-        <file>settings.test.json</file>
-    </qresource>
-</RCC>
