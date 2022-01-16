@@ -125,7 +125,7 @@ C[QRPCListenQRPC]--> CA[QRPCListenQRPCSlot] --> CAA[QRPCController]
 >               "userName":"localuser",
 >               "password":"localuser",
 >               "port":5432,
->               "dataBaseName":"public",
+>               "dataBaseName":"postgres",
 >               "schemaNames":"public"
 >           }
 >       }
