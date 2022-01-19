@@ -2,7 +2,7 @@
 
 #include <QThread>
 #include <QDebug>
-#include "../../qstm/src/qstm_macro.h"
+#include <QStm>
 
 #define Q_RPC_ROUTE_FLAGS(route, r_flags)\
 private:\

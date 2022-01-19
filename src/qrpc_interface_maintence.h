@@ -49,6 +49,7 @@ signals:
 
 };
 
+
 QRPC_CONTROLLER_AUTO_REGISTER(QRPCInterfaceMaintence)
 
 } // namespace QRpc

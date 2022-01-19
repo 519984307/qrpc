@@ -6,7 +6,7 @@
 #include <QByteArray>
 #include <QUuid>
 #include <QUrl>
-#include "../qrpc_macro.h"
+#include <QStm>
 
 namespace QRpc {
 namespace Util {

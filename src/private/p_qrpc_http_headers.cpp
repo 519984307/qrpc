@@ -1,8 +1,8 @@
 #include "./p_qrpc_http_headers.h"
-#include "../../../qstm/src/qstm_util_variant.h"
 #include "./p_qrpc_util.h"
 #include "../qrpc_macro.h"
 #include <QJsonDocument>
+#include <QStm>
 
 namespace QRpc {
 

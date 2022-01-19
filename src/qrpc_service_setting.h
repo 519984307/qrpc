@@ -33,19 +33,7 @@ public:
     //! \brief ServiceSetting
     //! \param parent
     //!
-    Q_INVOKABLE explicit ServiceSetting(QObject*parent=nullptr):QStm::SettingBase(parent)
-    {
-    }
-
-    ~ServiceSetting()
-    {
-    }
-
-    //!
-    //! \brief url
-    //! \return
-    //!
-    QVariant url()const;
+    Q_INVOKABLE explicit ServiceSetting(QObject*parent=nullptr);
 };
 
 

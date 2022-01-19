@@ -4,7 +4,7 @@
 #include "./private/p_qrpc_http_headers.h"
 #include "./private/p_qrpc_listen_request_code.h"
 #include "./qrpc_controller_setting.h"
-#include "../../qstm/src/qstm_util_variant.h"
+#include <QStm>
 #include <QThread>
 #include <QTemporaryFile>
 #include <QVariantHash>
