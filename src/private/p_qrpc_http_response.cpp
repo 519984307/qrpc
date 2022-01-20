@@ -64,21 +64,40 @@ void QRPCHttpResponse::setBody(const QVariant &vBody)
     case QMetaType_QVariantMap:
     case QMetaType_QVariantHash:
     case QMetaType_QVariantList:
-    case QMetaType_QString:
-    case QMetaType_QByteArray:
+    case QMetaType_QStringList:
     {
         if(this->header().isContentType(AppJson)){
             auto doc=QJsonDocument::fromVariant(vBody);
             p.response_body=doc.toJson(doc.Compact);
+            break;
         }
-        else if(this->header().isContentType(AppCBOR) || this->header().isContentType(AppOctetStream)){
+
+        if(this->header().isContentType(AppCBOR) || this->header().isContentType(AppOctetStream)){
             auto doc=QCborValue::fromVariant(vBody);
             p.response_body=doc.toByteArray();
+            break;
         }
-        else{//default json
-            auto doc=QJsonDocument::fromVariant(vBody);
+        auto doc=QJsonDocument::fromVariant(vBody);
+        p.response_body=doc.toJson(doc.Compact);
+        break;
+    }
+    case QMetaType_QString:
+    case QMetaType_QByteArray:
+    {
+        if(this->header().isContentType(AppJson)){
+            auto doc=QJsonDocument::fromJson(vBody.toByteArray());
             p.response_body=doc.toJson(doc.Compact);
+            break;
         }
+
+        if(this->header().isContentType(AppCBOR) || this->header().isContentType(AppOctetStream)){
+            auto doc=QCborValue::fromCbor(vBody.toByteArray());
+            p.response_body=doc.toByteArray();
+            break;
+        }
+
+        auto doc=QJsonDocument::fromJson(vBody.toByteArray());
+        p.response_body=doc.toJson(doc.Compact);
         break;
     }
     default:
@@ -101,7 +120,8 @@ QVariant QRPCHttpResponse::bodyVariant() const
     if(body.isEmpty()){
         return {};
     }
-    else if(this->header().isContentType(AppJson)){
+
+    if(this->header().isContentType(AppJson)){
         auto vdoc=QJsonDocument::fromJson(p.response_body, error).toVariant();
         if(!vdoc.isNull() && !vdoc.isValid())
             return vdoc;

@@ -1382,6 +1382,7 @@ void QRPCListenRequest::setResponseBody(const QVariant &value)
             p._responseBody=QVariant();
             return;
         }
+        p._responseBody=value;
         break;
     }
     default:
