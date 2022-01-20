@@ -1465,22 +1465,23 @@ void QRPCListenRequest::setRequestResponse(QObject *request)
 
 void QRPCListenRequest::setControllerSetting(const ControllerSetting&setting)
 {
-    if(setting.enabled()){
-        auto&set=setting;
-        auto&rq=*this;
-        Q_DECLARE_VU;
-        {
-            auto vDes=rq.requestHeader();
-            auto vSrc=set.headers();
-            auto vMap=vu.vUnion(vSrc, vDes).toHash();
-            rq.setRequestHeader(vMap);
-        }
-        {
-            auto vDes=rq.requestParameter();
-            auto vSrc=set.parameters();
-            auto vMap=vu.vUnion(vSrc, vDes).toHash();
-            rq.setRequestParameter(vMap);
-        }
+    if(!setting.enabled())
+        return;
+
+    auto&set=setting;
+    auto&rq=*this;
+    Q_DECLARE_VU;
+    {
+        auto vDes=rq.requestHeader();
+        auto vSrc=set.headers();
+        auto vHash=vu.vUnion(vSrc, vDes).toHash();
+        rq.setRequestHeader(vHash);
+    }
+    {
+        auto vDes=rq.requestParameter();
+        auto vSrc=set.parameters();
+        auto vHash=vu.vUnion(vSrc, vDes).toHash();
+        rq.setRequestParameter(vHash);
     }
 }
 
