@@ -6,23 +6,20 @@
 #include <QCoreApplication>
 #include <QCryptographicHash>
 
-namespace PrivateQRpc {
-    Q_GLOBAL_STATIC(QByteArray, baseUuid)
-}
-
 namespace QRpc {
 
-static auto&baseUuid=*PrivateQRpc::baseUuid;
-
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenPvt*>(this->p)
+auto&p =*reinterpret_cast<QRPCListenPvt*>(this->p)
 
+typedef QHash<int, QPair<int, const QMetaObject*>> MetaObjectVector;
+Q_GLOBAL_STATIC(MetaObjectVector, staticRegisterInterfaceMetaObject);
+Q_GLOBAL_STATIC(QByteArray, baseUuid)
 
 static void init()
 {
     QProcess process;
     auto bytes=process.environment().join(qsl(",")).toUtf8()+QDateTime::currentDateTime().toString().toUtf8();
-    baseUuid=QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex();
+    *baseUuid=QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex();
 }
 
 Q_COREAPP_STARTUP_FUNCTION(init)
@@ -36,7 +33,7 @@ public:
     QRPCServer*server=nullptr;
     explicit QRPCListenPvt(QRPCListen*parent):QObject(parent), cacheRequest(parent)
     {
-        this->uuid=QUuid::createUuidV5(QUuid::createUuid(), baseUuid);
+        this->uuid=QUuid::createUuidV5(QUuid::createUuid(), *baseUuid);
     }
 
     virtual ~QRPCListenPvt()
@@ -60,6 +57,33 @@ QRPCListen::~QRPCListen()
 {
     dPvt();delete&p;
 }
+
+int QRPCListen::interfaceRegister(const QVariant &type, const QMetaObject &metaObject)
+{
+    const auto itype=type.toInt();
+    if(!staticRegisterInterfaceMetaObject->contains(itype)){
+#if Q_RPC_LOG_VERBOSE
+        if(staticRegisterInterfaceMetaObject->isEmpty())
+            sInfo()<<qsl("interface registered: ")<<metaObject.className();
+        qInfo()<<qbl("interface: ")+metaObject.className();
+#endif
+        QPair<int, const QMetaObject*> pair(itype, &metaObject);
+        staticRegisterInterfaceMetaObject->insert(itype, pair);
+    }
+    return staticRegisterInterfaceMetaObject->contains(itype);
+}
+
+QVector<QPair<int, const QMetaObject*> > QRPCListen::interfaceCollection()
+{
+    QVector<QPair<int, const QMetaObject*> > __return;
+    QHashIterator <int, QPair<int, const QMetaObject*>> i(*staticRegisterInterfaceMetaObject);
+    while(i.hasNext()){
+        i.next();
+        __return<<i.value();
+    }
+    return __return;
+}
+
 
 QUuid QRPCListen::uuid() const
 {

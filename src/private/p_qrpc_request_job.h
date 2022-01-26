@@ -3,17 +3,27 @@
 #include <QSslCertificate>
 #include <QSslConfiguration>
 #include "../qrpc_request_exchange_setting.h"
+#ifdef Q_RPC_HTTP
 #include "./p_qrpc_request_job_http.h"
-#ifdef COMPILE_AMQP
+#endif
+#ifdef Q_RPC_AMQP
 #include "./p_qrpc_request_job_amqp.h"
 #endif
-#ifdef COMPILE_KAFKA
+#ifdef Q_RPC_KAFKA
 #include "./p_qrpc_request_job_broker_kafka.h"
 #endif
+#ifdef Q_RPC_LOCALSOCKET
 #include "./p_qrpc_request_job_localsocket.h"
+#endif
+#ifdef Q_RPC_DATABASE
 #include "./p_qrpc_request_job_database.h"
+#endif
+#ifdef Q_RPC_TCP
 #include "./p_qrpc_request_job_tcp.h"
+#endif
+#ifdef Q_RPC_WEBSOCKET
 #include "./p_qrpc_request_job_wss.h"
+#endif
 
 namespace QRpc {
 
@@ -24,12 +34,22 @@ class QRPCRequestJob : public QThread
 {
     Q_OBJECT
 public:
-    QRPCRequestJobResponse _response;
-    QRPCRequestJobWSS _requestJobWSS;
-    QRPCRequestJobTcp _requestJobTcp;
+#ifdef Q_RPC_HTTP
     QRPCRequestJobHttp _requestJobHttp;
+#endif
+#ifdef Q_RPC_WEBSOCKET
+    QRPCRequestJobWSS _requestJobWSS;
+#endif
+#ifdef Q_RPC_TCP
+    QRPCRequestJobTcp _requestJobTcp;
+#endif
+#ifdef Q_RPC_LOCALSOCKET
     QRPCRequestJobLocalSocket _requestJobLocalSocket;
+#endif
+#ifdef Q_RPC_DATABASE
     QRPCRequestJobDataBase _requestJobDataBase;
+#endif
+    QRPCRequestJobResponse _response;
     QRPCRequest::Action action=QRPCRequest::acRequest;
     QString action_fileName;
     QSslConfiguration sslConfiguration;
@@ -37,24 +57,42 @@ public:
 
     explicit QRPCRequestJob():
         QThread(nullptr),
-        _response(this),
-        _requestJobWSS(this),
-        _requestJobTcp(this),
+#ifdef Q_RPC_HTTP
         _requestJobHttp(this),
+#endif
+#ifdef Q_RPC_WEBSOCKET
+        _requestJobWSS(this),
+#endif
+#ifdef Q_RPC_TCP
+        _requestJobTcp(this),
+#endif
+#ifdef Q_RPC_LOCALSOCKET
         _requestJobLocalSocket(this),
+#endif
+#ifdef Q_RPC_DATABASE
         _requestJobDataBase(this)
+#endif
+        _response(this)
     {
         this->moveToThread(this);
         static qlonglong taskCount=0;
         this->setObjectName(qsl("ReqJob%1").arg(++taskCount));
-
-        _requestJobProtocolMap[QRpc::WebSocket]=&this->_requestJobWSS;
-        _requestJobProtocolMap[QRpc::TcpSocket]=&this->_requestJobTcp;
+#ifdef Q_RPC_HTTP
         _requestJobProtocolMap[QRpc::Http]=&this->_requestJobHttp;
         _requestJobProtocolMap[QRpc::Https]=&this->_requestJobHttp;
+#endif
+#ifdef Q_RPC_WEBSOCKET
+        _requestJobProtocolMap[QRpc::WebSocket]=&this->_requestJobWSS;
+#endif
+#ifdef Q_RPC_TCPSOCKET
+        _requestJobProtocolMap[QRpc::TcpSocket]=&this->_requestJobTcp;
+#endif
+#ifdef Q_RPC_LOCALSOCKET
         _requestJobProtocolMap[QRpc::LocalSocket]=&this->_requestJobLocalSocket;
+#endif
+#ifdef Q_RPC_DATABASE
         _requestJobProtocolMap[QRpc::DataBase]=&this->_requestJobDataBase;
-
+#endif
         QHashIterator<int, QRPCRequestJobProtocol*> i(_requestJobProtocolMap);
         while (i.hasNext()){
             i.next();

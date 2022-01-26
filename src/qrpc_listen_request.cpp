@@ -1236,11 +1236,21 @@ void QRPCListenRequest::setRequestTimeout(int value)
     p._requestTimeout = value;
 }
 
-QString QRPCListenRequest::uploadedFile() const
+QString QRPCListenRequest::uploadedFileName() const
 {
     dPvt();
-    auto files=p.uploadedFiles.keys();
-    return (files.empty())?qsl_null:files.first();
+    if(p.uploadedFiles.isEmpty())
+        return {};
+    return p.uploadedFiles.begin().key();
+}
+
+QFile *QRPCListenRequest::uploadedFile() const
+{
+    dPvt();
+    if(p.uploadedFiles.isEmpty())
+        return nullptr;
+
+    return p.uploadedFiles.begin().value();
 }
 
 QHash<QString, QFile *> &QRPCListenRequest::uploadedFiles() const
@@ -1256,12 +1266,13 @@ void QRPCListenRequest::setUploadedFiles(const QVariant &vFiles)
     p.freeFiles();
     for(const auto&v:files){
         auto file=new QFile(v);
-        if(!file->open(QFile::ReadOnly))
+        if(!file->open(QFile::ReadOnly)){
             delete file;
-        else{
-            auto filename=file->fileName().split(qbl("/")).last();
-            p.uploadedFiles.insert(filename, file);
+            continue;
         }
+
+        auto filename=file->fileName().split(qbl("/")).last();
+        p.uploadedFiles.insert(filename, file);
     }
 }
 

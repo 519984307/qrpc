@@ -471,10 +471,16 @@ public:
     void setRequestTimeout(int value);
 
     //!
+    //! \brief uploadedFileName
+    //! \return
+    //!
+    QString uploadedFileName() const;
+
+    //!
     //! \brief uploadedFile
     //! \return
     //!
-    QString uploadedFile() const;
+    QFile *uploadedFile() const;
 
     //!
     //! \brief uploadedFiles

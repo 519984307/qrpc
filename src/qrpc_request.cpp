@@ -255,15 +255,15 @@ QRPCRequest &QRPCRequest::setPort(const QVariant &value)
     QVariant v;
     auto type=qTypeId(value);
     switch (type) {
-    case QMetaType_QStringList:
     case QMetaType_QVariantList:
+    case QMetaType_QStringList:
     {
         auto l=value.toList();
         v=l.isEmpty()?0:l.last().toInt();
         break;
     }
-    case QMetaType_QVariantMap:
     case QMetaType_QVariantHash:
+    case QMetaType_QVariantMap:
     {
         auto l=value.toHash().values();
         v=l.isEmpty()?0:l.last().toInt();
@@ -443,7 +443,7 @@ QRPCHttpResponse &QRPCRequest::upload(QFile &file)
     return this->response();
 }
 
-QRPCHttpResponse &QRPCRequest::upload(const QString &route, const QByteArray &buffer)
+QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, const QByteArray &buffer)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -460,7 +460,8 @@ QRPCHttpResponse &QRPCRequest::upload(const QString &route, const QByteArray &bu
     return this->response();
 }
 
-QRPCHttpResponse &QRPCRequest::upload(const QString &route, QFile &file)
+
+QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, QFile &file)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -470,6 +471,18 @@ QRPCHttpResponse &QRPCRequest::upload(const QString &route, QFile &file)
     file.close();
     return this->response();
 }
+
+QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, QString &fileName, QFile &file)
+{
+    dPvt();
+    auto&e=p.exchange.call();
+    e.setRoute(route);
+    e.setMethod(QRpc::Post);
+    p.upload(e.route(), fileName);
+    file.close();
+    return this->response();
+}
+
 
 QRPCHttpResponse &QRPCRequest::download(QString &fileName)
 {
@@ -483,29 +496,25 @@ QRPCHttpResponse &QRPCRequest::download(QString &fileName)
     return this->response();
 }
 
-QRPCHttpResponse &QRPCRequest::download(const QString &route, QString &fileName)
+QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName)
 {
     dPvt();
     auto _fileName=p.parseFileName(fileName);
-    return this->download(QUrl(route), _fileName);
+    auto&e=p.exchange.call();
+    e.setRoute(route);
+    e.setMethod(QRpc::Get);
+    auto&response=p.download(e.route(), _fileName);
+    if(response)
+        fileName=_fileName;
+    return response;
 }
 
 QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName, const QVariant &parameter)
 {
     dPvt();
-
-    QString _route;
-    auto typeId=qTypeId(route);
-    switch (typeId) {
-    case QMetaType_QUrl:
-        _route=route.toUrl().toString();
-        break;
-    default:
-        _route=route.toString();
-    }
     auto _fileName=p.parseFileName(fileName);
     auto&e=p.exchange.call();
-    e.setRoute(_route);
+    e.setRoute(route);
     e.setMethod(QRpc::Get);
     this->setBody(parameter);
     auto&response=p.download(e.route(), _fileName);
@@ -514,25 +523,10 @@ QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName
     return response;
 }
 
-
-QRPCHttpResponse &QRPCRequest::download(const QUrl &route, QString &fileName)
-{
-    dPvt();
-    auto _fileName=p.parseFileName(fileName);
-    auto&e=p.exchange.call();
-    e.setRoute(route.toString());
-    e.setMethod(QRpc::Get);
-    auto&response=p.download(e.route(), _fileName);
-    if(response)
-        fileName=_fileName;
-    return response;
-}
-
-
 QRPCRequest &QRPCRequest::autoSetCookie()
 {
-    auto vMap=this->response().header().rawHeader();
-    QHashIterator<QString, QVariant> i(vMap);
+    auto vRawHeader=this->response().header().rawHeader();
+    QHashIterator<QString, QVariant> i(vRawHeader);
     auto cookies=this->header().cookies().toStringList();
     while (i.hasNext()){
         i.next();
@@ -621,10 +615,10 @@ QString QRPCRequest::Body::toString()const
     dPvt();
     auto type=qTypeId(p.request_body);
     switch (type) {
-    case QMetaType_QStringList:
     case QMetaType_QVariantList:
-    case QMetaType_QVariantMap:
     case QMetaType_QVariantHash:
+    case QMetaType_QVariantMap:
+    case QMetaType_QStringList:
         return QJsonDocument::fromVariant(p.request_body).toJson();
     default:
         return p.request_body.toString();
@@ -641,10 +635,10 @@ QVariantHash QRPCRequest::Body::toHash()const
     dPvt();
     auto type=qTypeId(p.request_body);
     switch (type) {
-    case QMetaType_QStringList:
+    case QMetaType_QVariantHash:
     case QMetaType_QVariantList:
     case QMetaType_QVariantMap:
-    case QMetaType_QVariantHash:
+    case QMetaType_QStringList:
         return QJsonDocument::fromVariant(p.request_body).object().toVariantHash();
     default:
         return QJsonDocument::fromJson(p.request_body.toByteArray()).object().toVariantHash();
@@ -656,10 +650,10 @@ QVariantList QRPCRequest::Body::toList() const
     dPvt();
     auto type=qTypeId(p.request_body);
     switch (type) {
-    case QMetaType_QStringList:
+    case QMetaType_QVariantHash:
     case QMetaType_QVariantList:
     case QMetaType_QVariantMap:
-    case QMetaType_QVariantHash:
+    case QMetaType_QStringList:
         return QJsonDocument::fromVariant(p.request_body).array().toVariantList();
     default:
         return QJsonDocument::fromJson(p.request_body.toByteArray()).array().toVariantList();

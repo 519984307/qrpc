@@ -36,4 +36,6 @@ private:
     void*p=nullptr;
 };
 
+QRPC_LISTTEN_AUTO_REGISTER(WebSocket, QRPCListenWebSocket)
+
 }

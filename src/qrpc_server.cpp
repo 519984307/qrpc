@@ -50,7 +50,7 @@ bool QRPCServer::start()
         this->controllers().append(v);
 
     this->parsers().clear();
-    for(auto&v:QRPCController::parserRequestList())
+    for(auto&v:QRPCController::staticParserRequestList())
         this->parsers().append(v);
 
     return p.listenColletions->start();

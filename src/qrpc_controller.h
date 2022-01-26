@@ -193,18 +193,18 @@ public:
     virtual QRPCServer*server();
 
     //!
-    //! \brief registerInterface
+    //! \brief interfaceRegister
     //! \param metaObject
     //! \return
     //!
-    static int registerInterface(const QMetaObject &metaObject);
+    static int interfaceRegister(const QMetaObject &metaObject);
 
     //!
-    //! \brief registerParserRequest
+    //! \brief parserRequestRegister
     //! \param metaObject
     //! \return
     //!
-    static int registerParserRequest(const QMetaObject &metaObject);
+    static int parserRequestRegister(const QMetaObject &metaObject);
 
     //!
     //! \brief staticInterfaceList
@@ -213,10 +213,10 @@ public:
     static QVector<const QMetaObject *> &staticInterfaceList();
 
     //!
-    //! \brief parserRequestList
+    //! \brief staticParserRequestList
     //! \return
     //!
-    static QVector<const QMetaObject *> &parserRequestList();
+    static QVector<const QMetaObject *> &staticParserRequestList();
 
     //!
     //! \brief methodBlackList

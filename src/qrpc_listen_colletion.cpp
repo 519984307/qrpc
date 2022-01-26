@@ -7,15 +7,16 @@
 #include "./qrpc_listen_protocol.h"
 
 #include "./private/p_qrpc_server.h"
-#include "./private/p_qrpc_listen_tcp.h"
-#include "./private/p_qrpc_listen_udp.h"
-#include "./private/p_qrpc_listen_wss.h"
-#include "./private/p_qrpc_listen_broker_mqtt.h"
-#include "./private/p_qrpc_listen_broker_amqp.h"
-#include "./private/p_qrpc_listen_broker_kafka.h"
-#include "./private/p_qrpc_listen_broker_database.h"
-#include "./private/p_qrpc_listen_http.h"
-#include "./private/p_qrpc_listen_qrpc.h"
+//#include "./private/p_qrpc_listen_tcp.h"
+//#include "./private/p_qrpc_listen_udp.h"
+//#include "./private/p_qrpc_listen_wss.h"
+//#include "./private/p_qrpc_listen_broker_mqtt.h"
+//#include "./private/p_qrpc_listen_broker_amqp.h"
+//#include "./private/p_qrpc_listen_broker_kafka.h"
+//#include "./private/p_qrpc_listen_broker_database.h"
+//#include "./private/p_qrpc_listen_http.h"
+//#include "./private/p_qrpc_listen_qrpc.h"
+
 
 namespace QRpc {
 
@@ -73,16 +74,20 @@ public:
 
     void makeListens()
     {
-        this->makeOption(0, QRPCListenQRPC::staticMetaObject);
-        this->makeOption(QRPCProtocol::TcpSocket, QRPCListenTCP::staticMetaObject);
-        this->makeOption(QRPCProtocol::UdpSocket, QRPCListenUDP::staticMetaObject);
-        this->makeOption(QRPCProtocol::WebSocket, QRPCListenWebSocket::staticMetaObject);
-        this->makeOption(QRPCProtocol::Mqtt, QRPCListenBrokerMQTT::staticMetaObject);
-        //this->makeOption(QRPCProtocol::DataBase, QRPCListenBrokerDataBase::staticMetaObject);
-        this->makeOption(QRPCProtocol::Amqp, QRPCListenBrokerAMQP::staticMetaObject);
-        this->makeOption(QRPCProtocol::Kafka, QRPCListenBrokerKAFKA::staticMetaObject);
-        this->makeOption(QRPCProtocol::Http, QRPCListenHTTP::staticMetaObject);
-        this->makeOption(QRPCProtocol::Https, QRPCListenHTTP::staticMetaObject);
+        auto vList=QRPCListen::interfaceCollection();
+        for(auto&item:vList){
+            this->makeOption(item.first, *item.second);
+        }
+//        this->makeOption(0, QRPCListenQRPC::staticMetaObject);
+//        this->makeOption(QRPCProtocol::TcpSocket, QRPCListenTCP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::UdpSocket, QRPCListenUDP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::WebSocket, QRPCListenWebSocket::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Mqtt, QRPCListenBrokerMQTT::staticMetaObject);
+//        //this->makeOption(QRPCProtocol::DataBase, QRPCListenBrokerDataBase::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Amqp, QRPCListenBrokerAMQP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Kafka, QRPCListenBrokerKAFKA::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Http, QRPCListenHTTP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Https, QRPCListenHTTP::staticMetaObject);
         this->loadSettings();
     }
 
