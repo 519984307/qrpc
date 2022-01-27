@@ -15,7 +15,7 @@
 namespace PrivateCPP {
 
 typedef QVector<QByteArray> ByteArrayVector;
-typedef QVector<const QMetaObject*> MetaMethodVector;
+typedef QVector<const QMetaObject*> MetaObjectVector;
 typedef QMultiHash<QByteArray, QStringList> MultStringList ;
 typedef QMultiHash<QByteArray, QRpc::QRPCControllerMethods> MultStringMethod;
 
@@ -29,8 +29,8 @@ auto&makeControllerRedirect(){
     return controllerRedirect;
 }
 
-auto&makeMetaMethodVector(){
-    static MetaMethodVector __return;
+auto&makeMetaObjectVector(){
+    static MetaObjectVector __return;
     return __return;
 }
 
@@ -40,7 +40,7 @@ auto&makeControllerMethods(){
 }
 
 auto&makeParserRequestMetaObjects(){
-    static MetaMethodVector __return;
+    static MetaObjectVector __return;
     return __return;
 }
 
@@ -52,8 +52,8 @@ auto&makeControllerMethodBlackList(){
 //Q_GLOBAL_STATIC(QRpc::QRPCControllerMethods, controllerRoutes);
 //Q_GLOBAL_STATIC(MultStringList, controllerRedirect);
 //Q_GLOBAL_STATIC(MultStringMethod, controllerMethods);
-//Q_GLOBAL_STATIC(MetaMethodVector, staticRegisterInterfaceMetaObject);
-//Q_GLOBAL_STATIC(MetaMethodVector, staticParserRequestMetaObjects);
+//Q_GLOBAL_STATIC(MetaObjectVector, staticRegisterInterfaceMetaObject);
+//Q_GLOBAL_STATIC(MetaObjectVector, staticParserRequestMetaObjects);
 //Q_GLOBAL_STATIC_WITH_ARGS(ByteArrayVector, staticControllerMethodBlackList,(ByteArrayVector()));
 }
 
@@ -66,7 +66,7 @@ namespace QRpc {
 static auto&staticControllerRoutes=PrivateCPP::makeControllerRoutes();
 static auto&staticControllerRedirect=PrivateCPP::makeControllerRedirect();
 static auto&staticControllerMethods=PrivateCPP::makeControllerMethods();
-static auto&staticRegisterInterfaceMetaObject=PrivateCPP::makeMetaMethodVector();
+static auto&staticRegisterInterfaceMetaObject=PrivateCPP::makeMetaObjectVector();
 static auto&staticParserRequestMetaObjects=PrivateCPP::makeParserRequestMetaObjects();
 static auto&staticControllerMethodBlackList=PrivateCPP::makeControllerMethodBlackList();
 
@@ -425,7 +425,7 @@ QRPCServer *QRPCController::server()
     return p.server;
 }
 
-int QRPCController::registerInterface(const QMetaObject &metaObject)
+int QRPCController::interfaceRegister(const QMetaObject &metaObject)
 {
     if(!staticRegisterInterfaceMetaObject.contains(&metaObject)){
 #if Q_RPC_LOG_VERBOSE
@@ -438,7 +438,7 @@ int QRPCController::registerInterface(const QMetaObject &metaObject)
     return staticRegisterInterfaceMetaObject.indexOf(&metaObject);
 }
 
-int QRPCController::registerParserRequest(const QMetaObject &metaObject)
+int QRPCController::parserRequestRegister(const QMetaObject &metaObject)
 {
     if(!staticParserRequestMetaObjects.contains(&metaObject)){
 #if Q_RPC_LOG_VERBOSE
@@ -457,7 +457,7 @@ QVector<const QMetaObject*>&QRPCController::staticInterfaceList()
     return staticRegisterInterfaceMetaObject;
 }
 
-QVector<const QMetaObject *> &QRPCController::parserRequestList()
+QVector<const QMetaObject *> &QRPCController::staticParserRequestList()
 {
     return staticParserRequestMetaObjects;
 }

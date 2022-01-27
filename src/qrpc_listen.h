@@ -34,6 +34,20 @@ public:
     ~QRPCListen();
 
     //!
+    //! \brief interfaceRegister
+    //! \param type
+    //! \param metaObject
+    //! \return
+    //!
+    static int interfaceRegister(const QVariant &type, const QMetaObject &metaObject);
+
+    //!
+    //! \brief interfaceCollection
+    //! \return
+    //!
+    static QVector<QPair<int, const QMetaObject *> > interfaceCollection();
+
+    //!
     //! \brief uuid
     //! \return
     //!

@@ -56,13 +56,13 @@ public:
     }
 };
 
-class HttpServer3drparty:public stefanfrings::HttpRequestHandler{
+class HttpServer3rdparty:public stefanfrings::HttpRequestHandler{
 public:
     QList<HttpListeners3drparty*> listenersPort;
     QMutex lock;
     bool realMessageOnException=false;
 
-    explicit HttpServer3drparty(QObject* parent=nullptr):stefanfrings::HttpRequestHandler(parent)
+    explicit HttpServer3rdparty(QObject* parent=nullptr):stefanfrings::HttpRequestHandler(parent)
     {
         this->realMessageOnException=false;
         auto colletions=this->listen()->colletions();
@@ -90,7 +90,7 @@ public:
         return false;
     }
 
-    virtual ~HttpServer3drparty()
+    virtual ~HttpServer3rdparty()
     {
         QMutexLOCKER locker(&this->lock);
         auto aux=this->listenersPort;
@@ -110,17 +110,17 @@ public:
         Q_UNUSED(ret)
         const auto time_start=QDateTime::currentDateTime();
 
-        const auto getHeaderMap=req.getHeaderMap();
-        const auto getParameterMap=req.getParameterMap();
+        const auto getHeaderHash=req.getHeaderMap();
+        const auto getParameterHash=req.getParameterMap();
 
         QVariantHash requestHeaderMap;
         QVariantHash requestParameterMap;
 
         {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            QHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+            QHashIterator<QByteArray, QByteArray> i(getHeaderHash);
 #else
-            QMultiHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+            QMultiHashIterator<QByteArray, QByteArray> i(getHeaderHash);
 #endif
 
             while (i.hasNext()) {
@@ -134,9 +134,9 @@ public:
 
         {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            QHashIterator<QByteArray, QByteArray> i(getParameterMap);
+            QHashIterator<QByteArray, QByteArray> i(getParameterHash);
 #else
-            QMultiHashIterator<QByteArray, QByteArray> i(getParameterMap);
+            QMultiHashIterator<QByteArray, QByteArray> i(getParameterHash);
 #endif
             while (i.hasNext()) {
                 i.next();
@@ -211,9 +211,9 @@ public:
             {
                 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-                    QHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+                    QHashIterator<QByteArray, QByteArray> i(getHeaderHash);
 #else
-                    QMultiHashIterator<QByteArray, QByteArray> i(getHeaderMap);
+                    QMultiHashIterator<QByteArray, QByteArray> i(getHeaderHash);
 #endif
                     while (i.hasNext()) {
                         i.next();
@@ -222,7 +222,7 @@ public:
                 }
 #if Q_RPC_LOG_SUPER_VERBOSE
                 {
-                    QHashIterator<QByteArray, QByteArray> i(getParameterMap);
+                    QHashIterator<QByteArray, QByteArray> i(getParameterHash);
                     while (i.hasNext()) {
                         i.next();
                         cWarning()<<qbl("   parameter - ")+i.key()+qbl(":")+i.value();
@@ -297,7 +297,7 @@ public slots:
 
 class QRPCListenHTTPPvt:public QObject{
 public:
-    HttpServer3drparty*_listenServer=nullptr;
+    HttpServer3rdparty*_listenServer=nullptr;
     QRPCListenHTTP*parent=nullptr;
 
     explicit QRPCListenHTTPPvt(QRPCListenHTTP*parent):QObject(parent)
@@ -312,8 +312,8 @@ public:
     bool start()
     {
         auto&p=*this;
-        p._listenServer = new HttpServer3drparty(this->parent);
-        QObject::connect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3drparty::onRpcResponse);
+        p._listenServer = new HttpServer3rdparty(this->parent);
+        QObject::connect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3rdparty::onRpcResponse);
         return p._listenServer->isListening();
     }
 
@@ -321,7 +321,7 @@ public:
     {
         auto&p=*this;
         if(p._listenServer!=nullptr){
-            QObject::disconnect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3drparty::onRpcResponse);
+            QObject::disconnect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3rdparty::onRpcResponse);
             delete p._listenServer;
         }
         p._listenServer=nullptr;

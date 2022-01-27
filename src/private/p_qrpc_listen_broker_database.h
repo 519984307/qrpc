@@ -42,5 +42,6 @@ signals:
     void rpcResponseClient(QSqlDriver*sqlDriver, const QString&requestPath, const QVariantHash&responseBody);
 };
 
+QRPC_LISTTEN_AUTO_REGISTER(Database, QRPCListenBrokerDataBase)
 
 }

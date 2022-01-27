@@ -210,7 +210,7 @@ public:
         auto baseRoute = QString::fromUtf8(this->parent->baseRoute()).trimmed().replace(qsl("\""),qsl_null);
         auto routeCall=route.trimmed();
         if(!routeCall.startsWith(baseRoute))
-            routeCall=qsl("/%1/%2/").arg(baseRoute,route);
+            routeCall=qsl("/%1/%2/").arg(baseRoute, route);
 
         auto&e=this->exchange.call();
         e.setMethod(QRpc::Post);
@@ -219,22 +219,16 @@ public:
         if(e.protocol()==QRpc::Http || e.protocol()==QRpc::Https){
             auto e_port=e.port()==80?qsl_null:qsl(":%1").arg(e.port());
             auto request_url = qsl("%1%2/%3/").arg(e.hostName(), e_port, e.route()).replace(qsl("\""),qsl_null).replace(qsl("//"), qsl("/"));
-            auto request_url_part = request_url.split(qsl("/"));
-            request_url.clear();
-            for(auto&line:request_url_part){
-                if(!line.trimmed().isEmpty()){
-                    if(!request_url.isEmpty())
-                        request_url+=qsl("/");
-                    request_url+=line;
-                }
-            }
-            request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url);
+            while(request_url.contains(qsl("//")))
+                request_url=request_url.replace(qsl("//"), qsl("/"));
+            request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url.simplified());
             this->request_url=QUrl(request_url).toString();
         }
         else {
             auto request_url = qsl("%1:%2").arg(e.hostName(),e.port()).replace(qsl("\""),qsl_null).replace(qsl("//"), qsl("/"));
-            auto request_url_part = request_url.split(qsl("/"));
-            request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url);
+            request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url.simplified());
+            while(request_url.contains(qsl("//")))
+                request_url=request_url.replace(qsl("//"), qsl("/"));
             this->request_url=QUrl(request_url);
         }
 

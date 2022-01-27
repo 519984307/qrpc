@@ -387,7 +387,7 @@ public:
     //! \param buffer
     //! \return
     //!
-    virtual QRPCHttpResponse&upload(const QString &route, const QByteArray &buffer);
+    virtual QRPCHttpResponse&upload(const QVariant &route, const QByteArray &buffer);
 
     //!
     //! \brief upload
@@ -395,7 +395,16 @@ public:
     //! \param file
     //! \return
     //!
-    virtual QRPCHttpResponse&upload(const QString &route, QFile &file);
+    virtual QRPCHttpResponse&upload(const QVariant &route, QFile &file);
+
+    //!
+    //! \brief upload
+    //! \param route
+    //! \param fileName
+    //! \param file
+    //! \return
+    //!
+    virtual QRPCHttpResponse&upload(const QVariant &route, QString&fileName, QFile &file);
 
     //!
     //! \brief download
@@ -410,7 +419,7 @@ public:
     //! \param fileName
     //! \return
     //!
-    virtual QRPCHttpResponse&download(const QString &route, QString&fileName);
+    virtual QRPCHttpResponse&download(const QVariant &route, QString&fileName);
 
     //!
     //! \brief download
@@ -420,14 +429,6 @@ public:
     //! \return
     //!
     virtual QRPCHttpResponse&download(const QVariant &route, QString&fileName, const QVariant &parameter);
-
-    //!
-    //! \brief download
-    //! \param route
-    //! \param fileName
-    //! \return
-    //!
-    virtual QRPCHttpResponse&download(const QUrl&route, QString&fileName);
 
     //!
     //! \brief autoSetCookie

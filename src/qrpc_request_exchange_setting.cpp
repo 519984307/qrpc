@@ -302,7 +302,14 @@ QString &QRPCRequestExchangeSetting::route() const
 void QRPCRequestExchangeSetting::setRoute(const QVariant &value)
 {
     dPvt();
-    p.route = value.toString();
+    auto typeId=qTypeId(value);
+    switch (typeId) {
+    case QMetaType_QUrl:
+        p.route = value.toUrl().toString();
+        break;
+    default:
+        p.route = value.toString();
+    }
 }
 
 QString QRPCRequestExchangeSetting::topic() const

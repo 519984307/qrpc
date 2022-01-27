@@ -48,4 +48,6 @@ private:
     void*p=nullptr;
 };
 
+QRPC_LISTTEN_AUTO_REGISTER(0, QRPCListenQRPC)
+
 }

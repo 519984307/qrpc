@@ -29,5 +29,8 @@ private:
     void*p=nullptr;
 };
 
+QRPC_LISTTEN_AUTO_REGISTER(Http, QRPCListenHTTP)
+//QRPC_LISTTEN_AUTO_REGISTER(Https, QRPCListenHTTP)
+
 
 }
