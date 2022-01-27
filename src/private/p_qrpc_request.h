@@ -240,9 +240,9 @@ public:
 
         auto job = new QRPCRequestJob();
         job->action=QRPCRequest::acUpload;
-        QObject::connect(this, &QRPCRequestPvt::run_job, job, &QRPCRequestJob::onRunJob);
+        QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         if(job->start()){
-            emit run_job(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
+            emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
             job->wait();
         }
         this->qrpcResponse.setResponse(&job->response());
@@ -336,9 +336,9 @@ public:
         auto job = new QRPCRequestJob();
         job->action=QRPCRequest::acDownload;
         job->action_fileName = fileName;
-        QObject::connect(this, &QRPCRequestPvt::run_job, job, &QRPCRequestJob::onRunJob);
+        QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         job->start();
-        emit run_job(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
+        emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
         job->wait();
 
         this->qrpcResponse.setResponse(&job->response());
@@ -485,9 +485,9 @@ public:
 
         auto job = new QRPCRequestJob();
         job->action=QRPCRequest::acRequest;
-        QObject::connect(this, &QRPCRequestPvt::run_job, job, &QRPCRequestJob::onRunJob);
+        QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         if(job->start()->isRunning()){
-            emit run_job(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
+            emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
             job->wait();
         }
         this->qrpcResponse.setResponse(&job->response());
@@ -503,7 +503,7 @@ public:
         return this->qrpcResponse;
     }
 signals:
-    void run_job(const QSslConfiguration*sslConfig, const QVariantHash&headers, const QVariant&url, const QString&fileName, QRpc::QRPCRequest*request);
+    void runJob(const QSslConfiguration*sslConfig, const QVariantHash&headers, const QVariant&url, const QString&fileName, QRpc::QRPCRequest*request);
 };
 
 }
