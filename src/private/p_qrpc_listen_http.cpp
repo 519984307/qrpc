@@ -153,6 +153,13 @@ public:
         auto requestBody=QString(req.getBody()).trimmed();
         auto requestMethod=QString(req.getMethod()).toLower();
 
+
+        if(!requestPath.isEmpty()){
+            auto c=requestPath.at(requestPath.length()-1);
+            if(c=='/')
+                requestPath=requestPath.left(requestPath.length()-1);
+        }
+
         request.setRequestProtocol(QRpc::Http);
         request.setRequestPath(requestPath.toUtf8());
         request.setRequestHeader(requestHeaderMap);
@@ -161,15 +168,16 @@ public:
         request.setRequestBody(requestBody);
 
 
-        auto vMap=request.toHash();
+        auto vHash=request.toHash();
         QStringList uploadedFiles;
-        {
-            auto rList=req.uploadedFiles.values();
-            for(auto&v:rList){
-                uploadedFiles<<v->fileName();
+        if(!req.uploadedFiles.isEmpty()){
+            QHashIterator<QByteArray,QTemporaryFile*> i(req.uploadedFiles);
+            while(i.hasNext()){
+                i.next();
+                uploadedFiles<<i.value()->fileName();
             }
         }
-        emit this->listen()->rpcRequest(vMap, QVariant(uploadedFiles));
+        emit this->listen()->rpcRequest(vHash, QVariant(uploadedFiles));
         request.start();
 
         const auto mSecsSinceEpoch=double(QDateTime::currentDateTime().toMSecsSinceEpoch()-time_start.toMSecsSinceEpoch())/1000.000;
@@ -179,7 +187,7 @@ public:
 
         QByteArray body;
 
-        static const auto staticUrlNames=QVector<int>()<<QMetaType_QUrl<<QMetaType_QVariantMap<<QMetaType_QString << QMetaType_QByteArray<<QMetaType_QChar << QMetaType_QBitArray;
+        static const auto staticUrlNames=QVector<int>{QMetaType_QUrl, QMetaType_QVariantMap, QMetaType_QString, QMetaType_QByteArray, QMetaType_QChar, QMetaType_QBitArray};
         const auto&responseBody=request.responseBody();
         Url rpc_url;
         if(!staticUrlNames.contains(qTypeId(responseBody)))

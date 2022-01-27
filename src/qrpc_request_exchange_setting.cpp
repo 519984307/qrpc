@@ -308,8 +308,12 @@ void QRPCRequestExchangeSetting::setRoute(const QVariant &value)
         p.route = value.toUrl().toString();
         break;
     default:
-        p.route = value.toString();
+        p.route = value.toString().trimmed();
     }
+    while(p.route.contains(qsl("//")))
+        p.route=p.route.replace(qsl("//"),qsl("/"));
+    while(p.route.endsWith(qsl("/")))
+        p.route=p.route.left(p.route.length()-1);
 }
 
 QString QRPCRequestExchangeSetting::topic() const

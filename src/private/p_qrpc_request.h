@@ -210,21 +210,25 @@ public:
         auto baseRoute = QString::fromUtf8(this->parent->baseRoute()).trimmed().replace(qsl("\""),qsl_null);
         auto routeCall=route.trimmed();
         if(!routeCall.startsWith(baseRoute))
-            routeCall=qsl("/%1/%2/").arg(baseRoute, route);
+            routeCall=qsl("/%1/%2").arg(baseRoute, route);
 
         auto&e=this->exchange.call();
         e.setMethod(QRpc::Post);
         e.setRoute(routeCall);
 
-        if(e.protocol()==QRpc::Http || e.protocol()==QRpc::Https){
+        switch (e.protocol()) {
+        case QRpc::Http:
+        case QRpc::Https:
+        {
             auto e_port=e.port()==80?qsl_null:qsl(":%1").arg(e.port());
-            auto request_url = qsl("%1%2/%3/").arg(e.hostName(), e_port, e.route()).replace(qsl("\""),qsl_null).replace(qsl("//"), qsl("/"));
+            auto request_url = qsl("%1%2/%3").arg(e.hostName(), e_port, e.route()).replace(qsl("\""),qsl_null).replace(qsl("//"), qsl("/"));
             while(request_url.contains(qsl("//")))
                 request_url=request_url.replace(qsl("//"), qsl("/"));
             request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url.simplified());
             this->request_url=QUrl(request_url).toString();
+            break;
         }
-        else {
+        default:
             auto request_url = qsl("%1:%2").arg(e.hostName(),e.port()).replace(qsl("\""),qsl_null).replace(qsl("//"), qsl("/"));
             request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url.simplified());
             while(request_url.contains(qsl("//")))
@@ -258,7 +262,7 @@ public:
 
         auto routeCall=route.trimmed();
         if(!routeCall.startsWith(baseRoute))
-            routeCall=qsl("/%1/%2/").arg(baseRoute, route);
+            routeCall=qsl("/%1/%2").arg(baseRoute, route);
 
         auto&e=this->exchange.call();
         e.setMethod(QRpc::Get);
@@ -266,27 +270,38 @@ public:
         auto&vBody=this->request_body;
         auto method=e.method();
         QMultiHash<QString,QVariant> paramsGet;
-        if(method==QRpc::Head || method==QRpc::Get || method==QRpc::Delete || method==QRpc::Options){
+        switch (method) {
+        case QRpc::Head:
+        case QRpc::Get:
+        case QRpc::Delete:
+        case QRpc::Options:
+        {
             Q_DECLARE_VU;
             paramsGet=vu.toMultiHash(vBody);
             vBody.clear();
             auto paramsGetOriginais = e.parameter();
-            if (!paramsGetOriginais.isEmpty()){
+            if (!paramsGetOriginais.isEmpty())
                 paramsGet.unite(paramsGetOriginais);
-            }
+            break;
+        }
+        default:
+            break;
         }
 
-        if(e.protocol()==QRpc::Http || e.protocol()==QRpc::Https){
+        switch (e.protocol()) {
+        case QRpc::Http:
+        case QRpc::Https:
+        {
             auto e_port=e.port()==80?qsl_null:qsl(":%1").arg(e.port());
-            auto request_url_str = qsl("%1%2/%3/").arg(e.hostName(), e_port, e.route()).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/"));
+            auto request_url_str = qsl("%1%2/%3").arg(e.hostName(), e_port, e.route()).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/"));
             auto request_url_part = request_url_str.split(qsl("/"));
             request_url_str.clear();
             for(auto&line:request_url_part){
-                if(!line.trimmed().isEmpty()){
-                    if(!request_url_str.isEmpty())
-                        request_url_str+=qsl("/");
-                    request_url_str+=line;
-                }
+                if(line.trimmed().isEmpty())
+                    continue;
+                if(!request_url_str.isEmpty())
+                    request_url_str+=qsl("/");
+                request_url_str+=line;
             }
             request_url_str=qsl("%1://%2").arg(e.protocolUrlName(), request_url_str);
             this->request_url=QUrl(request_url_str);
@@ -307,8 +322,9 @@ public:
                 url.setQuery(url_query);
                 this->request_url=url;
             }
+            break;
         }
-        else {
+        default:
             auto request_url = qsl("%1:%2").arg(e.hostName()).arg(e.port()).replace(qsl("\""),qsl_null).replace(qsl("//"), qsl("/"));
             auto request_url_part = request_url.split(qsl("/"));
             request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url);
@@ -339,34 +355,45 @@ public:
         auto route=vRoute.toString().trimmed();
         auto routeCall=route.trimmed();
         if(!routeCall.startsWith(baseRoute))
-            routeCall=qsl("/%1/%2/").arg(baseRoute,route);
+            routeCall=qsl("/%1/%2").arg(baseRoute,route);
 
         auto&e=this->exchange.call();
         e.setMethod(method);
         e.setRoute(routeCall);
 
         QMultiHash<QString,QVariant> paramsGet;
-        if(method==QRpc::Head || method==QRpc::Get || method==QRpc::Delete || method==QRpc::Options){
+        switch (method) {
+        case QRpc::Head:
+        case QRpc::Get:
+        case QRpc::Delete:
+        case QRpc::Options:
+        {
             Q_DECLARE_VU;
             paramsGet=vu.toMultiHash(vBody);
             vBody.clear();
             auto paramsGetOriginais = e.parameter();
-            if (!paramsGetOriginais.isEmpty()){
+            if (!paramsGetOriginais.isEmpty())
                 paramsGet.unite(paramsGetOriginais);
-            }
+            break;
+        }
+        default:
+            break;
         }
 
-        if(e.protocol()==QRpc::Http || e.protocol()==QRpc::Https){
+        switch (e.protocol()) {
+        case QRpc::Http:
+        case QRpc::Https:
+        {
             auto e_port=e.port()==80?qsl_null:qsl(":%1").arg(e.port());
-            auto request_url_str = qsl("%1%2/%3/").arg(e.hostName(), e_port, e.route()).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/"));
+            auto request_url_str = qsl("%1%2/%3").arg(e.hostName(), e_port, e.route()).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/"));
             auto request_url_part = request_url_str.split(qsl("/"));
             request_url_str.clear();
             for(auto&line:request_url_part){
-                if(!line.trimmed().isEmpty()){
-                    if(!request_url_str.isEmpty())
-                        request_url_str+=qsl("/");
-                    request_url_str+=line;
-                }
+                if(line.trimmed().isEmpty())
+                    continue;
+                if(!request_url_str.isEmpty())
+                    request_url_str+=qsl("/");
+                request_url_str+=line;
             }
             request_url_str=qsl("%1://%2").arg(e.protocolUrlName(), request_url_str);
             this->request_url=QUrl(request_url_str);
@@ -385,8 +412,10 @@ public:
                 url.setQuery(url_query);
                 this->request_url=url;
             }
+            break;
         }
-        else if(e.protocol()==QRpc::DataBase){
+        case QRpc::DataBase:
+        {
             auto topic=e.topic().trimmed();
             if(topic.isEmpty()){
                 auto driver=e.driver();
@@ -394,49 +423,64 @@ public:
                 topic=qsl("broker-%1-%2").arg(driver).arg(port).toLower();
             }
             this->request_url=topic;
+            break;
         }
-        else {
+        default:
             auto request_url = qsl("%1:%2").arg(e.hostName()).arg(e.port()).replace(qsl("\""), qsl_null).replace(qsl("//"),qsl("/"));
             auto request_url_part = request_url.split(qbl("/"));
             request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url);
             this->request_url=QUrl(request_url);
         }
 
-
-        if(e.protocol()==QRpc::Http || e.protocol()==QRpc::Https){
-            if(qTypeId(vBody)==QMetaType_QVariantList || qTypeId(vBody)==QMetaType_QStringList || qTypeId(vBody)==QMetaType_QVariantHash || qTypeId(vBody)==QMetaType_QVariantMap){
+        switch (e.protocol()) {
+        case QRpc::Http:
+        case QRpc::Https:
+        {
+            switch (qTypeId(vBody)) {
+            case QMetaType_QVariantHash:
+            case QMetaType_QVariantList:
+            case QMetaType_QStringList:
+            case QMetaType_QVariantMap:
                 this->request_body = QJsonDocument::fromVariant(vBody).toJson(QJsonDocument::Compact);
-            }
-            else{
+                break;
+            default:
                 this->request_body = vBody.toByteArray();
             }
+            break;
         }
-        else if(e.protocol()==QRpc::DataBase || e.protocol()==QRpc::Kafka || e.protocol()==QRpc::Amqp  || e.protocol()==QRpc::WebSocket || e.protocol()==QRpc::TcpSocket || e.protocol()==QRpc::UdpSocket){
-
-
-            if(qTypeId(vBody)==QMetaType_QVariantList || qTypeId(vBody)==QMetaType_QStringList || qTypeId(vBody)==QMetaType_QVariantMap || qTypeId(vBody)==QMetaType_QVariantHash){
+        case QRpc::DataBase:
+        case QRpc::Kafka:
+        case QRpc::Amqp:
+        case QRpc::WebSocket:
+        case QRpc::TcpSocket:
+        case QRpc::UdpSocket:
+        {
+            switch (qTypeId(vBody)) {
+            case QMetaType_QVariantHash:
+            case QMetaType_QVariantList:
+            case QMetaType_QStringList:
+            case QMetaType_QVariantMap:
                 this->request_body = QJsonDocument::fromVariant(vBody).toJson(QJsonDocument::Compact);
-            }
-            else{
+                break;
+            default:
                 this->request_body = vBody.toByteArray();
             }
 
             auto base=QUuid::createUuid().toString() + QDateTime::currentDateTime().toString();
-
             QRPCListenRequest request;
             request.setRequestProtocol(e.protocol());
-
             request.setRequestUuid( QUuid::createUuidV3(QUuid::createUuid(), base.toUtf8()) );
             request.setRequestMethod(e.methodName().toUtf8().toLower());
             request.setRequestHeader(this->qrpcHeader.rawHeader());
             request.setRequestBody(vBody);
             request.setRequestPath(routeCall.toUtf8());
-
             this->request_body = request.toHash();
+            break;
         }
-        else{
+        default:
             this->request_body = vBody;
         }
+
         auto job = new QRPCRequestJob();
         job->action=QRPCRequest::acRequest;
         QObject::connect(this, &QRPCRequestPvt::run_job, job, &QRPCRequestJob::onRunJob);
