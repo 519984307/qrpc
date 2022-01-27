@@ -166,8 +166,10 @@ public:
     {
         if(!static_log_register)
             return;
+
         if(!request.isValid())
             return;
+
         QFile file(this->fileLog);
         if (!file.open(QIODevice::Append | QIODevice::WriteOnly | QIODevice::Text))
             return;
