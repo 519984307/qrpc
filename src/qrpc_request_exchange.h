@@ -29,6 +29,12 @@ public:
     QRPCRequestExchange &operator =(QRPCRequestExchange &e);
 
     //!
+    //! \brief clear
+    //! \return
+    //!
+    virtual QRPCRequestExchange&clear();
+
+    //!
     //! \brief call
     //! \return
     //!

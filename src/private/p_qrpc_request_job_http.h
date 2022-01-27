@@ -3,8 +3,10 @@
 #include "./p_qrpc_request_job_protocol.h"
 #include <QHttpMultiPart>
 #include <QTemporaryFile>
+#include <QCoreApplication>
 #include <QMutex>
 #include <QSslConfiguration>
+#include <QStandardPaths>
 
 namespace QRpc {
 
@@ -15,11 +17,12 @@ class QRPCRequestJobHttp : public QRPCRequestJobProtocol
 {
     Q_OBJECT
 public:
+    QString tempLocation;
     QTimer*__timeout=nullptr;
     QMutex mutexRequestFinished;
     QFile fileDownload;
     QFile fileUpload;
-    QTemporaryFile fileTemp;
+    QFile fileTemp;
     QNetworkRequest request;
     QRPCRequestJobResponse*response=nullptr;
     QNetworkReply *reply = nullptr;
@@ -27,15 +30,33 @@ public:
 
     Q_INVOKABLE explicit QRPCRequestJobHttp(QObject*parent):QRPCRequestJobProtocol(parent)
     {
-        fileTemp.setAutoRemove(false);
+        this->tempLocation=qsl("%1/%2.%3.tmp").arg(QStandardPaths::writableLocation(QStandardPaths::TempLocation), qAppName().replace(qsl_space, qsl_underline),qsl("%1"));
     }
 
     ~QRPCRequestJobHttp()
     {
-        if(this->fileTemp.isOpen())
-            this->fileTemp.close();
+        this->fileFree();
+
         if(this->nam!=nullptr)
             this->nam->deleteLater();
+    }
+
+    void fileMake()
+    {
+        this->fileFree();
+        static int fileTempNumber=0;
+
+        auto fileTemp=this->tempLocation.arg(++fileTempNumber);
+        this->fileTemp.setFileName(fileTemp);
+    }
+
+    void fileFree()
+    {
+        if(this->fileTemp.isOpen())
+            this->fileTemp.close();
+
+        if(this->fileTemp.exists())
+            this->fileTemp.remove();
     }
 
     virtual bool call(QRPCRequestJobResponse*response)override
@@ -70,13 +91,19 @@ public:
                     else{
                         auto v=i.value();
                         QStringList headerValues;
-                        if(qTypeId(v)==QMetaType_QVariantList || qTypeId(v)==QMetaType_QStringList){
+                        switch (qTypeId(v)) {
+                        case QMetaType_QVariantList:
+                        case QMetaType_QStringList:
+                        {
                             auto vList=v.toList();
                             for(auto&r:vList){
                                 headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                             }
+                            break;
                         }
-                        else if(qTypeId(v)==QMetaType_QVariantHash || qTypeId(v)==QMetaType_QVariantMap){
+                        case QMetaType_QVariantHash:
+                        case QMetaType_QVariantMap:
+                        {
                             auto vMap=v.toHash();
                             QHashIterator<QString, QVariant> i(vMap);
                             while (i.hasNext()) {
@@ -84,10 +111,12 @@ public:
                                 auto r=qsl("%1=%2").arg(i.value().toString(), v.toString()).replace(qsl("\n"), qsl(";"));
                                 headerValues<<r;
                             }
+                            break;
                         }
-                        else{
+                        default:
                             headerValues<<v.toString();
                         }
+
                         v=headerValues.join(qsl("; "));
                         auto k=i.key().toUtf8().trimmed();
                         if(!ignoreHeaders.contains(k.toLower()))
@@ -163,6 +192,8 @@ public:
         else{
             configureHeadersIgnored();
             if(action==QRPCRequest::acDownload){
+                this->fileMake();
+                //this->fileTemp=new QTemporaryFile();
                 this->fileDownload.setFileName(this->action_fileName);
                 if(!this->fileDownload.open(QFile::Truncate | QFile::WriteOnly | QFile::Unbuffered)){
                     auto msg=qsl("invalid download fileName: %1").arg(this->fileDownload.fileName());
@@ -171,7 +202,7 @@ public:
                     response->response_status_code=-1;
                     response->response_status_reason_phrase = msg.toUtf8();
                 }
-                else if(!this->fileTemp.open()){
+                else if(!this->fileTemp.open(QFile::Truncate | QFile::Unbuffered | QFile::WriteOnly)){
                     auto msg=qsl("invalid download temporary fileName: %1").arg(this->fileTemp.fileName());
                     sWarning()<<msg;
                     response->response_qt_status_code=QNetworkReply::NoError;
@@ -256,22 +287,24 @@ private slots:
 
     void onReplyError(QNetworkReply::NetworkError e)
     {
-        if(response->response_qt_status_code==QNetworkReply::NoError){
+        if(response->response_qt_status_code==QNetworkReply::NoError)
             response->response_qt_status_code=e;
-        }
+
         this->onFinish();
     };
 
     void onReplyFinish()
     {
+        if(this->reply==nullptr)
+            return;
+
         QMutexLOCKER locker(&mutexRequestFinished);
-        if(this->reply!=nullptr){
-            if(response->response_qt_status_code==QNetworkReply::NoError){
-                if(response->response_qt_status_code!=QNetworkReply::TimeoutError)
-                    response->response_qt_status_code = this->reply->error();
-                this->onFinish();
-            }
-        }
+        if(response->response_qt_status_code!=QNetworkReply::NoError)
+            return;
+
+        if(response->response_qt_status_code!=QNetworkReply::TimeoutError)
+            response->response_qt_status_code = this->reply->error();
+        this->onFinish();
 
     };
     void onReplyTimeout()
@@ -307,10 +340,19 @@ private slots:
     {
         Q_UNUSED(bytesReceived)
         Q_UNUSED(bytesTotal)
-        if(this->reply!=nullptr){
-            const auto bytes=this->reply->read(bytesReceived);
-            this->fileTemp.write(bytes);
+        if(this->reply==nullptr)
+            return;
+
+//        if(this->fileTemp==nullptr)
+//            return;
+
+        if(!this->fileTemp.isOpen()){
+            qWarning()<<tr("invalid fileTemp: %1").arg(this->fileTemp.fileName());
+            return;
         }
+        const auto bytes=this->reply->read(bytesReceived);
+        this->fileTemp.write(bytes);
+        this->fileTemp.flush();
     }
 
 
@@ -319,13 +361,13 @@ private slots:
         this->timeout_stop();
 
         response->request_finish=QDateTime::currentDateTime();
-        if(this->fileTemp.isOpen()){
-            //auto fileName=this->fileTemp.fileName();
-            this->fileTemp.close();
+        if(/*this->fileTemp!=nullptr && */this->fileTemp.isOpen()){
+            auto fileName=this->fileTemp.fileName();
             this->fileDownload.close();
             QFile::remove(this->fileDownload.fileName());
-            QFile::rename(this->fileTemp.fileName(), this->fileDownload.fileName());
+            QFile::rename(fileName, this->fileDownload.fileName());
             QFile::remove(this->fileTemp.fileName());
+            this->fileFree();
         }
 
 

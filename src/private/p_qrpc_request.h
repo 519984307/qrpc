@@ -238,16 +238,15 @@ public:
             this->request_url=QUrl(request_url);
         }
 
-        auto job = new QRPCRequestJob();
-        job->action=QRPCRequest::acUpload;
+        auto job = QRPCRequestJob::newJob(QRPCRequest::acUpload);
         QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
-        if(job->start()){
-            emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
-            job->wait();
-        }
+        job->start();
+        emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
+        job->wait();
+        QObject::disconnect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         this->qrpcResponse.setResponse(&job->response());
         this->writeLog(job->response(), job->response().toVariant());
-        delete job;
+        job->release();
         return this->qrpcResponse;
     }
 
@@ -333,17 +332,15 @@ public:
             this->request_url=QUrl(request_url);
         }
 
-        auto job = new QRPCRequestJob();
-        job->action=QRPCRequest::acDownload;
-        job->action_fileName = fileName;
+        auto job = QRPCRequestJob::newJob(QRPCRequest::acDownload, fileName);
         QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         job->start();
         emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
         job->wait();
-
+        QObject::disconnect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         this->qrpcResponse.setResponse(&job->response());
         this->writeLog(job->response(), job->response().toVariant());
-        delete job;
+        job->release();
         return this->qrpcResponse;
     }
 
@@ -483,16 +480,14 @@ public:
             this->request_body = vBody;
         }
 
-        auto job = new QRPCRequestJob();
-        job->action=QRPCRequest::acRequest;
+        auto job = QRPCRequestJob::newJob(QRPCRequest::acRequest);
         QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
-        if(job->start()->isRunning()){
-            emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
-            job->wait();
-        }
+        emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
+        job->wait();
+        QObject::disconnect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         this->qrpcResponse.setResponse(&job->response());
         this->writeLog(job->response(), job->response().toVariant());
-        delete job;
+        job->release();
 
 #ifdef Q_RPC_LOG
         if(!this->parent->response().isOk()){

@@ -70,6 +70,19 @@ QRPCRequestExchangeSetting&QRPCRequestExchangeSetting::operator=(const QRPCReque
     return*this;
 }
 
+QRPCRequestExchangeSetting &QRPCRequestExchangeSetting::clear()
+{
+    auto&e=*this;
+    for(int i = 0; i < e.metaObject()->propertyCount(); ++i) {
+        auto property=e.metaObject()->property(i);
+        if(QByteArray(property.name()) == qbl("objectName"))
+            continue;
+
+        property.write(this, {});
+    }
+    return*this;
+}
+
 QRPCRequestExchangeSetting &QRPCRequestExchangeSetting::operator=(const QVariantHash &e)
 {
     QStm::MetaObjectUtil util;

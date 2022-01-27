@@ -70,7 +70,7 @@ public slots:
             return;
         }
 
-        auto vMap=request.toHash();
+        auto vHash=request.toHash();
         QRPCListenSlotList*listenSlotList=nullptr;
         {//locker
             QMutexLOCKER locker(&mutexMapLocker);
@@ -82,10 +82,10 @@ public slots:
             }
         }
 
-        auto requestInvoke=[&listenSlotList, &vMap, &uploadedFiles](QRPCListenQRPCSlot*&thread){
+        auto requestInvoke=[&listenSlotList, &vHash, &uploadedFiles](QRPCListenQRPCSlot*&thread){
             thread=nullptr;
             for(auto&v:*listenSlotList){
-                if(!v->canRequestInvoke(vMap, uploadedFiles))
+                if(!v->canRequestInvoke(vHash, uploadedFiles))
                     continue;
                 thread=v;
                 return true;
