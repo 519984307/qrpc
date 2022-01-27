@@ -12,6 +12,11 @@ class QRPCInterfaceMaintence : public QRpc::QRPCController
     Q_OBJECT
     QRPC_DECLARE_ROUTE(QRPCInterfaceCheck,"v1/maintence")
 public:
+
+    //!
+    //! \brief QRPCInterfaceMaintence
+    //! \param parent
+    //!
     Q_INVOKABLE explicit QRPCInterfaceMaintence(QObject *parent = nullptr);
     ~QRPCInterfaceMaintence();
 
