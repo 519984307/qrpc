@@ -218,15 +218,15 @@ public:
     }
 
 private slots:
-    void onRequestInvoke(QVariantHash vRequestMap, const QVariant&uploadedFiles)
+    void onRequestInvoke(QVariantHash vRequestHash, const QVariant&uploadedFiles)
     {
         if(this->listenQRPC==nullptr){
             qFatal("listen pool is nullptr");
         }
 
-        auto requestPath=vRequestMap.value(qsl("requestPath")).toString();
+        auto requestPath=vRequestHash.value(qsl("requestPath")).toString();
         const auto&controllerSetting=this->listenQRPC->server()->controllerOptions().setting(requestPath);
-        QRPCListenRequest request(vRequestMap, controllerSetting);
+        QRPCListenRequest request(vRequestHash, controllerSetting);
         request.setUploadedFiles(uploadedFiles);
         if(!request.isValid())
             request.co().setBadRequest();
@@ -235,13 +235,13 @@ private slots:
 
         auto listenUuid=request.listenUuid();
         auto requestUuid=request.requestUuid();
-        vRequestMap=request.toHash();
+        vRequestHash=request.toHash();
         auto listen=this->listenQRPC->childrenListen(listenUuid);
         if(listen==nullptr){
             sWarning()<<qsl("invalid listen for ")<<listenUuid.toString();
         }
         else{
-            emit listen->rpcResponse(requestUuid, vRequestMap);
+            emit listen->rpcResponse(requestUuid, vRequestHash);
         }
         this->lockedMutex.unlock();
         this->locked=false;
