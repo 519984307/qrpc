@@ -25,6 +25,11 @@ public:
     {
     }
 
+    virtual QRPCRequestJobProtocol&clear()
+    {
+        return*this;
+    }
+
     virtual bool call(QRPCRequestJobResponse*response)
     {
         response->response_status_code=QNetworkReply::UnknownServerError;

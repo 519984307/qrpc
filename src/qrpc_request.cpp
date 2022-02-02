@@ -450,7 +450,7 @@ QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, const QByteArray &b
     e.setRoute(route);
     e.setMethod(QRpc::Post);
     QTemporaryFile file;
-    //file.setAutoRemove(false);
+
     if(!file.open())
         return this->response();
     file.write(buffer);

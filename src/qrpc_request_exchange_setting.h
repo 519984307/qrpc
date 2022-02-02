@@ -49,6 +49,12 @@ public:
     QRPCRequestExchangeSetting&operator=(const QVariantHash&e);
 
     //!
+    //! \brief clear
+    //! \return
+    //!
+    virtual QRPCRequestExchangeSetting&clear();
+
+    //!
     //! \brief toMap
     //! \return
     //!

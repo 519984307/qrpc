@@ -46,6 +46,7 @@ public:
     Q_INVOKABLE explicit QRPCRequestJobResponse(QObject*parent):QObject(parent)
     {
     }
+
     explicit QRPCRequestJobResponse(const QVariantHash&request_header, const QVariant&vUrl, QRPCRequest&request, QObject*parent):QObject(parent)
     {
         this->request_url = vUrl;
@@ -75,6 +76,25 @@ public:
         this->response_qt_status_code=e.response_qt_status_code;
         this->responseHeader=e.responseHeader;
         return*this;
+    }
+
+    void clear()
+    {
+        this->request_exchange.clear();
+        this->qrpcRequest=nullptr;
+
+        this->request_uuid=QUuid::createUuidV3(QUuid::createUuid(), QUuid::createUuid().toString().toUtf8());
+        this->request_header.clear();
+        this->request_parameters.clear();
+        this->request_body.clear();
+        this->activityLimit=120000;
+        this->request_start=QDateTime();
+        this->request_finish=QDateTime();
+        this->response_status_code = QNetworkReply::NoError;
+        this->response_status_reason_phrase.clear();
+        this->response_body.clear();
+        this->response_qt_status_code = QNetworkReply::NoError;
+        this->responseHeader.clear();
     }
 
     QVariantHash toMapResquest()

@@ -45,6 +45,14 @@ QRPCRequestExchange&QRPCRequestExchange::operator =(QRPCRequestExchange &e)
     return*this;
 }
 
+QRPCRequestExchange &QRPCRequestExchange::clear()
+{
+    dPvt();
+    p.call.clear();
+    p.back.clear();
+    return*this;
+}
+
 QRPCRequestExchangeSetting &QRPCRequestExchange::call()
 {
     dPvt();
