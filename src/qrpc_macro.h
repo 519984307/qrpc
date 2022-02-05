@@ -278,31 +278,3 @@ virtual QString description()const override{\
     static QString __return(vdesc);\
     return __return;\
 }
-
-#define Q_RPC_DECLARE_INTERFACE_METHOD_CHECK()      \
-public:                                             \
-Q_INVOKABLE virtual QVariant check()                \
-{                                                   \
-    this->rq().co().setOK();                        \
-    return {};                                      \
-}                                                   \
-Q_INVOKABLE virtual QVariant ping()                 \
-{                                                   \
-    this->rq().co().setOK();                        \
-    return QDateTime::currentDateTime();            \
-}                                                   \
-Q_INVOKABLE virtual QVariant fullCheck()            \
-{                                                   \
-    this->rq().co().setOK();                        \
-    return {};                                      \
-}                                                   \
-Q_INVOKABLE virtual QVariant connectionsCheck()     \
-{                                                   \
-    this->rq().co().setOK();                        \
-    return {};                                      \
-}                                                   \
-Q_INVOKABLE virtual QVariant businessCheck()        \
-{                                                   \
-    this->rq().co().setNotImplemented();            \
-    return {};                                      \
-}
