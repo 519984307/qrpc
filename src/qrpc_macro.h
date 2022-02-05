@@ -284,7 +284,7 @@ public:                                             \
 Q_INVOKABLE virtual QVariant check()                \
 {                                                   \
     this->rq().co().setOK();                        \
-    QRPC_RETURN_VARIANT();                          \
+    return {};                                      \
 }                                                   \
 Q_INVOKABLE virtual QVariant ping()                 \
 {                                                   \
