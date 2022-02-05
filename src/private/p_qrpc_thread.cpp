@@ -73,8 +73,6 @@ bool QRPCThread::stop()
 bool QRPCThread::quit()
 {
     QThread::quit();
-    if(this->currentThread()!=this)
-        QThread::wait();
     return true;
 }
 
