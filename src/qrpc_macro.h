@@ -283,6 +283,7 @@ virtual QString description()const override{\
 public:                                             \
 Q_INVOKABLE virtual QVariant check()                \
 {                                                   \
+    this->rq().co().setOK();                        \
     QRPC_RETURN_VARIANT();                          \
 }                                                   \
 Q_INVOKABLE virtual QVariant ping()                 \
