@@ -1,6 +1,7 @@
 #pragma once
 
 #include "./qrpc_test.h"
+#include "../src/qrpc_macro.h"
 #include "../src/qrpc_server.h"
 #include "../src/qrpc_types.h"
 #include "../src/qrpc_request.h"
