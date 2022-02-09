@@ -1047,7 +1047,7 @@ bool QRPCListenRequest::requestParserBodyMap(const QVariant &property, QVariantM
             break;
         }
         if(!p._requestParserProperty.isEmpty()){
-            auto vBody=p.requestParamCache();
+            auto vBody=this->requestParamMap();
             QVariantList vPropBody;
             auto vKeys=vBody.keys();
             for(auto&v:vKeys){
