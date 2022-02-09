@@ -1066,6 +1066,22 @@ bool QRPCListenRequest::requestParserBodyMap(const QVariant &property, QVariantM
     return __return;
 }
 
+bool QRPCListenRequest::requestParserBodyHash()
+{
+    dPvt();
+    QVariantHash body;
+    if(!this->requestParserBodyHash(p._requestParserProperty, body))
+        return this->co().setBadRequest().isOK();
+
+    return true;
+}
+
+bool QRPCListenRequest::requestParserBodyHash(const QVariant &property)
+{
+    QVariantHash body;
+    return this->requestParserBodyHash(property, body);
+}
+
 bool QRPCListenRequest::requestParserBodyHash(const QVariant &property, QVariantHash &body) const
 {
     dPvt();
@@ -1143,19 +1159,21 @@ QVariant QRPCListenRequest::requestParamHash(const QByteArray &key) const
     QHashIterator<QString, QVariant> i(map);
     while (i.hasNext()) {
         i.next();
+
         auto bKey=i.key().trimmed().toLower().toUtf8();
-        if(akey==bKey){
-            auto&v=i.value();
-            switch (qTypeId(p._requestBody)) {
-            case QMetaType_QString:
-            case QMetaType_QByteArray:
-            {
-                auto s=v.toByteArray();
-                return(s.isEmpty())?QVariant():s;
-            }
-            default:
-                return v;
-            }
+        if(akey!=bKey)
+            continue;
+
+        auto&v=i.value();
+        switch (qTypeId(p._requestBody)) {
+        case QMetaType_QString:
+        case QMetaType_QByteArray:
+        {
+            auto s=v.toByteArray();
+            return(s.isEmpty())?QVariant():s;
+        }
+        default:
+            return v;
         }
     }
 

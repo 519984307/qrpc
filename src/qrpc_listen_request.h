@@ -412,6 +412,9 @@ public:
     //! \param body
     //! \return
     //!
+    //!
+    bool requestParserBodyHash();
+    bool requestParserBodyHash(const QVariant &property);
     bool requestParserBodyHash(const QVariant &property, QVariantHash&body)const;
 
     //!
