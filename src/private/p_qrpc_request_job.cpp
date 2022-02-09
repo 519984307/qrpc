@@ -160,14 +160,21 @@ QRPCRequestJob *QRPCRequestJob::newJob(QRPCRequest::Action action, const QString
         }
         else{
             job=requestJobPool->takeFirst();
-            job->quit();
-            job->wait();
         }
         requestJobMutex->unlock();
     }
     auto&p=*static_cast<QRPCRequestJobPvt*>(job->p);
     p.action=action;
     p.action_fileName=action_fileName;
+    return job;
+}
+
+QRPCRequestJob *QRPCRequestJob::runJob(QRPCRequestJob*job)
+{
+    if(job->isRunning()){
+        job->quit();
+        job->wait();
+    }
     job->start();
     return job;
 }

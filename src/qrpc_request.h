@@ -273,6 +273,28 @@ public:
     virtual QRPCHttpResponse &response();
 
     //!
+    //! \brief requestRecovery
+    //! \return
+    //! repeat call on return
+    virtual QHash<int,int> requestRecovery() const;
+
+    //!
+    //! \brief setRequestRecovery
+    //! \param statusCode
+    //! \param repeatCount
+    //! \return
+    //! re-run request on response specific status code
+    virtual QRPCRequest&setRequestRecovery(int statusCode);
+    virtual QRPCRequest&setRequestRecovery(int statusCode, int repeatCount=1);
+
+    //!
+    //! \brief setRequestRecoveryOnBadGateway
+    //! \param repeatCount
+    //! \return
+    //! re-run request on response status code 502 ou message BadRequest
+    virtual QRPCRequest&setRequestRecoveryOnBadGateway(int repeatCount=1);
+
+    //!
     //! \brief lastError
     //! \return
     //!

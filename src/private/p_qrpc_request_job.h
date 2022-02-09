@@ -24,6 +24,7 @@ public:
     void run()override;
 
     static QRPCRequestJob*newJob(QRPCRequest::Action action, const QString&action_fileName={});
+    static QRPCRequestJob*runJob(QRPCRequestJob *job);
 
     QRPCRequestJob &start();
 

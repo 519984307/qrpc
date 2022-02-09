@@ -313,6 +313,33 @@ QRPCHttpResponse &QRPCRequest::response()
     return p.qrpcResponse;
 }
 
+QHash<int, int> QRPCRequest::requestRecovery()const
+{
+    dPvt();
+    return p.requestRecovery;
+}
+
+QRPCRequest &QRPCRequest::setRequestRecovery(int statusCode)
+{
+    dPvt();
+    p.requestRecovery[statusCode]=1;
+    return*this;
+}
+
+QRPCRequest &QRPCRequest::setRequestRecovery(int statusCode, int repeatCount)
+{
+    dPvt();
+    p.requestRecovery[statusCode]=repeatCount;
+    return*this;
+}
+
+QRPCRequest &QRPCRequest::setRequestRecoveryOnBadGateway(int repeatCount)
+{
+    dPvt();
+    p.requestRecovery[QRPCListenRequestCode::ssBadGateway]=repeatCount;
+    return*this;
+}
+
 LastError &QRPCRequest::lastError()
 {
     dPvt();

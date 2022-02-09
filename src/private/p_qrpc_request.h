@@ -97,6 +97,7 @@ class QRPCRequestPvt:public QObject{
     Q_OBJECT
 public:
     QRPCRequest*parent=nullptr;
+    QHash<int,int> requestRecovery;
 
     QRPCRequestExchange exchange;
     QRpc::QRPCHttpHeaders qrpcHeader;
@@ -479,11 +480,44 @@ public:
         default:
             this->request_body = vBody;
         }
-
+        const auto&requestRecovery=this->requestRecovery;
         auto job = QRPCRequestJob::newJob(QRPCRequest::acRequest);
         QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
-        emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
-        job->wait();
+        int executeCount=0;
+        forever{
+            job=QRPCRequestJob::runJob(job);
+            ++executeCount;
+            emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
+            job->wait();
+
+            if(job->response().response_qt_status_code==QNetworkReply::NoError)//if succes then break
+                break;
+
+            auto response_status_code=job->response().response_status_code;
+            if(!requestRecovery.contains(response_status_code)){//if not check status code then check reason_phrase
+                auto response_status_reason_phrase=job->response().response_status_reason_phrase.toLower().simplified();
+                QHashIterator<int,int> i(requestRecovery);
+                bool doContinue=false;
+                while(i.hasNext()){
+                    i.next();
+                    auto reason_phrase=QRPCListenRequestCode::reasonPhrase(response_status_code).toLower().simplified();
+                    if(response_status_reason_phrase.contains(i.value())){
+                        doContinue=true;
+                        break;
+                    }
+                }
+                if(!doContinue)
+                    break;
+            }
+
+            auto recoveryCount=requestRecovery.contains(response_status_code);
+
+            if(recoveryCount<=0)//if status code invalid then break
+                break;
+
+            if(recoveryCount<=executeCount)//if recovery limit then break
+                break;
+        }
         QObject::disconnect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
         this->qrpcResponse.setResponse(&job->response());
         this->writeLog(job->response(), job->response().toVariant());
