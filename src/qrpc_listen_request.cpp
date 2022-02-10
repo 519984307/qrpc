@@ -232,7 +232,7 @@ public:
                 }
             }
         }
-        return QByteArray();
+        return {};
     }
 
 public slots:
