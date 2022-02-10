@@ -53,19 +53,17 @@ class QRPCListenRequestPvt:public QObject{
 public:
     QHash<QString, QFile *> uploadedFiles;
     QEventLoop eventLoop;
-    QVariantHash map;
     QUuid _listenUuid;
     ContentType _requestContentType=QRpc::AppNone;
     QUuid _requestUuid;
     QByteArray _requestProtocol;
     QByteArray _requestPath;
     QByteArray _requestMethod;
-    QVariantHash _requestBroker;
     QVariantHash _requestHeader;
     QVariantHash _requestParameter;
     QVariant _requestBody;
     QVariantList _requestParserProperty;
-    QVariantHash _requestBodyMap;
+
     QVariantHash _responseHeader;
     QVariantHash _responseCallback;
     QVariant _responseBody;
@@ -238,7 +236,8 @@ public:
     }
 
 public slots:
-    void onRequestFinish(){
+    void onRequestFinish()
+    {
         this->eventLoop.quit();
     }
 };
