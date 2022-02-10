@@ -183,11 +183,11 @@ return {};
     this->rq().requestParserProperty()<<QByteArrayLiteral(#v).toLower()
 
 #define QRPC_V_SET_MAP(v)\
-auto v=this->rq().requestParamMap(QByteArrayLiteral(#v)).toMap();\
+auto v=this->rq().requestParamHash(QByteArrayLiteral(#v)).toMap();\
     this->rq().requestParserProperty()<<QByteArrayLiteral(#v).toLower()
 
 #define QRPC_V_SET_HASH(v)\
-auto v=this->rq().requestParamMap(QByteArrayLiteral(#v)).toHash();\
+auto v=this->rq().requestParamHash(QByteArrayLiteral(#v)).toHash();\
     this->rq().requestParserProperty()<<QByteArrayLiteral(#v).toLower()
 
 #define QRPC_V_SET_LIST(v)\
@@ -211,7 +211,7 @@ auto v=this->rq().requestParamMap(QByteArrayLiteral(#v)).toHash();\
     auto v=this->rq().requestBodyHash()
 
 #define QRPC_V_CHECK_BODY_PARSER()\
-    if(!this->rq().requestParserBodyMap()){\
+    if(!this->rq().requestParserBodyHash()){\
         if(this->rq().co().isOK())\
             this->rq().co().setBadRequest();\
         return {};\
