@@ -15,7 +15,7 @@ class QRPCHttpHeadersPvt{
 public:
 
     QObject*parent=nullptr;
-    QVariantHash  header;
+    QVariantHash header;
 
     explicit QRPCHttpHeadersPvt(QRPCHttpHeaders*parent)
     {
@@ -33,25 +33,30 @@ public:
         QStringList vList;
         while (i.hasNext()) {
             i.next();
-            if(i.key().trimmed().toLower()==vkey){
-                auto&v=i.value();
-                switch (qTypeId(v)) {
-                case QMetaType_QStringList:
-                    vList=v.toStringList();
-                    break;
-                case QMetaType_QVariantList:
-                {
-                    for(auto&v:v.toList()){
-                        vList<<v.toString();
-                    }
-                    break;
-                }
-                default:
+
+            if(i.key().trimmed().toLower()!=vkey)
+                continue;
+
+            auto&v=i.value();
+            switch (qTypeId(v)) {
+            case QMetaType_QStringList:
+                vList=v.toStringList();
+                break;
+            case QMetaType_QVariantList:
+            {
+                for(auto&v:v.toList())
                     vList<<v.toString();
-                }
+                break;
+            }
+            default:
+                vList<<v.toString();
             }
         }
-        return vList.isEmpty()?QVariant():vList;
+
+        if(vList.isEmpty())
+            return {};
+
+        return vList;
     }
 };
 
@@ -97,6 +102,7 @@ QVariant QRPCHttpHeaders::rawHeader(const QString &headername)const
     QHashIterator<QString, QVariant> i(p.header);
     while (i.hasNext()) {
         i.next();
+
         if(i.key().toLower()!=headername.toLower())
             continue;
 
@@ -110,6 +116,7 @@ QVariant QRPCHttpHeaders::rawHeader(const QString &headername)const
         default:
             vList=v.toString().split(qsl(";"));
         }
+
         for(auto&header:vList)
             returnList<<header;
     }
@@ -206,10 +213,14 @@ QRPCHttpHeaders &QRPCHttpHeaders::addRawHeader(const QString &header, const QVar
     vList.clear();
     for(auto&v:list){
         auto vv=v.toByteArray().trimmed();
-        if(!vv.isEmpty()){
-            if(!vList.contains(vv))
-                vList<<vv.trimmed();
-        }
+
+        if(vv.isEmpty())
+            continue;
+
+        if(vList.contains(vv))
+            continue;
+
+        vList<<vv.trimmed();
     }
     this->setRawHeader(headerName, vList);
     return*this;
@@ -219,13 +230,11 @@ QRPCHttpHeaders &QRPCHttpHeaders::setContentType(const int contentType)
 {
     QString header;
     auto content_type=ContentType(contentType);
-    if(QRPCContentTypeHeaderTypeToHeader.contains(content_type)){
-        header=QRPCContentTypeHeaderTypeToHeader.value(content_type);
-    }
-    else{
-        header=QRPCContentTypeHeaderTypeToHeader.value(QRpc::AppOctetStream);
-    }
-    return this->setContentType(header);
+
+    if(QRPCContentTypeHeaderTypeToHeader.contains(content_type))
+        return this->setContentType(QRPCContentTypeHeaderTypeToHeader.value(content_type));
+
+    return this->setContentType(QRPCContentTypeHeaderTypeToHeader.value(QRpc::AppOctetStream));
 }
 
 QRPCHttpHeaders &QRPCHttpHeaders::setContentType(const QVariant &v)
@@ -258,11 +267,10 @@ bool QRPCHttpHeaders::isContentType(int contentType) const
         int cType=-1;
         if(!ContentTypeHeaderToHeaderType.contains(ct))
             continue;
-        else{
-            cType=ContentTypeHeaderToHeaderType.value(ct);
-            if(contentType==cType)
-                return true;
-        }
+        cType=ContentTypeHeaderToHeaderType.value(ct);
+        if(contentType!=cType)
+            continue;
+        return true;
     }
     return false;
 }

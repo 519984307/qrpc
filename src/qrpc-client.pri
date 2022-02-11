@@ -65,7 +65,11 @@ SOURCES += \
     $$PWD/private/p_qrpc_http_headers.cpp \
     $$PWD/private/p_qrpc_http_response.cpp \
     $$PWD/private/p_qrpc_listen_request_code.cpp \
+    $$PWD/private/p_qrpc_request.cpp \
     $$PWD/private/p_qrpc_request_job.cpp \
+    $$PWD/private/p_qrpc_request_job_http.cpp \
+    $$PWD/private/p_qrpc_request_job_protocol.cpp \
+    $$PWD/private/p_qrpc_request_job_response.cpp \
     $$PWD/qrpc_listen_request.cpp \
     $$PWD/qrpc_request_exchange.cpp \
     $$PWD/qrpc_request_exchange_setting.cpp \

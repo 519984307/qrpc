@@ -11,11 +11,13 @@ public:
     QRPCRequestExchangeSetting call;
     QRPCRequestExchangeSetting back;
 
-    explicit QRPCRequestExchangePvt(QRPCRequestExchange*parent):call(parent), back(parent){
+    explicit QRPCRequestExchangePvt(QRPCRequestExchange*parent):call(parent), back(parent)
+    {
         this->parent=parent;
     }
 
-    virtual ~QRPCRequestExchangePvt(){
+    virtual ~QRPCRequestExchangePvt()
+    {
     }
 };
 

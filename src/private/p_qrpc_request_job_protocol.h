@@ -16,36 +16,19 @@ public:
     QString action_fileName;
     QSslConfiguration sslConfiguration;
 
-    Q_INVOKABLE explicit QRPCRequestJobProtocol(QObject*parent):QObject(parent), sslConfiguration(QSslConfiguration::defaultConfiguration())
-    {
-        QObject::connect(this, &QRPCRequestJobProtocol::____verify, this, &QRPCRequestJobProtocol::____on_verify);
-    }
+    Q_INVOKABLE explicit QRPCRequestJobProtocol(QObject*parent);
 
-    ~QRPCRequestJobProtocol()
-    {
-    }
+    ~QRPCRequestJobProtocol();
 
-    virtual QRPCRequestJobProtocol&clear()
-    {
-        return*this;
-    }
+    virtual QRPCRequestJobProtocol&clear();
 
-    virtual bool call(QRPCRequestJobResponse*response)
-    {
-        response->response_status_code=QNetworkReply::UnknownServerError;
-        response->response_body.clear();
-        emit this->callback(QVariant());
-        return false;
-    }
+    virtual bool call(QRPCRequestJobResponse*response);
 
 signals:
     void callback(const QVariant&vHash);
     void ____verify(const QVariant&v);
 public slots:
-    virtual void ____on_verify(const QVariant&v)
-    {
-        Q_UNUSED(v)
-    }
+    virtual void ____onVerify(const QVariant&v);
 };
 
 }

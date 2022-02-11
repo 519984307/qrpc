@@ -188,11 +188,11 @@ void QRPCRequestExchangeSetting::setMethod(const QString &value)
     dPvt();
     const auto vv=value.trimmed().toLower();
     for (const auto&v : QRPCRequestMethodNameList){
-        if(v.trimmed().toLower()==vv){
-            const auto&i = QRPCRequestMethodName.key(v);
-            p.method=QRPCRequestMethod(i);
+        if(v.trimmed().toLower()!=vv)
             return;
-        }
+        const auto&i = QRPCRequestMethodName.key(v);
+        p.method=QRPCRequestMethod(i);
+        return;
     }
     p.method=QRpc::Post;
 }

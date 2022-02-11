@@ -20,6 +20,7 @@ HEADERS += \
 
 SOURCES += \
 #    $$PWD/private/p_qrpc_thread_ping.cpp \
+    $$PWD/private/p_qrpc_controller_options.cpp \
     $$PWD/qrpc_service_setting.cpp \
     $$PWD/qrpc_controller_options.cpp \
     $$PWD/qrpc_last_error.cpp \
