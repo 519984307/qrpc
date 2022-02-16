@@ -13,18 +13,18 @@ class Q_RPC_EXPORT QRPCRequestExchangeSetting: public QObject
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(QString      protocol         READ protocolName       WRITE setProtocol            )
-    Q_PROPERTY(int          method           READ ___method          WRITE setMethod              )
-    Q_PROPERTY(QString      vHost            READ vHost              WRITE setVHost               )
-    Q_PROPERTY(QString      driver           READ driver             WRITE setDriver              )
-    Q_PROPERTY(QString      hostName         READ hostName           WRITE setHostName            )
-    Q_PROPERTY(QString      userName         READ userName           WRITE setUserName            )
-    Q_PROPERTY(QString      passWord         READ passWord           WRITE setPassWord            )
-    Q_PROPERTY(QVariantHash parameter        READ parameter          WRITE setParameter           )
-    Q_PROPERTY(int          port             READ port               WRITE setPort                )
-    Q_PROPERTY(QString      route            READ route              WRITE setRoute               )
-    Q_PROPERTY(QString      topic            READ topic              WRITE setTopic               )
-    Q_PROPERTY(QVariant     activityLimit    READ activityLimit      WRITE setActivityLimit       )
+    Q_PROPERTY(QString protocol READ protocolName WRITE setProtocol NOTIFY activityLimiChangedt)
+    Q_PROPERTY(int method READ ___method WRITE setMethod NOTIFY topicChanged )
+    Q_PROPERTY(QString vHost READ vHost WRITE setVHost NOTIFY routeChanged )
+    Q_PROPERTY(QString driver READ driver WRITE setDriver NOTIFY portChanged )
+    Q_PROPERTY(QString hostName READ hostName WRITE setHostName NOTIFY parameterChanged )
+    Q_PROPERTY(QString userName READ userName WRITE setUserName NOTIFY passWordChanged )
+    Q_PROPERTY(QString passWord READ passWord WRITE setPassWord NOTIFY userNameChanged )
+    Q_PROPERTY(QVariantHash parameter READ parameter WRITE setParameter NOTIFY hostNameChanged )
+    Q_PROPERTY(int port READ port WRITE setPort NOTIFY driverChanged )
+    Q_PROPERTY(QString route READ route WRITE setRoute NOTIFY vHostChanged )
+    Q_PROPERTY(QString topic READ topic WRITE setTopic NOTIFY methodChanged )
+    Q_PROPERTY(QVariant activityLimit READ activityLimit WRITE setActivityLimit NOTIFY protocolChanged )
 
     //!
     //! \brief QRPCRequestExchangeSetting
@@ -185,6 +185,20 @@ public:
     //!
     virtual QVariantHash parameter() const;
     virtual void setParameter(const QVariantHash &parameter);
+
+signals:
+    void protocolChanged();
+    void methodChanged();
+    void vHostChanged();
+    void driverChanged();
+    void hostNameChanged();
+    void userNameChanged();
+    void passWordChanged();
+    void parameterChanged();
+    void portChanged();
+    void routeChanged();
+    void topicChanged();
+    void activityLimitChanged();
 
 private:
     void*p = nullptr;
