@@ -217,19 +217,13 @@ public:
                          .replace(qsl("Basic"),qsl("basic"))
                          .replace(qsl("Bearer"),qsl("bearer"))
                          .replace(qsl("Service"),qsl("service"));
-#if Q_RPC_LOG_SUPER_VERBOSE
-            sWarning()<<qsl("%1: %2").arg(QString(k)).arg(QString(v));
-#endif
-            if(k==qsl("authorization")){
-                if(v.startsWith(stype)){
-                    auto authList=v.split(stype);
-                    auto value=authList.last().trimmed();
-#if Q_RPC_LOG_SUPER_VERBOSE
-                    sWarning()<<type<<":1: "<<authList;
-                    sWarning()<<type<<":2: "<<value;
-#endif
-                    return value.toUtf8();
-                }
+            if(k!=qsl("authorization"))
+                continue;
+
+            if(v.startsWith(stype)){
+                auto authList=v.split(stype);
+                auto value=authList.last().trimmed();
+                return value.toUtf8();
             }
         }
         return {};
@@ -492,8 +486,7 @@ bool QRPCListenRequest::mergeMap(const QVariantMap &vRequest)
                 for(auto&v:mNew){
                     if(vLst.contains(v))
                         continue;
-                    else
-                        vLst<<v;
+                    vLst<<v;
                 }
                 vNew=vLst;
             }
