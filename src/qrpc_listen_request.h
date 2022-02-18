@@ -37,9 +37,9 @@ public:
     Q_PROPERTY(QVariant requestBody READ requestBody WRITE setRequestBody NOTIFY requestHeaderChanged )
     Q_PROPERTY(int requestTimeout READ requestTimeout WRITE setRequestTimeout NOTIFY requestMethodChanged )
     Q_PROPERTY(QVariantHash responseHeader READ responseHeader WRITE setResponseHeader NOTIFY requestPathChanged )
-    Q_PROPERTY(QVariant responseBody READ responseBody WRITE setResponseBody NOTIFY requestProtocolChanged )
+    Q_PROPERTY(QVariant responseBody READ responseBody WRITE setResponseBody NOTIFY responseBodyChanged )
     Q_PROPERTY(int responseCode READ responseCode WRITE setResponseCode NOTIFY requestUuidChanged )
-    Q_PROPERTY(QByteArray responsePhrase READ responsePhrase WRITE setResponsePhrase NOTIFY requestContentTypChangede)
+    Q_PROPERTY(QByteArray responsePhrase READ responsePhrase WRITE setResponsePhrase NOTIFY responsePhraseChanged)
     Q_PROPERTY(QVariantHash responseCallback READ responseCallback WRITE setResponseCallback NOTIFY listenUuidChanged )
 
 public:

@@ -184,7 +184,7 @@ public:
     {
         this->_requestHeader=value;
         this->_requestContentType=QRpc::AppXwwwForm;
-        static auto headerName=ContentTypeName.toLower();
+        static auto headerName=QString(ContentTypeName).toLower();
         QHashIterator<QString, QVariant> i(value);
         while (i.hasNext()) {
             i.next();

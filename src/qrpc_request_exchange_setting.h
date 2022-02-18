@@ -13,7 +13,7 @@ class Q_RPC_EXPORT QRPCRequestExchangeSetting: public QObject
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(QString protocol READ protocolName WRITE setProtocol NOTIFY activityLimiChangedt)
+    Q_PROPERTY(QString protocol READ protocolName WRITE setProtocol NOTIFY protocolChanged)
     Q_PROPERTY(int method READ ___method WRITE setMethod NOTIFY topicChanged )
     Q_PROPERTY(QString vHost READ vHost WRITE setVHost NOTIFY routeChanged )
     Q_PROPERTY(QString driver READ driver WRITE setDriver NOTIFY portChanged )
@@ -24,7 +24,7 @@ public:
     Q_PROPERTY(int port READ port WRITE setPort NOTIFY driverChanged )
     Q_PROPERTY(QString route READ route WRITE setRoute NOTIFY vHostChanged )
     Q_PROPERTY(QString topic READ topic WRITE setTopic NOTIFY methodChanged )
-    Q_PROPERTY(QVariant activityLimit READ activityLimit WRITE setActivityLimit NOTIFY protocolChanged )
+    Q_PROPERTY(QVariant activityLimit READ activityLimit WRITE setActivityLimit NOTIFY activityLimitChanged )
 
     //!
     //! \brief QRPCRequestExchangeSetting

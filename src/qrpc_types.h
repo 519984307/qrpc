@@ -11,8 +11,8 @@
 
 namespace QRpc {
 
-    static const auto ContentTypeName=QString("Content-Type");
-    static const auto ContentDispositionName=QString("Content-Disposition");
+    static const auto ContentTypeName="Content-Type";
+    static const auto ContentDispositionName="Content-Disposition";
 
     enum ContentType {
           AppNone=1

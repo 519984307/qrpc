@@ -241,7 +241,7 @@ QRPCHttpHeaders &QRPCHttpHeaders::setContentType(const QVariant &v)
 {
     dPvt();
     p.header.remove(ContentTypeName);
-    p.header.remove(ContentTypeName.toLower());
+    p.header.remove(QString(ContentTypeName).toLower());
     QVariant value=v;
     if(qTypeId(v)==QMetaType_QUrl){
         value=QVariant();

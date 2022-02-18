@@ -257,7 +257,7 @@ public:
                 QRPCHttpHeaders headers(rpc_url.headers());
                 if(!headers.contentDisposition().isValid()){
                     auto fileName=rpc_url.toLocalFile().split(qsl("/")).last();
-                    rpc_url.headers().insert(ContentDispositionName.toUtf8(), qsl("inline; filename=\"%1\"").arg(fileName).toUtf8());
+                    rpc_url.headers().insert(QString(ContentDispositionName).toUtf8(), qsl("inline; filename=\"%1\"").arg(fileName).toUtf8());
                     if(!headers.contentType().isValid())
                         headers.setContentType(rpc_url.url());
                 }
