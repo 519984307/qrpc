@@ -26,21 +26,21 @@ class Q_RPC_EXPORT QRPCListenRequest: public QObject
     friend class QRPCRequestPvt;
 public:
 
-    Q_PROPERTY(QUuid listenUuid READ listenUuid WRITE setListenUuid NOTIFY responseCallbackChanged )
-    Q_PROPERTY(int requestContentType READ requestContentType WRITE setRequestContentType NOTIFY responsePhraseChanged )
-    Q_PROPERTY(QUuid requestUuid READ requestUuid WRITE setRequestUuid NOTIFY responseCodeChanged )
-    Q_PROPERTY(QByteArray requestProtocol READ requestProtocol WRITE setRequestProtocol NOTIFY responseBodyChanged )
-    Q_PROPERTY(QByteArray requestPath READ requestPath WRITE setRequestPath NOTIFY responseHeaderChanged )
-    Q_PROPERTY(QByteArray requestMethod READ requestMethod WRITE setRequestMethod NOTIFY requestTimeoutChanged )
-    Q_PROPERTY(QVariantHash requestHeader READ requestHeader WRITE setRequestHeader NOTIFY requestBodyChanged )
+    Q_PROPERTY(QUuid listenUuid READ listenUuid WRITE setListenUuid NOTIFY listenUuidChanged )
+    Q_PROPERTY(int requestContentType READ requestContentType WRITE setRequestContentType NOTIFY requestContentTypeChanged )
+    Q_PROPERTY(QUuid requestUuid READ requestUuid WRITE setRequestUuid NOTIFY requestUuidChanged )
+    Q_PROPERTY(QByteArray requestProtocol READ requestProtocol WRITE setRequestProtocol NOTIFY requestProtocolChanged )
+    Q_PROPERTY(QByteArray requestPath READ requestPath WRITE setRequestPath NOTIFY requestPathChanged )
+    Q_PROPERTY(QByteArray requestMethod READ requestMethod WRITE setRequestMethod NOTIFY requestMethodChanged )
+    Q_PROPERTY(QVariantHash requestHeader READ requestHeader WRITE setRequestHeader NOTIFY requestHeaderChanged )
     Q_PROPERTY(QVariantHash requestParameter READ requestParameter WRITE setRequestParameter NOTIFY requestParameterChanged )
-    Q_PROPERTY(QVariant requestBody READ requestBody WRITE setRequestBody NOTIFY requestHeaderChanged )
-    Q_PROPERTY(int requestTimeout READ requestTimeout WRITE setRequestTimeout NOTIFY requestMethodChanged )
-    Q_PROPERTY(QVariantHash responseHeader READ responseHeader WRITE setResponseHeader NOTIFY requestPathChanged )
-    Q_PROPERTY(QVariant responseBody READ responseBody WRITE setResponseBody NOTIFY requestProtocolChanged )
-    Q_PROPERTY(int responseCode READ responseCode WRITE setResponseCode NOTIFY requestUuidChanged )
-    Q_PROPERTY(QByteArray responsePhrase READ responsePhrase WRITE setResponsePhrase NOTIFY requestContentTypChangede)
-    Q_PROPERTY(QVariantHash responseCallback READ responseCallback WRITE setResponseCallback NOTIFY listenUuidChanged )
+    Q_PROPERTY(QVariant requestBody READ requestBody WRITE setRequestBody NOTIFY requestBodyChanged )
+    Q_PROPERTY(int requestTimeout READ requestTimeout WRITE setRequestTimeout NOTIFY requestTimeoutChanged )
+    Q_PROPERTY(QVariantHash responseHeader READ responseHeader WRITE setResponseHeader NOTIFY responseHeaderChanged )
+    Q_PROPERTY(QVariant responseBody READ responseBody WRITE setResponseBody NOTIFY responseBodyChanged )
+    Q_PROPERTY(int responseCode READ responseCode WRITE setResponseCode NOTIFY responseCodeChanged )
+    Q_PROPERTY(QByteArray responsePhrase READ responsePhrase WRITE setResponsePhrase NOTIFY responsePhraseChanged)
+    Q_PROPERTY(QVariantHash responseCallback READ responseCallback WRITE setResponseCallback NOTIFY responseCallbackChanged )
 
 public:
     //!
