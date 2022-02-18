@@ -190,7 +190,7 @@ QRPCRequestJob &QRPCRequestJob::start()
 
 QRPCRequestJob &QRPCRequestJob::release()
 {
-    QMutexLocker locker(requestJobMutex);
+    QMutexLOCKER locker(requestJobMutex);
     requestJobPool->append(this);
     return *this;
 }

@@ -112,7 +112,7 @@ QRPCListenQRPC::QRPCListenQRPC(QObject *parent):QRPCListen(nullptr){
 QRPCListenQRPC::~QRPCListenQRPC()
 {
     dPvt();
-    QMutexLocker(&p.mutexRunning);
+    QMutexLOCKER(&p.mutexRunning);
     delete&p;
 }
 
