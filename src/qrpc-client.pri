@@ -15,6 +15,9 @@ QT += sql
 DEFINES+=Q_RPC_DATABASE
 HEADERS += \
     $$PWD/private/p_qrpc_request_job_database.h \
+
+SOURCES+= \
+    $$PWD/private/p_qrpc_request_job_database.cpp \
 }
 
 ##declare to include CONFIG+=Q_RPC_TCP
@@ -22,6 +25,9 @@ CONFIG(Q_RPC_TCPSOCKET){
 DEFINES+=Q_RPC_TCPSOCKET
 HEADERS += \
     $$PWD/private/p_qrpc_request_job_tcp.h \
+
+SOURCES += \
+    $$PWD/private/p_qrpc_request_job_tcp.cpp \
 }
 
 ##declare to include CONFIG+=Q_RPC_UDP
@@ -67,7 +73,6 @@ SOURCES += \
     $$PWD/private/p_qrpc_listen_request_code.cpp \
     $$PWD/private/p_qrpc_request.cpp \
     $$PWD/private/p_qrpc_request_job.cpp \
-    $$PWD/private/p_qrpc_request_job_database.cpp \
     $$PWD/private/p_qrpc_request_job_http.cpp \
     $$PWD/private/p_qrpc_request_job_protocol.cpp \
     $$PWD/private/p_qrpc_request_job_response.cpp \
