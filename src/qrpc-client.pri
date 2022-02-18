@@ -7,6 +7,9 @@ QT += websockets
 DEFINES+=Q_RPC_WEBSOCKET
 HEADERS += \
     $$PWD/private/p_qrpc_request_job_wss.h \
+
+SOURCES += \
+    $$PWD/private/p_qrpc_request_job_wss.cpp \
 }
 
 ##declare to include CONFIG+=Q_RPC_DATABASE
@@ -35,6 +38,9 @@ CONFIG(Q_RPC_UDPSOCKET){
 DEFINES+=Q_RPC_UDPSOCKET
 HEADERS += \
     $$PWD/private/p_qrpc_request_job_udp.h \
+
+SOURCES += \
+    $$PWD/private/p_qrpc_request_job_udp.cpp \
 }
 
 ##declare to include CONFIG+=Q_RPC_LOCALSOCKET
@@ -42,6 +48,9 @@ CONFIG(Q_RPC_LOCALSOCKET){
 DEFINES+=Q_RPC_LOCALSOCKET
 HEADERS += \
     $$PWD/private/p_qrpc_request_job_localsocket.h \
+
+SOURCES += \
+    $$PWD/private/p_qrpc_request_job_localsocket.cpp \
 }
 
 ##obrigatory
@@ -50,6 +59,9 @@ CONFIG(Q_RPC_HTTP){
 DEFINES+=Q_RPC_HTTP
 HEADERS += \
     $$PWD/private/p_qrpc_request_job_http.h \
+
+SOURCES += \
+        $$PWD/private/p_qrpc_request_job_http.cpp \
 }
 
 HEADERS += \
@@ -73,7 +85,6 @@ SOURCES += \
     $$PWD/private/p_qrpc_listen_request_code.cpp \
     $$PWD/private/p_qrpc_request.cpp \
     $$PWD/private/p_qrpc_request_job.cpp \
-    $$PWD/private/p_qrpc_request_job_http.cpp \
     $$PWD/private/p_qrpc_request_job_protocol.cpp \
     $$PWD/private/p_qrpc_request_job_response.cpp \
     $$PWD/qrpc_listen_request.cpp \
