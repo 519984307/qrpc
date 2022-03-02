@@ -35,8 +35,8 @@ void QRPCRequestJobHttp::fileFree()
 
 bool QRPCRequestJobHttp::call(QRPCRequestJobResponse *response)
 {
-    static const QVector<QString> removeHeaders={{qsl("host")},{qsl("content-length")}};
-    static const QVector<QString> ignoreHeaders={{ContentDispositionName}, {ContentTypeName}, {QString(ContentDispositionName).toLower()}, {QString(ContentTypeName).toLower()}};
+    static const QStringList removeHeaders={{qsl("host")},{qsl("content-length")}};
+    static const QStringList ignoreHeaders={{ContentDispositionName}, {ContentTypeName}, {QString(ContentDispositionName).toLower()}, {QString(ContentTypeName).toLower()}};
 
     if(this->nam==nullptr)
         this->nam = new QNetworkAccessManager(nullptr);

@@ -112,7 +112,7 @@ void QRPCListenRequestParser::makeRoute(const QMetaObject &metaObject)
     if(parser==nullptr)
         return;
 
-    static const auto ignoreNames=QVector<QString>()<<qsl("route")<<qsl("makeRoute");
+    static const auto ignoreNames=QStringList()<<qsl("route")<<qsl("makeRoute");
     auto className=QByteArray(metaObject.className());
     if(staticMetaObjectRoute->contains(className))
         return;

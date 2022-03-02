@@ -306,3 +306,19 @@ Q_INVOKABLE virtual QVariant businessCheck()        \
     this->rq().co().setNotImplemented();            \
     return {};                                      \
 }
+
+
+#define QRPC_API_DOC_INFO(apiClass) public:\
+Q_INVOKABLE void __rpc_api_info_##apiClass(APIDocument&document)
+
+#define QRPC_API_DOC_OPERATION_GET(method) public:\
+    Q_INVOKABLE void __rpc_api_info_get_##method(APIPathOperation&operation)
+
+#define QRPC_API_DOC_OPERATION_POST(method) public:\
+    Q_INVOKABLE void __rpc_api_info_post_##method(APIPathOperation&operation)
+
+#define QRPC_API_DOC_OPERATION_PUT(method) public:\
+    Q_INVOKABLE void __rpc_api_info_put_##method(APIPathOperation&operation)
+
+#define QRPC_API_DOC_OPERATION_DELETE(method) public:\
+    Q_INVOKABLE void __rpc_api_info_delete_##method(APIPathOperation&operation)

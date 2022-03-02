@@ -25,7 +25,7 @@ class Q_RPC_EXPORT QRPCController: public QObject
     friend class QRPCRequest;
     friend class QRPCListenQRPC;
     friend class QRPCListenQRPCSlotPvt;
-    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled )
+    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 
 public:
     //!
@@ -259,6 +259,12 @@ protected:
     //! \return
     //!
     static const QVariantHash routeFlagsMaker(const QString&request_path, const QVariant &flag);
+
+signals:
+    //!
+    //! \brief enabledChanged
+    //!
+    void enabledChanged();
 private:
     void*p = nullptr;
     QRPCProtocol acceptedProtocols;
