@@ -25,6 +25,8 @@ class Q_RPC_EXPORT QRPCController: public QObject
     friend class QRPCRequest;
     friend class QRPCListenQRPC;
     friend class QRPCListenQRPCSlotPvt;
+
+    Q_PROPERTY(QVariant basePath READ basePath CONSTANT)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 
 public:
@@ -40,9 +42,16 @@ public:
     ~QRPCController();
 
     //!
+    //! \brief basePath
+    //! \return
+    //!
+    Q_INVOKABLE virtual QVariant basePath()const;
+
+    //!
     //! \brief route
     //! \return
     //!
+    QT_DEPRECATED_X("Use basePath;")
     Q_INVOKABLE virtual QVariant route()const;
 
     //!
@@ -73,7 +82,6 @@ public:
     //! \return
     //!
     Q_INVOKABLE virtual QString description()const;
-
 
     //!
     //! \brief controllerSetting

@@ -236,12 +236,9 @@ static auto ParserObject##MetaObject=QRpc::QRPCController::parserRequestRegister
 
 #define QRPC_DECLARE_ROUTE(Controller, v1)\
 public:\
-Q_INVOKABLE virtual QVariant route()const override\
+Q_INVOKABLE virtual QVariant basePath()const override\
 {\
     return QVariant(v1);\
-}\
-Q_INVOKABLE virtual void makeRoute() override{\
-    QRPCController::makeRoute(this, this->metaObject());\
 }
 
 #define QRPC_METHOD_PROPERTIES(method, properties)\
@@ -306,19 +303,3 @@ Q_INVOKABLE virtual QVariant businessCheck()        \
     this->rq().co().setNotImplemented();            \
     return {};                                      \
 }
-
-
-#define QRPC_API_DOC_INFO(apiClass) public:\
-Q_INVOKABLE void __rpc_api_info_##apiClass(APIDocument&document)
-
-#define QRPC_API_DOC_OPERATION_GET(method) public:\
-    Q_INVOKABLE void __rpc_api_info_get_##method(APIPathOperation&operation)
-
-#define QRPC_API_DOC_OPERATION_POST(method) public:\
-    Q_INVOKABLE void __rpc_api_info_post_##method(APIPathOperation&operation)
-
-#define QRPC_API_DOC_OPERATION_PUT(method) public:\
-    Q_INVOKABLE void __rpc_api_info_put_##method(APIPathOperation&operation)
-
-#define QRPC_API_DOC_OPERATION_DELETE(method) public:\
-    Q_INVOKABLE void __rpc_api_info_delete_##method(APIPathOperation&operation)
