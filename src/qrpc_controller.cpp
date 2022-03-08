@@ -494,10 +494,10 @@ const QVariantHash QRPCController::routeFlagsMaker(const QString &request_path, 
         __route=lst.join(qsl("/"));
     }
     auto typeId=qTypeId(flag);
-    if(QStmTypesVariantDictionary.contains(typeId))
+    if(QMetaTypeUtilVariantDictionary.contains(typeId))
         return flag.toHash();
 
-    if(QStmTypesVariantList.contains(typeId))
+    if(QMetaTypeUtilVariantList.contains(typeId))
         return {};
     return QJsonDocument::fromJson(flag.toString().toUtf8()).toVariant().toHash();
 }

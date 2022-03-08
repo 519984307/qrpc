@@ -82,7 +82,7 @@ const QVariantHash toMapResquest(int method, const QVariant&request_url, const Q
         const auto&k=i.key();
         auto v=i.value();
         auto typeId=qTypeId(v);
-        v = QStmTypesVariantList.contains(typeId)?v.toStringList().join(qsl(";")):v;
+        v = QMetaTypeUtilVariantList.contains(typeId)?v.toStringList().join(qsl(";")):v;
         headers<<qsl("-H '%1: %2'").arg(k, v.toString());
     }
 

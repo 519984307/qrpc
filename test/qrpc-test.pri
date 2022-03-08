@@ -23,5 +23,6 @@ SOURCES += \
     $$PWD/functional_test_request_cbor.cpp \
     $$PWD/functional_test_request_cors.cpp \
     $$PWD/functional_test_upload_download.cpp \
-    $$PWD/functional_test_request_broker_database.cpp
+    $$PWD/functional_test_request_broker_database.cpp \
+    $$PWD/qrpc_test.cpp
 
