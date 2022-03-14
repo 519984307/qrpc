@@ -24,55 +24,55 @@ Q_GLOBAL_STATIC(StringMetaMethod, staticMetaObjectMetaMethod)
 Q_GLOBAL_STATIC(QMutex, staticMetaObjectLock)
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenRequestParserPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenRequestParserPvt*>(this->p)
 
-class QRPCListenRequestParserPvt{
+class ListenRequestParserPvt{
 public:
-    QRPCController*controller=nullptr;
-    explicit QRPCListenRequestParserPvt(QObject*parent=nullptr)
+    Controller*controller=nullptr;
+    explicit ListenRequestParserPvt(QObject*parent=nullptr)
     {
         Q_UNUSED(parent)
     }
 
-    virtual ~QRPCListenRequestParserPvt()
+    virtual ~ListenRequestParserPvt()
     {
     }
 };
 
 
-QRPCListenRequestParser::QRPCListenRequestParser(QObject *parent) : QObject(parent)
+ListenRequestParser::ListenRequestParser(QObject *parent) : QObject(parent)
 {
-    this->p = new QRPCListenRequestParserPvt(parent);
+    this->p = new ListenRequestParserPvt(parent);
 }
 
-QRPCListenRequestParser::~QRPCListenRequestParser(){
+ListenRequestParser::~ListenRequestParser(){
     dPvt();
     delete&p;
 }
 
-QRPCController &QRPCListenRequestParser::controller()
+Controller &ListenRequestParser::controller()
 {
     dPvt();
     return*p.controller;
 }
 
-QRPCListenRequest &QRPCListenRequestParser::request()
+ListenRequest &ListenRequestParser::request()
 {
     dPvt();
     if(p.controller==nullptr){
-        static QRPCListenRequest req;
+        static ListenRequest req;
         req.clear();
         return req;
     }
     return p.controller->request();
 }
 
-QRPCListenRequest &QRPCListenRequestParser::rq()
+ListenRequest &ListenRequestParser::rq()
 {
     return this->request();
 }
 
-bool QRPCListenRequestParser::canRoute(const QMetaObject &metaObject, const QString &route)
+bool ListenRequestParser::canRoute(const QMetaObject &metaObject, const QString &route)
 {
     auto className=QByteArray(metaObject.className());
     QString staticRoute=staticMetaObjectRoute->value(className);
@@ -83,10 +83,10 @@ bool QRPCListenRequestParser::canRoute(const QMetaObject &metaObject, const QStr
     return false;
 }
 
-bool QRPCListenRequestParser::routeToMethod(const QMetaObject &metaObject, const QString &route, QMetaMethod&outMethod)
+bool ListenRequestParser::routeToMethod(const QMetaObject &metaObject, const QString &route, QMetaMethod&outMethod)
 {
     auto vRoute=QRpc::Util::routeParser(route).split(qbl("/")).join(qbl("/"));
-    if(QRPCListenRequestParser::canRoute(metaObject, vRoute)){
+    if(ListenRequestParser::canRoute(metaObject, vRoute)){
         auto list = staticMetaObjectMetaMethod->values(metaObject.className());
         auto v0=QRpc::Util::routeExtractMethod(route);
         for(auto&v:list){
@@ -101,14 +101,14 @@ bool QRPCListenRequestParser::routeToMethod(const QMetaObject &metaObject, const
     return false;
 }
 
-void QRPCListenRequestParser::apiInitialize(const QMetaObject &metaObject)
+void ListenRequestParser::apiInitialize(const QMetaObject &metaObject)
 {
     QScopedPointer<QObject> scopePointer(metaObject.newInstance(Q_ARG(QObject*, nullptr )));
     auto object=scopePointer.data();
     if(object==nullptr)
         return;
 
-    auto parser=dynamic_cast<QRPCListenRequestParser*>(object);
+    auto parser=dynamic_cast<ListenRequestParser*>(object);
     if(parser==nullptr)
         return;
 
@@ -140,7 +140,7 @@ void QRPCListenRequestParser::apiInitialize(const QMetaObject &metaObject)
     }
 }
 
-bool QRPCListenRequestParser::parse(const QMetaMethod&metaMethod)
+bool ListenRequestParser::parse(const QMetaMethod&metaMethod)
 {
     bool returnVariant=false;
     auto argReturn=Q_RETURN_ARG(bool, returnVariant);
@@ -163,7 +163,7 @@ bool QRPCListenRequestParser::parse(const QMetaMethod&metaMethod)
     return true;
 }
 
-void QRPCListenRequestParser::setController(QRPCController *value)
+void ListenRequestParser::setController(Controller *value)
 {
     dPvt();
     p.controller = value;

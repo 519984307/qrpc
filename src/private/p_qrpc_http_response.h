@@ -6,23 +6,23 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCHttpResponse class
+//! \brief The HttpResponse class
 //!
-class Q_RPC_EXPORT QRPCHttpResponse: public QObject{
+class Q_RPC_EXPORT HttpResponse: public QObject{
     Q_OBJECT
 public:
     //!
-    //! \brief QRPCHttpResponse
+    //! \brief HttpResponse
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCHttpResponse(QObject*parent=nullptr);
-    ~QRPCHttpResponse();
+    Q_INVOKABLE explicit HttpResponse(QObject*parent=nullptr);
+    ~HttpResponse();
 
     //!
     //! \brief header
     //! \return
     //!
-    virtual QRpc::QRPCHttpHeaders&header() const;
+    virtual QRpc::HttpHeaders&header() const;
 
     //!
     //! \brief setBody
@@ -143,7 +143,7 @@ public:
     //! \param objectResponse
     //! \return
     //!
-    virtual QRPCHttpResponse&setResponse(QObject *objectResponse);
+    virtual HttpResponse&setResponse(QObject *objectResponse);
 
     //!
     //! \brief toString
@@ -161,7 +161,7 @@ public:
     //! \param output
     //! \return
     //!
-    virtual QRPCHttpResponse &print(const QString&output=QString());
+    virtual HttpResponse &print(const QString&output=QString());
 
     //!
     //! \brief printOut

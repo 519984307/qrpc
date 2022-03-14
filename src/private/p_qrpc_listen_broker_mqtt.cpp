@@ -3,25 +3,25 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenBrokerMQTTPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenBrokerMQTTPvt*>(this->p)
 
-class QRPCListenBrokerMQTTPvt{
+class ListenBrokerMQTTPvt{
 public:
-    explicit QRPCListenBrokerMQTTPvt(QRPCListenBrokerMQTT*object)
+    explicit ListenBrokerMQTTPvt(ListenBrokerMQTT*object)
     {
         Q_UNUSED(object)
     }
-    virtual ~QRPCListenBrokerMQTTPvt()
+    virtual ~ListenBrokerMQTTPvt()
     {
     }
 };
 
-QRPCListenBrokerMQTT::QRPCListenBrokerMQTT(QObject *parent):QRPCListen(parent)
+ListenBrokerMQTT::ListenBrokerMQTT(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenBrokerMQTTPvt(this);
+    this->p = new ListenBrokerMQTTPvt(this);
 }
 
-QRPCListenBrokerMQTT::~QRPCListenBrokerMQTT()
+ListenBrokerMQTT::~ListenBrokerMQTT()
 {
     dPvt();delete&p;
 }

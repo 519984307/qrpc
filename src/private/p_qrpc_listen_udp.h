@@ -8,14 +8,14 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenUDP class
+//! \brief The ListenUDP class
 //!
-class Q_RPC_EXPORT QRPCListenUDP:public QRPCListen{
+class Q_RPC_EXPORT ListenUDP:public Listen{
     Q_OBJECT
 public:
 
-    explicit QRPCListenUDP(QObject*parent=nullptr);
-    ~QRPCListenUDP();
+    explicit ListenUDP(QObject*parent=nullptr);
+    ~ListenUDP();
 
     //!
     //! \brief start
@@ -32,6 +32,6 @@ private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(UdpSocket, QRPCListenUDP)
+QRPC_LISTTEN_AUTO_REGISTER(UdpSocket, ListenUDP)
 
 }

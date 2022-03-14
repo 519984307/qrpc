@@ -19,44 +19,44 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCHttpResponsePvt*>(this->p)
+    auto&p =*reinterpret_cast<HttpResponsePvt*>(this->p)
 
-class QRPCHttpResponsePvt{
+class HttpResponsePvt{
 public:
-    QRPCHttpResponse*parent=nullptr;
-    QRpc::QRPCHttpHeaders response_header;
+    HttpResponse*parent=nullptr;
+    QRpc::HttpHeaders response_header;
     int response_status_code=0;
     QNetworkReply::NetworkError response_qt_status_code=QNetworkReply::NoError;
     QString response_reason_phrase;
     QByteArray response_body;
-    explicit QRPCHttpResponsePvt(QRPCHttpResponse*parent): response_header(parent)
+    explicit HttpResponsePvt(HttpResponse*parent): response_header(parent)
     {
     }
 
-    virtual ~QRPCHttpResponsePvt()
+    virtual ~HttpResponsePvt()
     {
     }
 };
 
 
-QRPCHttpResponse::QRPCHttpResponse(QObject *parent):QObject(parent)
+HttpResponse::HttpResponse(QObject *parent):QObject(parent)
 {
-    this->p = new QRPCHttpResponsePvt(this);
+    this->p = new HttpResponsePvt(this);
 }
 
-QRPCHttpResponse::~QRPCHttpResponse()
+HttpResponse::~HttpResponse()
 {
     dPvt();
     delete&p;
 }
 
-QRPCHttpHeaders &QRPCHttpResponse::header() const
+HttpHeaders &HttpResponse::header() const
 {
     dPvt();
     return p.response_header;
 }
 
-void QRPCHttpResponse::setBody(const QVariant &vBody)
+void HttpResponse::setBody(const QVariant &vBody)
 {
     dPvt();
     auto typeId=qTypeId(vBody);
@@ -105,13 +105,13 @@ void QRPCHttpResponse::setBody(const QVariant &vBody)
     }
 }
 
-QByteArray &QRPCHttpResponse::body() const
+QByteArray &HttpResponse::body() const
 {
     dPvt();
     return p.response_body;
 }
 
-QVariant QRPCHttpResponse::bodyVariant() const
+QVariant HttpResponse::bodyVariant() const
 {
     dPvt();
     //    QVariant v;
@@ -148,32 +148,32 @@ QVariant QRPCHttpResponse::bodyVariant() const
     return p.response_body;
 }
 
-QVariantMap QRPCHttpResponse::bodyMap() const
+QVariantMap HttpResponse::bodyMap() const
 {
     return this->bodyVariant().toMap();
 }
 
-QVariantHash QRPCHttpResponse::bodyHash() const
+QVariantHash HttpResponse::bodyHash() const
 {
     return this->bodyVariant().toHash();
 }
 
-QVariantHash QRPCHttpResponse::bodyObject() const
+QVariantHash HttpResponse::bodyObject() const
 {
     return this->bodyVariant().toHash();
 }
 
-QVariantList QRPCHttpResponse::bodyList() const
+QVariantList HttpResponse::bodyList() const
 {
     return this->bodyVariant().toList();
 }
 
-QVariantList QRPCHttpResponse::bodyArray() const
+QVariantList HttpResponse::bodyArray() const
 {
     return this->bodyVariant().toList();
 }
 
-QVariantList QRPCHttpResponse::bodyToList() const
+QVariantList HttpResponse::bodyToList() const
 {
     auto v=this->bodyVariant();
     switch (qTypeId(v)) {
@@ -187,37 +187,37 @@ QVariantList QRPCHttpResponse::bodyToList() const
     }
 }
 
-int &QRPCHttpResponse::statusCode() const
+int &HttpResponse::statusCode() const
 {
     dPvt();
     return p.response_status_code;
 }
 
-QString &QRPCHttpResponse::reasonPhrase() const
+QString &HttpResponse::reasonPhrase() const
 {
     dPvt();
     return p.response_reason_phrase;
 }
 
-QNetworkReply::NetworkError &QRPCHttpResponse::qtStatusCode() const
+QNetworkReply::NetworkError &HttpResponse::qtStatusCode() const
 {
     dPvt();
     return p.response_qt_status_code;
 }
 
-QVariantHash QRPCHttpResponse::toMap() const
+QVariantHash HttpResponse::toMap() const
 {
     dPvt();
     return QJsonDocument::fromJson(p.response_body).object().toVariantHash();
 }
 
-QVariantHash QRPCHttpResponse::toHash() const
+QVariantHash HttpResponse::toHash() const
 {
     dPvt();
     return QJsonDocument::fromJson(p.response_body).object().toVariantHash();
 }
 
-QVariantHash QRPCHttpResponse::toResponse() const
+QVariantHash HttpResponse::toResponse() const
 {
     dPvt();
     auto response_body=QJsonDocument::fromJson(p.response_body).object().toVariantHash();
@@ -229,7 +229,7 @@ QVariantHash QRPCHttpResponse::toResponse() const
     return vBody;
 }
 
-bool QRPCHttpResponse::isOk() const
+bool HttpResponse::isOk() const
 {
     dPvt();
     if(p.response_status_code==200)
@@ -241,7 +241,7 @@ bool QRPCHttpResponse::isOk() const
     return false;
 }
 
-bool QRPCHttpResponse::isCreated() const
+bool HttpResponse::isCreated() const
 {
     dPvt();
     if(p.response_qt_status_code!=QNetworkReply::NoError)
@@ -253,7 +253,7 @@ bool QRPCHttpResponse::isCreated() const
     return true;
 }
 
-bool QRPCHttpResponse::isNotFound() const
+bool HttpResponse::isNotFound() const
 {
     dPvt();
     if(p.response_status_code==404)
@@ -262,7 +262,7 @@ bool QRPCHttpResponse::isNotFound() const
     return false;
 }
 
-bool QRPCHttpResponse::isUnAuthorized() const
+bool HttpResponse::isUnAuthorized() const
 {
     dPvt();
     if(p.response_status_code==401)
@@ -271,11 +271,11 @@ bool QRPCHttpResponse::isUnAuthorized() const
     return false;
 }
 
-QRPCHttpResponse &QRPCHttpResponse::setResponse(QObject *objectResponse)
+HttpResponse &HttpResponse::setResponse(QObject *objectResponse)
 {
     dPvt();
-    if(objectResponse!=nullptr && QRpc::QRPCRequestJobResponse::staticMetaObject.cast(objectResponse)){
-        auto&response=*dynamic_cast<QRpc::QRPCRequestJobResponse*>(objectResponse);
+    if(objectResponse!=nullptr && QRpc::RequestJobResponse::staticMetaObject.cast(objectResponse)){
+        auto&response=*dynamic_cast<QRpc::RequestJobResponse*>(objectResponse);
         p.response_header.setRawHeader(response.responseHeader);
         p.response_status_code=response.response_status_code;
         p.response_qt_status_code=response.response_qt_status_code;
@@ -285,16 +285,16 @@ QRPCHttpResponse &QRPCHttpResponse::setResponse(QObject *objectResponse)
     return*this;
 }
 
-QString QRPCHttpResponse::toString() const
+QString HttpResponse::toString() const
 {
     dPvt();
     auto&response=*this;
-    auto qt_text=QRPCListenRequestCode::qt_network_error_phrase(p.response_qt_status_code);
+    auto qt_text=ListenRequestCode::qt_network_error_phrase(p.response_qt_status_code);
     auto msg=qsl("QtStatus: Status:%1, %2, %3").arg(QString::number(response.qtStatusCode()), response.reasonPhrase(),qt_text);
     return msg;
 }
 
-QRPCHttpResponse::operator bool() const
+HttpResponse::operator bool() const
 {
     dPvt();
     if(p.response_qt_status_code==QNetworkReply::NoError)
@@ -306,14 +306,14 @@ QRPCHttpResponse::operator bool() const
     return false;
 }
 
-QRPCHttpResponse&QRPCHttpResponse::print(const QString &output)
+HttpResponse&HttpResponse::print(const QString &output)
 {
     for(auto&v:this->printOut(output))
         sInfo()<<v;
     return*this;
 }
 
-QStringList QRPCHttpResponse::printOut(const QString &output)
+QStringList HttpResponse::printOut(const QString &output)
 {
     auto space=output.trimmed().isEmpty()?qsl_null:qsl("    ");
     Q_DECLARE_VU;

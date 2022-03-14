@@ -5,51 +5,51 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCThreadPvt*>(this->p)
+    auto&p =*reinterpret_cast<ThreadPvt*>(this->p)
 
-class QRPCThreadPvt{
+class ThreadPvt{
 public:
     QMutex lockRunWait;
     QMutex mutexRunning;
 
-    explicit QRPCThreadPvt()
+    explicit ThreadPvt()
     {
     }
 
-    virtual ~QRPCThreadPvt()
+    virtual ~ThreadPvt()
     {
     }
 
 };
 
-QRPCThread::QRPCThread(QObject *parent):QThread(nullptr)
+Thread::Thread(QObject *parent):QThread(nullptr)
 {
     Q_UNUSED(parent)
-    this->p = new QRPCThreadPvt();
+    this->p = new ThreadPvt();
 }
 
-QRPCThread::~QRPCThread()
+Thread::~Thread()
 {
     dPvt();delete&p;
 }
 
-void QRPCThread::run()
+void Thread::run()
 {
     dPvt();
     if(p.mutexRunning.tryLock(1000)){
-        QTimer::singleShot(10, this, &QRPCThread::eventRun);
+        QTimer::singleShot(10, this, &Thread::eventRun);
         this->exec();
         p.mutexRunning.unlock();
     }
 }
 
-void QRPCThread::eventRun()
+void Thread::eventRun()
 {
     QThread::sleep(1);
     this->quit();
 }
 
-bool QRPCThread::start()
+bool Thread::start()
 {
     dPvt();
     if(p.mutexRunning.tryLock(1000)){
@@ -65,12 +65,12 @@ bool QRPCThread::start()
     return false;
 }
 
-bool QRPCThread::stop()
+bool Thread::stop()
 {
     return this->quit();
 }
 
-bool QRPCThread::quit()
+bool Thread::quit()
 {
     QThread::quit();
     return true;

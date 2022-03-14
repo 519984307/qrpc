@@ -20,14 +20,14 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestJobResponse class
+//! \brief The RequestJobResponse class
 //!
-class QRPCRequestJobResponse:public QObject{
+class RequestJobResponse:public QObject{
     Q_OBJECT
 public:
 
-    QRPCRequestExchange request_exchange;
-    QRPCRequest*qrpcRequest=nullptr;
+    RequestExchange request_exchange;
+    Request*qrpcRequest=nullptr;
 
     QUuid request_uuid=QUuid::createUuidV3(QUuid::createUuid(), QUuid::createUuid().toString().toUtf8());
     QVariant request_url;
@@ -43,13 +43,13 @@ public:
     QNetworkReply::NetworkError response_qt_status_code = QNetworkReply::NoError;
     QHash<QString, QVariant> responseHeader;
 
-    explicit QRPCRequestJobResponse(QObject*parent);
+    explicit RequestJobResponse(QObject*parent);
 
-    explicit QRPCRequestJobResponse(const QVariantHash&request_header, const QVariant&vUrl, QRPCRequest&request, QObject*parent);
+    explicit RequestJobResponse(const QVariantHash&request_header, const QVariant&vUrl, Request&request, QObject*parent);
 
-    ~QRPCRequestJobResponse();
+    ~RequestJobResponse();
 
-    QRPCRequestJobResponse &operator =(QRPCRequestJobResponse &e);
+    RequestJobResponse &operator =(RequestJobResponse &e);
 
     void clear();
 

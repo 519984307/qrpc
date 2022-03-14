@@ -18,9 +18,9 @@ static const char* listen_database_port="5432";
 static const char* listen_kafka_port="2181";
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenProtocolPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenProtocolPvt*>(this->p)
 
-class QRPCListenProtocolPvt:public QObject{
+class ListenProtocolPvt:public QObject{
 public:
     int protocol=-1;
     QMetaObject protocolMetaObject;
@@ -45,12 +45,12 @@ public:
     QByteArray sslCertFile ;
     bool realMessageOnException=false;
 
-    explicit QRPCListenProtocolPvt(QObject*parent):QObject(parent)
+    explicit ListenProtocolPvt(QObject*parent):QObject(parent)
     {
         this->settings=new QSettings(nullptr);
     }
 
-    ~QRPCListenProtocolPvt()
+    ~ListenProtocolPvt()
     {
         delete this->settings;
     }
@@ -66,7 +66,7 @@ public:
     {
         static auto exceptionProperty=QStringList{qsl("protocol"),qsl("protocolname"),qsl("optionname")};
         this->settingsHash=settings.isEmpty()?this->settingsHash:settings;
-        const QMetaObject* metaObject = dynamic_cast<QRPCListenProtocol*>(this->parent())->metaObject();
+        const QMetaObject* metaObject = dynamic_cast<ListenProtocol*>(this->parent())->metaObject();
         for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
             auto property = metaObject->property(i);
             auto propertyName=QString::fromUtf8(property.name()).toLower();
@@ -109,11 +109,11 @@ public:
     }
 
 
-    QRPCListenProtocolPvt&makeHash()
+    ListenProtocolPvt&makeHash()
     {
         this->settingsHash.clear();
         this->settings->clear();
-        const QMetaObject* metaObject = dynamic_cast<QRPCListenProtocol*>(this->parent())->metaObject();
+        const QMetaObject* metaObject = dynamic_cast<ListenProtocol*>(this->parent())->metaObject();
         for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
             auto property = metaObject->property(i);
             auto key=property.name();
@@ -131,36 +131,36 @@ public slots:
     }
 };
 
-QRPCListenProtocol::QRPCListenProtocol(QObject *parent):QObject(parent)
+ListenProtocol::ListenProtocol(QObject *parent):QObject(parent)
 {
-    this->p = new QRPCListenProtocolPvt(this);
+    this->p = new ListenProtocolPvt(this);
 }
 
-QRPCListenProtocol::QRPCListenProtocol(int protocol, const QMetaObject&metaObject, QObject *parent):QObject(parent)
+ListenProtocol::ListenProtocol(int protocol, const QMetaObject&metaObject, QObject *parent):QObject(parent)
 {
-    this->p = new QRPCListenProtocolPvt(this);
+    this->p = new ListenProtocolPvt(this);
     dPvt();
-    QObject::connect(this, &QRPCListenProtocol::changeProperty, &p, &QRPCListenProtocolPvt::changeMap);
+    QObject::connect(this, &ListenProtocol::changeProperty, &p, &ListenProtocolPvt::changeMap);
     p.protocol = protocol;
     p.optionName = p.protocolName();
     p.protocolMetaObject = metaObject;
     p.makeHash();
 }
 
-bool QRPCListenProtocol::isValid() const
+bool ListenProtocol::isValid() const
 {
     dPvt();
     return p.protocol>=0;
 }
 
-QRPCListen*QRPCListenProtocol::makeListen()
+Listen*ListenProtocol::makeListen()
 {
     dPvt();
     auto object=p.protocolMetaObject.newInstance();
     if(object==nullptr)
         return nullptr;
 
-    auto listen=dynamic_cast<QRPCListen*>(object);
+    auto listen=dynamic_cast<Listen*>(object);
     if(listen==nullptr){
         delete object;
         return nullptr;
@@ -170,195 +170,195 @@ QRPCListen*QRPCListenProtocol::makeListen()
     return listen;
 }
 
-int QRPCListenProtocol::protocol()
+int ListenProtocol::protocol()
 {
     dPvt();
     return p.protocol;
 }
 
-void QRPCListenProtocol::setProtocol(const int &value)
+void ListenProtocol::setProtocol(const int &value)
 {
     dPvt();
     p.protocol=value;
 }
 
-QByteArray QRPCListenProtocol::protocolName()
+QByteArray ListenProtocol::protocolName()
 {
     dPvt();
     return p.protocolName();
 }
 
-QByteArray QRPCListenProtocol::optionName()
+QByteArray ListenProtocol::optionName()
 {
     dPvt();
     return p.optionName;
 }
 
-void QRPCListenProtocol::setSettings(const QVariantHash &settings, const QVariantHash &defaultSettings)
+void ListenProtocol::setSettings(const QVariantHash &settings, const QVariantHash &defaultSettings)
 {
     dPvt();
     p.setSettings(settings, defaultSettings);
 }
 
-void QRPCListenProtocol::setOptionName(const QByteArray &value)
+void ListenProtocol::setOptionName(const QByteArray &value)
 {
     dPvt();
     p.optionName=value;
 }
 
-int QRPCListenProtocol::minThreads() const
+int ListenProtocol::minThreads() const
 {
     dPvt();
     return p.minThreads;
 }
 
-void QRPCListenProtocol::setMinThreads(int value)
+void ListenProtocol::setMinThreads(int value)
 {
     dPvt();
     p.minThreads=value;
 }
 
-int QRPCListenProtocol::maxThreads() const
+int ListenProtocol::maxThreads() const
 {
     dPvt();
     return p.maxThreads;
 }
 
-void QRPCListenProtocol::setMaxThreads(int value)
+void ListenProtocol::setMaxThreads(int value)
 {
     dPvt();
     p.maxThreads=value;
 }
 
-int QRPCListenProtocol::cleanupInterval() const
+int ListenProtocol::cleanupInterval() const
 {
     dPvt();
     return p.cleanupInterval;
 }
 
-void QRPCListenProtocol::setCleanupInterval(int value)
+void ListenProtocol::setCleanupInterval(int value)
 {
     dPvt();
     p.cleanupInterval=value;
 }
 
-int QRPCListenProtocol::maxRequestSize() const
+int ListenProtocol::maxRequestSize() const
 {
     dPvt();
     return p.maxRequestSize;
 }
 
-void QRPCListenProtocol::setMaxRequestSize(int value)
+void ListenProtocol::setMaxRequestSize(int value)
 {
     dPvt();
     p.maxRequestSize = value;
 }
 
-int QRPCListenProtocol::maxMultiPartSize() const
+int ListenProtocol::maxMultiPartSize() const
 {
     dPvt();
     return p.maxMultiPartSize;
 }
 
-void QRPCListenProtocol::setMaxMultiPartSize(int value)
+void ListenProtocol::setMaxMultiPartSize(int value)
 {
     dPvt();
     p.maxMultiPartSize = value;
 }
 
-QByteArray QRPCListenProtocol::driver() const
+QByteArray ListenProtocol::driver() const
 {
     dPvt();
     return p.driver;
 }
 
-void QRPCListenProtocol::setDriver(const QByteArray &value)
+void ListenProtocol::setDriver(const QByteArray &value)
 {
     dPvt();
     p.driver=value;
 }
 
 
-QByteArray QRPCListenProtocol::hostName() const
+QByteArray ListenProtocol::hostName() const
 {
     dPvt();
     return p.hostName;
 }
 
-void QRPCListenProtocol::setHostName(const QByteArray &value)
+void ListenProtocol::setHostName(const QByteArray &value)
 {
     dPvt();
     p.hostName=value;
 }
 
-QByteArray QRPCListenProtocol::userName() const
+QByteArray ListenProtocol::userName() const
 {
     dPvt();
     return p.userName;
 }
 
-void QRPCListenProtocol::setUserName(const QByteArray &value)
+void ListenProtocol::setUserName(const QByteArray &value)
 {
     dPvt();
     p.userName=value;
 }
 
-QByteArray QRPCListenProtocol::password() const
+QByteArray ListenProtocol::password() const
 {
     dPvt();
     return p.password;
 }
 
-void QRPCListenProtocol::setPassword(const QByteArray &value)
+void ListenProtocol::setPassword(const QByteArray &value)
 {
     dPvt();
     p.password=value;
 }
 
-QByteArray QRPCListenProtocol::database() const
+QByteArray ListenProtocol::database() const
 {
     dPvt();
     return p.database;
 }
 
-void QRPCListenProtocol::setDatabase(const QByteArray &value)
+void ListenProtocol::setDatabase(const QByteArray &value)
 {
     dPvt();
     p.database=value;
 }
 
-QByteArray QRPCListenProtocol::options() const
+QByteArray ListenProtocol::options() const
 {
     dPvt();
     return p.options;
 }
 
-void QRPCListenProtocol::setOptions(const QByteArray &value)
+void ListenProtocol::setOptions(const QByteArray &value)
 {
     dPvt();
     p.options=value;
 }
 
-QVariantList&QRPCListenProtocol::queue()
+QVariantList&ListenProtocol::queue()
 {
     dPvt();
     return p.queue;
 }
 
-void QRPCListenProtocol::setQueue(const QByteArray &value)
+void ListenProtocol::setQueue(const QByteArray &value)
 {
     dPvt();
     p.queue.clear();
     p.queue<<value;
 }
 
-void QRPCListenProtocol::setQueue(const QVariantList &value)
+void ListenProtocol::setQueue(const QVariantList &value)
 {
     dPvt();
     p.queue=value;
 }
 
-QVariantList QRPCListenProtocol::port() const
+QVariantList ListenProtocol::port() const
 {
     dPvt();
     if(!p.port.isEmpty())
@@ -387,7 +387,7 @@ QVariantList QRPCListenProtocol::port() const
     }
 }
 
-void QRPCListenProtocol::setPort(const QVariant &value)
+void ListenProtocol::setPort(const QVariant &value)
 {
     dPvt();
     QVariantList l;
@@ -402,25 +402,25 @@ void QRPCListenProtocol::setPort(const QVariant &value)
     p.port=l;
 }
 
-QVariantMap QRPCListenProtocol::toMap() const
+QVariantMap ListenProtocol::toMap() const
 {
     dPvt();
     return QVariant(p.makeHash().settingsHash).toMap();
 }
 
-QVariantHash &QRPCListenProtocol::toHash() const
+QVariantHash &ListenProtocol::toHash() const
 {
     dPvt();
     return p.makeHash().settingsHash;
 }
 
-QSettings &QRPCListenProtocol::settings() const
+QSettings &ListenProtocol::settings() const
 {   
     dPvt();
     return*p.makeHash().settings;
 }
 
-QSettings *QRPCListenProtocol::makeSettings(QObject*parent)
+QSettings *ListenProtocol::makeSettings(QObject*parent)
 {
     dPvt();
     auto settings=new QSettings(parent);
@@ -431,55 +431,55 @@ QSettings *QRPCListenProtocol::makeSettings(QObject*parent)
     return settings;
 }
 
-QVariantHash QRPCListenProtocol::makeSettingsHash()const
+QVariantHash ListenProtocol::makeSettingsHash()const
 {
     dPvt();
     return p.makeHash().settingsHash;
 }
 
-bool QRPCListenProtocol::enabled() const
+bool ListenProtocol::enabled() const
 {
     dPvt();
     return p.enabled;
 }
 
-void QRPCListenProtocol::setEnabled(bool value)
+void ListenProtocol::setEnabled(bool value)
 {
     dPvt();
     p.enabled=value;
 }
 
-QByteArray QRPCListenProtocol::sslKeyFile() const
+QByteArray ListenProtocol::sslKeyFile() const
 {
     dPvt();
     return p.sslKeyFile;
 }
 
-void QRPCListenProtocol::setSslKeyFile(const QByteArray &value)
+void ListenProtocol::setSslKeyFile(const QByteArray &value)
 {
     dPvt();
     p.sslKeyFile = value;
 }
 
-QByteArray QRPCListenProtocol::sslCertFile() const
+QByteArray ListenProtocol::sslCertFile() const
 {
     dPvt();
     return p.sslCertFile;
 }
 
-void QRPCListenProtocol::setSslCertFile(const QByteArray &value)
+void ListenProtocol::setSslCertFile(const QByteArray &value)
 {
     dPvt();
     p.sslCertFile = value;
 }
 
-bool QRPCListenProtocol::realMessageOnException() const
+bool ListenProtocol::realMessageOnException() const
 {
     dPvt();
     return p.realMessageOnException;
 }
 
-void QRPCListenProtocol::setRealMessageOnException(bool value)
+void ListenProtocol::setRealMessageOnException(bool value)
 {
     dPvt();
     p.realMessageOnException = value;

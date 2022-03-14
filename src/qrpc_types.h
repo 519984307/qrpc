@@ -156,9 +156,9 @@ namespace QRpc {
     const auto QRPCContentTypeExtensionToHeader=___QRPCContentTypeExtensionToHeader();
 
 
-    enum QRPCRequestMethod {Head=1, Get=2, Post=4, Put=8, Delete=16, Options=32, Patch=64, Trace=128, MaxMethod=Trace};
+    enum RequestMethod {Head=1, Get=2, Post=4, Put=8, Delete=16, Options=32, Patch=64, Trace=128, MaxMethod=Trace};
 
-    static auto ___QRPCRequestMethodName()
+    static auto ___RequestMethodName()
     {
         QHash<int, QString> r;
         r.insert(Head, QT_STRINGIFY2(Head));
@@ -171,12 +171,12 @@ namespace QRpc {
         r.insert(Trace, QT_STRINGIFY2(Trace));
         return r;
     }
-    static const auto QRPCRequestMethodName = ___QRPCRequestMethodName();
-    static const auto QRPCRequestMethodNameList = ___QRPCRequestMethodName().values();
+    static const auto RequestMethodName = ___RequestMethodName();
+    static const auto RequestMethodNameList = ___RequestMethodName().values();
 
-    static auto ___QRPCRequestMethodType()
+    static auto ___RequestMethodType()
     {
-        QHash<QString,QRPCRequestMethod> r;
+        QHash<QString,RequestMethod> r;
         r.insert(QT_STRINGIFY2(head), Head);
         r.insert(QT_STRINGIFY2(get), Get);
         r.insert(QT_STRINGIFY2(post), Post);
@@ -196,7 +196,7 @@ namespace QRpc {
         r.insert(QT_STRINGIFY2(Trace), Trace);
         return r;
     }
-    static const auto QRPCRequestMethodType=___QRPCRequestMethodType();
+    static const auto RequestMethodType=___RequestMethodType();
     enum QRPCProtocol {TcpSocket=1, UdpSocket=2, WebSocket=4, Mqtt=8, Amqp=16, Http=32, Https=64, DataBase=128, Kafka=256, LocalSocket=612};
     Q_DECLARE_FLAGS(QRPCProtocols, QRPCProtocol)
     static auto ___QRPCProtocolType()
@@ -267,8 +267,8 @@ namespace QRpc {
     static const auto QRPCProtocolUrlName=___QRPCProtocolUrlName();
     static const auto rpcProtocolMin=QRPCProtocol(1);
     static const auto rpcProtocolMax=LocalSocket;
-    class QRPCListen;
-    class QRPCListenProtocol;
+    class Listen;
+    class ListenProtocol;
 
 
     static auto ___QSslSslProtocolToName()

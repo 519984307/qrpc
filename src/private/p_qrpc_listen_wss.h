@@ -5,21 +5,21 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenWebSocket class
+//! \brief The ListenWebSocket class
 //!
-class Q_RPC_EXPORT QRPCListenWebSocket:public QRPCListen{
+class Q_RPC_EXPORT ListenWebSocket:public Listen{
     Q_OBJECT
 public:
     //!
-    //! \brief QRPCListenWebSocket
+    //! \brief ListenWebSocket
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenWebSocket(QObject *parent=nullptr);
+    Q_INVOKABLE explicit ListenWebSocket(QObject *parent=nullptr);
 
     //!
-    //! \brief ~QRPCListenWebSocket
+    //! \brief ~ListenWebSocket
     //!
-    ~QRPCListenWebSocket();
+    ~ListenWebSocket();
 
     //!
     //! \brief start
@@ -36,6 +36,6 @@ private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(WebSocket, QRPCListenWebSocket)
+QRPC_LISTTEN_AUTO_REGISTER(WebSocket, ListenWebSocket)
 
 }

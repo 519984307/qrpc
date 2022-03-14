@@ -11,9 +11,9 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestJobHttp class
+//! \brief The RequestJobHttp class
 //!
-class QRPCRequestJobHttp : public QRPCRequestJobProtocol
+class RequestJobHttp : public RequestJobProtocol
 {
     Q_OBJECT
 public:
@@ -24,19 +24,19 @@ public:
     QFile fileUpload;
     QFile fileTemp;
     QNetworkRequest request;
-    QRPCRequestJobResponse*response=nullptr;
+    RequestJobResponse*response=nullptr;
     QNetworkReply *reply = nullptr;
     QNetworkAccessManager*nam = nullptr;
 
-    Q_INVOKABLE explicit QRPCRequestJobHttp(QObject*parent);
+    Q_INVOKABLE explicit RequestJobHttp(QObject*parent);
 
-    ~QRPCRequestJobHttp();
+    ~RequestJobHttp();
 
     void fileMake();
 
     void fileFree();
 
-    virtual bool call(QRPCRequestJobResponse*response)override;
+    virtual bool call(RequestJobResponse*response)override;
 
     void timeout_start();
 

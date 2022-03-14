@@ -4,17 +4,17 @@
 
 namespace QRpc {
 
-QRPCRequest::QRPCRequest(QObject *parent):QObject(parent)
+Request::Request(QObject *parent):QObject(parent)
 {
-    this->p = new QRPCRequestPvt(this);
+    this->p = new RequestPvt(this);
 }
 
-QRPCRequest::~QRPCRequest()
+Request::~Request()
 {
     dPvt();delete&p;
 }
 
-bool QRPCRequest::startsWith(const QString &requestPath, const QVariant &requestPathBase)
+bool Request::startsWith(const QString &requestPath, const QVariant &requestPathBase)
 {
     auto list=requestPathBase.toStringList();
     for(auto&requestPathBase:list){
@@ -43,22 +43,22 @@ bool QRPCRequest::startsWith(const QString &requestPath, const QVariant &request
     return false;
 }
 
-bool QRPCRequest::startsWith(const QString &requestPath)
+bool Request::startsWith(const QString &requestPath)
 {
     return this->startsWith(this->route(), requestPath);
 }
 
-bool QRPCRequest::isEqual(const QString &requestPath)
+bool Request::isEqual(const QString &requestPath)
 {
     return this->isEqual(requestPath, this->route());
 }
 
-bool QRPCRequest::isEqual(const QString &requestPath, const QVariant &requestPathBase)
+bool Request::isEqual(const QString &requestPath, const QVariant &requestPathBase)
 {
-    return QRPCRequest::startsWith(requestPath,requestPathBase);
+    return Request::startsWith(requestPath,requestPathBase);
 }
 
-bool QRPCRequest::canRequest() const
+bool Request::canRequest() const
 {
     if(this->port().toInt()<0)
         return false;
@@ -69,14 +69,14 @@ bool QRPCRequest::canRequest() const
     return true;
 }
 
-QRPCRequest &QRPCRequest::setSettings(const ServiceSetting &setting)
+Request &Request::setSettings(const ServiceSetting &setting)
 {
     dPvt();
     p.setSettings(setting);
     return*this;
 }
 
-QRPCRequest &QRPCRequest::setSettings(const QVariantHash &setting)
+Request &Request::setSettings(const QVariantHash &setting)
 {
     ServiceSetting _setting;
     _setting.fromHash(setting);
@@ -98,12 +98,12 @@ QRPCRequest &QRPCRequest::setSettings(const QVariantHash &setting)
     return*this;
 }
 
-QString QRPCRequest::url() const
+QString Request::url() const
 {
     return this->url(qsl_null);
 }
 
-QString QRPCRequest::url(const QString &path) const
+QString Request::url(const QString &path) const
 {
     auto&rq=*this;
 
@@ -118,137 +118,137 @@ QString QRPCRequest::url(const QString &path) const
     return qsl("%1://%2:%3%4").arg(rq.protocolName(),rq.hostName(),rq.port().toString(),spath);
 }
 
-QRPCProtocol QRPCRequest::protocol() const
+QRPCProtocol Request::protocol() const
 {
     dPvt();
     return p.exchange.call().protocol();
 }
 
-QString QRPCRequest::protocolName() const
+QString Request::protocolName() const
 {
     dPvt();
     return p.exchange.call().protocolName();
 }
 
-QRPCRequest &QRPCRequest::setProtocol(const QVariant &value)
+Request &Request::setProtocol(const QVariant &value)
 {
     dPvt();
     p.exchange.setProtocol(value);
     return*this;
 }
 
-QRPCRequestMethod QRPCRequest::method() const
+RequestMethod Request::method() const
 {
     dPvt();
-    return QRPCRequestMethod(p.exchange.call().method());
+    return RequestMethod(p.exchange.call().method());
 }
 
-QRPCRequest &QRPCRequest::setMethod(const QString &value)
-{
-    dPvt();
-    p.exchange.setMethod(value);
-    return*this;
-}
-
-QRPCRequest &QRPCRequest::setMethod(const QByteArray &value)
+Request &Request::setMethod(const QString &value)
 {
     dPvt();
     p.exchange.setMethod(value);
     return*this;
 }
 
-QRPCRequest &QRPCRequest::setMethod(const int &value)
+Request &Request::setMethod(const QByteArray &value)
 {
     dPvt();
-    p.exchange.setMethod(QRPCRequestMethod(value));
+    p.exchange.setMethod(value);
     return*this;
 }
 
-QString QRPCRequest::driver() const
+Request &Request::setMethod(const int &value)
+{
+    dPvt();
+    p.exchange.setMethod(RequestMethod(value));
+    return*this;
+}
+
+QString Request::driver() const
 {
     dPvt();
     return p.exchange.call().driver();
 }
 
-QRPCRequest &QRPCRequest::setDriver(const QString &value)
+Request &Request::setDriver(const QString &value)
 {
     dPvt();
     p.exchange.call().setDriver(value);
     return*this;
 }
 
-QString QRPCRequest::hostName() const
+QString Request::hostName() const
 {
     dPvt();
     return p.exchange.call().hostName();
 }
 
-QRPCRequest &QRPCRequest::setHostName(const QString &value)
+Request &Request::setHostName(const QString &value)
 {
     dPvt();
     p.exchange.setHostName(value);
     return*this;
 }
 
-QString QRPCRequest::userName() const
+QString Request::userName() const
 {
     dPvt();
     return p.exchange.call().userName();
 }
 
-QRPCRequest &QRPCRequest::setUserName(const QString &value)
+Request &Request::setUserName(const QString &value)
 {
     dPvt();
     p.exchange.call().setUserName(value);
     return*this;
 }
 
-QString QRPCRequest::password() const
+QString Request::password() const
 {
     dPvt();
     return p.exchange.call().passWord();
 }
 
-QRPCRequest &QRPCRequest::setPassword(const QString &value)
+Request &Request::setPassword(const QString &value)
 {
     dPvt();
     p.exchange.call().setPassWord(value);
     return*this;
 }
 
-QString&QRPCRequest::route() const
+QString&Request::route() const
 {
     dPvt();
     return p.exchange.call().route();
 }
 
-QRPCRequest &QRPCRequest::setRoute(const QVariant &value)
+Request &Request::setRoute(const QVariant &value)
 {
     dPvt();
     p.exchange.call().setRoute(value);
     return*this;
 }
 
-QVariant QRPCRequest::body() const
+QVariant Request::body() const
 {
     dPvt();
     return p.qrpcBody.body();
 }
 
-QRPCRequest &QRPCRequest::setBody(const QVariant &value)
+Request &Request::setBody(const QVariant &value)
 {
     dPvt();
     p.qrpcBody.setBody(value);
     return*this;
 }
 
-QVariant QRPCRequest::port() const
+QVariant Request::port() const
 {
     dPvt();
     return p.exchange.call().port();
 }
 
-QRPCRequest &QRPCRequest::setPort(const QVariant &value)
+Request &Request::setPort(const QVariant &value)
 {
     dPvt();
 
@@ -276,84 +276,84 @@ QRPCRequest &QRPCRequest::setPort(const QVariant &value)
     return*this;
 }
 
-qlonglong QRPCRequest::activityLimit() const
+qlonglong Request::activityLimit() const
 {
     dPvt();
     return p.exchange.call().activityLimit();
 }
 
-QRPCRequest &QRPCRequest::setActivityLimit(const QVariant &value)
+Request &Request::setActivityLimit(const QVariant &value)
 {
     dPvt();
     p.exchange.call().setActivityLimit(value);
     return*this;
 }
 
-QRPCRequestExchange &QRPCRequest::exchange()
+RequestExchange &Request::exchange()
 {
     dPvt();
     return p.exchange;
 }
 
-QRpc::QRPCHttpHeaders &QRPCRequest::header()
+QRpc::HttpHeaders &Request::header()
 {
     dPvt();
     return p.qrpcHeader;
 }
 
-QRPCRequest::Body &QRPCRequest::body()
+Request::Body &Request::body()
 {
     dPvt();
     return p.qrpcBody;
 }
 
-QRPCHttpResponse &QRPCRequest::response()
+HttpResponse &Request::response()
 {
     dPvt();
     return p.qrpcResponse;
 }
 
-QHash<int, int> QRPCRequest::requestRecovery()const
+QHash<int, int> Request::requestRecovery()const
 {
     dPvt();
     return p.requestRecovery;
 }
 
-QRPCRequest &QRPCRequest::setRequestRecovery(int statusCode)
+Request &Request::setRequestRecovery(int statusCode)
 {
     dPvt();
     p.requestRecovery[statusCode]=1;
     return*this;
 }
 
-QRPCRequest &QRPCRequest::setRequestRecovery(int statusCode, int repeatCount)
+Request &Request::setRequestRecovery(int statusCode, int repeatCount)
 {
     dPvt();
     p.requestRecovery[statusCode]=repeatCount;
     return*this;
 }
 
-QRPCRequest &QRPCRequest::setRequestRecoveryOnBadGateway(int repeatCount)
+Request &Request::setRequestRecoveryOnBadGateway(int repeatCount)
 {
     dPvt();
-    p.requestRecovery[QRPCListenRequestCode::ssBadGateway]=repeatCount;
+    p.requestRecovery[ListenRequestCode::ssBadGateway]=repeatCount;
     return*this;
 }
 
-LastError &QRPCRequest::lastError()
+LastError &Request::lastError()
 {
     dPvt();
     return p.qrpcLastError;
 }
 
-QRPCHttpResponse &QRPCRequest::call()
+HttpResponse &Request::call()
 {
     dPvt();
     auto&e=p.exchange.call();
     return p.call(e.method(), e.route(), QByteArray());
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QVariant &route)
+HttpResponse &Request::call(const QVariant &route)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -361,7 +361,7 @@ QRPCHttpResponse &QRPCRequest::call(const QVariant &route)
     return p.call(e.method(), e.route(), this->body().body());
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QVariant &route, const QVariant &body)
+HttpResponse &Request::call(const QVariant &route, const QVariant &body)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -369,7 +369,7 @@ QRPCHttpResponse &QRPCRequest::call(const QVariant &route, const QVariant &body)
     return p.call(e.method(), e.route(), body);
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QVariant &route, const QVariant&body, const QString &method, const QVariantHash parameter)
+HttpResponse &Request::call(const QVariant &route, const QVariant&body, const QString &method, const QVariantHash parameter)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -379,7 +379,7 @@ QRPCHttpResponse &QRPCRequest::call(const QVariant &route, const QVariant&body, 
     return p.call(e.method(), e.route(), body);
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QString &route, const QVariant &body)
+HttpResponse &Request::call(const RequestMethod &method, const QString &route, const QVariant &body)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -388,7 +388,7 @@ QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QStri
     return p.call(e.method(), e.route(), body);
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method)
+HttpResponse &Request::call(const RequestMethod &method)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -397,7 +397,7 @@ QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method)
     return p.call(e.method(), e.route(), body);
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QVariant &route, const QObject &objectBody)
+HttpResponse &Request::call(const QVariant &route, const QObject &objectBody)
 {
     QVariantHash mapObject;
     for(int i = 0; i < objectBody.metaObject()->propertyCount(); ++i) {
@@ -411,7 +411,7 @@ QRPCHttpResponse &QRPCRequest::call(const QVariant &route, const QObject &object
     return p.call(e.method(), route, QJsonDocument::fromVariant(mapObject).toJson());
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QString &route, const QObject &objectBody)
+HttpResponse &Request::call(const RequestMethod &method, const QString &route, const QObject &objectBody)
 {
     QVariantHash mapObject;
     for(int i = 0; i < objectBody.metaObject()->propertyCount(); ++i) {
@@ -425,7 +425,7 @@ QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QStri
     return p.call(e.method(), e.route(), mapObject);
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QVariant &route, QIODevice &ioDeviceBody)
+HttpResponse &Request::call(const QVariant &route, QIODevice &ioDeviceBody)
 {
     dPvt();
     auto body=ioDeviceBody.readAll();
@@ -435,7 +435,7 @@ QRPCHttpResponse &QRPCRequest::call(const QVariant &route, QIODevice &ioDeviceBo
     return p.call(e.method(), e.route(), body);
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QString &route)
+HttpResponse &Request::call(const RequestMethod &method, const QString &route)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -444,7 +444,7 @@ QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QStri
     return p.call(e.method(), e.route(), this->body().body());
 }
 
-QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QString &route, QIODevice &ioDeviceBody)
+HttpResponse &Request::call(const RequestMethod &method, const QString &route, QIODevice &ioDeviceBody)
 {
     dPvt();
     auto body=ioDeviceBody.readAll();
@@ -454,13 +454,13 @@ QRPCHttpResponse &QRPCRequest::call(const QRPCRequestMethod &method, const QStri
     return p.call(e.method(), e.route(), body);
 }
 
-QRPCRequest &QRPCRequest::operator=(const QRpc::ServiceSetting &value)
+Request &Request::operator=(const QRpc::ServiceSetting &value)
 {
     this->setSettings(value);
     return*this;
 }
 
-QRPCHttpResponse &QRPCRequest::upload(QFile &file)
+HttpResponse &Request::upload(QFile &file)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -470,7 +470,7 @@ QRPCHttpResponse &QRPCRequest::upload(QFile &file)
     return this->response();
 }
 
-QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, const QByteArray &buffer)
+HttpResponse &Request::upload(const QVariant &route, const QByteArray &buffer)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -488,7 +488,7 @@ QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, const QByteArray &b
 }
 
 
-QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, QFile &file)
+HttpResponse &Request::upload(const QVariant &route, QFile &file)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -499,7 +499,7 @@ QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, QFile &file)
     return this->response();
 }
 
-QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, QString &fileName, QFile &file)
+HttpResponse &Request::upload(const QVariant &route, QString &fileName, QFile &file)
 {
     dPvt();
     auto&e=p.exchange.call();
@@ -511,7 +511,7 @@ QRPCHttpResponse &QRPCRequest::upload(const QVariant &route, QString &fileName, 
 }
 
 
-QRPCHttpResponse &QRPCRequest::download(QString &fileName)
+HttpResponse &Request::download(QString &fileName)
 {
     dPvt();
     auto _fileName=p.parseFileName(fileName);
@@ -523,7 +523,7 @@ QRPCHttpResponse &QRPCRequest::download(QString &fileName)
     return this->response();
 }
 
-QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName)
+HttpResponse &Request::download(const QVariant &route, QString &fileName)
 {
     dPvt();
     auto _fileName=p.parseFileName(fileName);
@@ -536,7 +536,7 @@ QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName
     return response;
 }
 
-QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName, const QVariant &parameter)
+HttpResponse &Request::download(const QVariant &route, QString &fileName, const QVariant &parameter)
 {
     dPvt();
     auto _fileName=p.parseFileName(fileName);
@@ -550,7 +550,7 @@ QRPCHttpResponse &QRPCRequest::download(const QVariant &route, QString &fileName
     return response;
 }
 
-QRPCRequest &QRPCRequest::autoSetCookie()
+Request &Request::autoSetCookie()
 {
     auto vRawHeader=this->response().header().rawHeader();
     QHashIterator<QString, QVariant> i(vRawHeader);
@@ -569,42 +569,42 @@ QRPCRequest &QRPCRequest::autoSetCookie()
     return*this;
 }
 
-QString QRPCRequest::toString() const
+QString Request::toString() const
 {
     dPvt();\
     auto&response=p.qrpcResponse;
-    auto qt_text=QRPCListenRequestCode::qt_network_error_phrase(p.response_qt_status_code);
+    auto qt_text=ListenRequestCode::qt_network_error_phrase(p.response_qt_status_code);
     auto msg=qsl("%1:QtStatus: Status:%2, %3, %4").arg(p.exchange.call().url(), QString::number(response.qtStatusCode()),response.reasonPhrase(), qt_text);
     return msg;
 }
 
-QVariantHash QRPCRequest::toResponse()const
+QVariantHash Request::toResponse()const
 {
     dPvt();
     return p.qrpcResponse.toResponse();
 }
 
-QSslConfiguration &QRPCRequest::sslConfiguration()
+QSslConfiguration &Request::sslConfiguration()
 {
     dPvt();
     return p.sslConfiguration;
 }
 
-QRPCRequest&QRPCRequest::setSslConfiguration(const QSslConfiguration &value)
+Request&Request::setSslConfiguration(const QSslConfiguration &value)
 {
     dPvt();
     p.sslConfiguration = value;
     return*this;
 }
 
-QRPCRequest &QRPCRequest::print()
+Request &Request::print()
 {
     for(auto&v:this->printOut())
         sInfo()<<v;
     return*this;
 }
 
-QStringList QRPCRequest::printOut()
+QStringList Request::printOut()
 {
     QStringList out;
     for(auto&v:this->exchange().printOut(qsl("exchange")))
@@ -616,28 +616,28 @@ QStringList QRPCRequest::printOut()
     return out;
 }
 
-QRPCRequest::Body::Body(QObject *parent):QObject(parent)
+Request::Body::Body(QObject *parent):QObject(parent)
 {
 }
 
-QRPCRequest::Body::~Body()
+Request::Body::~Body()
 {
     
 }
 
-QVariant &QRPCRequest::Body::body() const
+QVariant &Request::Body::body() const
 {
     dPvt();
     return p.request_body;
 }
 
-void QRPCRequest::Body::setBody(const QVariant &value)
+void Request::Body::setBody(const QVariant &value)
 {
     dPvt();
     p.request_body=value;
 }
 
-QString QRPCRequest::Body::toString()const
+QString Request::Body::toString()const
 {
     dPvt();
     auto type=qTypeId(p.request_body);
@@ -652,12 +652,12 @@ QString QRPCRequest::Body::toString()const
     }
 }
 
-QVariantMap QRPCRequest::Body::toMap() const
+QVariantMap Request::Body::toMap() const
 {
     return QVariant(this->toHash()).toMap();
 }
 
-QVariantHash QRPCRequest::Body::toHash()const
+QVariantHash Request::Body::toHash()const
 {
     dPvt();
     auto type=qTypeId(p.request_body);
@@ -672,7 +672,7 @@ QVariantHash QRPCRequest::Body::toHash()const
     }
 }
 
-QVariantList QRPCRequest::Body::toList() const
+QVariantList Request::Body::toList() const
 {
     dPvt();
     auto type=qTypeId(p.request_body);
@@ -687,7 +687,7 @@ QVariantList QRPCRequest::Body::toList() const
     }
 }
 
-QRPCRequest &QRPCRequest::Body::rq()
+Request &Request::Body::rq()
 {
     dPvt();
     return*p.parent;

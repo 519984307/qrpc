@@ -16,13 +16,13 @@ namespace QRpc {
 typedef QVector<QByteArray> ByteArrayVector;
 typedef QVector<const QMetaObject*> MetaObjectVector;
 typedef QMultiHash<QByteArray, QStringList> MultStringList ;
-typedef QMultiHash<QByteArray, QRpc::QRPCControllerMethods> MultStringMethod;
+typedef QMultiHash<QByteArray, QRpc::ControllerMethods> MultStringMethod;
 typedef QHash<QByteArray, QVariantHash> NotationMaked;
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCControllerPvt*>(this->p)
+    auto&p =*reinterpret_cast<ControllerPvt*>(this->p)
 
-Q_GLOBAL_STATIC(QRPCControllerMethods, staticControllerRoutes);
+Q_GLOBAL_STATIC(ControllerMethods, staticControllerRoutes);
 Q_GLOBAL_STATIC(MultStringList, staticControllerRedirect);
 Q_GLOBAL_STATIC(MultStringMethod, staticControllerMethods);
 Q_GLOBAL_STATIC(MetaObjectVector, staticRegisterInterfaceMetaObject);
@@ -51,6 +51,20 @@ static QVariantHash reMakeNotation(const QVariant &notations)
     return __return;
 }
 
+static bool staticApiNotationsMethod(const QMetaMethod &method, QVariantHash &vNotation)
+{
+    if(!staticControllerNotationMethodsMaked->contains(method.name()))
+        return {};
+
+    auto v=staticControllerNotationMethodsMaked->value(method.name());
+
+    if(v.isEmpty())
+        return {};
+
+    vNotation=v;
+
+    return true;
+}
 
 static void staticApiMakeNotations(QObject*makeObject, const QMetaObject*metaObject)
 {
@@ -63,7 +77,7 @@ static void staticApiMakeNotations(QObject*makeObject, const QMetaObject*metaObj
     if(!ctrMethods.isEmpty())
         return;
 
-    auto controller=dynamic_cast<QRPCController*>(makeObject);
+    auto controller=dynamic_cast<Controller*>(makeObject);
     if(controller==nullptr)
         return;
 
@@ -124,7 +138,7 @@ static void staticApiMakeBasePath(QObject*makeObject, const QMetaObject*metaObje
     if(!ctrMethods.isEmpty())
         return;
 
-    auto controller=dynamic_cast<QRPCController*>(makeObject);
+    auto controller=dynamic_cast<Controller*>(makeObject);
     if(controller==nullptr)
         return;
 
@@ -138,10 +152,6 @@ static void staticApiMakeBasePath(QObject*makeObject, const QMetaObject*metaObje
 #if Q_RPC_LOG_SUPER_VERBOSE
     sWarning()<<"registered class : "<<makeObject->metaObject()->className();
 #endif
-
-    static const auto _rpc_notation_method=QByteArray("_rpc_notation_method");
-    static const auto _rpc_notation_class=QByteArray("_rpc_notation_class");
-
     for (auto i = 0; i < metaObject->methodCount(); ++i) {
         auto method = metaObject->method(i);
 
@@ -196,15 +206,15 @@ static void staticApiInitialize(QObject*makeObject, const QMetaObject*metaObject
 static void initQRPCParserRoutes()
 {
     for(auto&metaObject:*staticParserRequestMetaObjects){
-        QRPCListenRequestParser::apiInitialize(*metaObject);
+        ListenRequestParser::apiInitialize(*metaObject);
     }
 }
 
-static void initQRPCController()
+static void initController()
 {
     static auto ignoreMethods=QVector<QByteArray>{"destroyed", "objectNameChanged", "deleteLater", "_q_reregisterTimers"};
     auto&statiList=*staticControllerMethodBlackList;
-    const auto &metaObject=&QRPCController::staticMetaObject;
+    const auto &metaObject=&Controller::staticMetaObject;
     for (int i = 0; i < metaObject->methodCount(); ++i) {
         auto method = metaObject->method(i);
 
@@ -223,106 +233,106 @@ static void initQRPCController()
 static void init()
 {
     initQRPCParserRoutes();
-    initQRPCController();
+    initController();
 }
 
 Q_COREAPP_STARTUP_FUNCTION(init)
 
-class QRPCControllerPvt{
+class ControllerPvt{
 public:
-    QRPCServer*server=nullptr;
-    QRPCListenRequest*request=nullptr;
+    Server*server=nullptr;
+    ListenRequest*request=nullptr;
     ControllerSetting controllerSetting;
     bool enabled=true;
 
-    explicit QRPCControllerPvt()
+    explicit ControllerPvt()
     {
     }
 
-    virtual ~QRPCControllerPvt()
+    virtual ~ControllerPvt()
     {
     }
 
 
 };
 
-QRPCController::QRPCController(QObject *parent):QObject(parent), NotationsExtended(this)
+Controller::Controller(QObject *parent):QObject(parent), NotationsExtended(this)
 {
-    this->p = new QRPCControllerPvt();
+    this->p = new ControllerPvt();
 }
 
-QRPCController::~QRPCController()
+Controller::~Controller()
 {
     dPvt();delete&p;
 }
 
-QVariant QRPCController::basePath() const
+QVariant Controller::basePath() const
 {
     return qsl("/");
 }
 
-QVariant QRPCController::route() const
+QVariant Controller::route() const
 {
     return qsl("/");
 }
 
-QRPCController &QRPCController::apiInitialize()
+Controller &Controller::apiInitialize()
 {
-    QRPCController::apiInitialize(this, this->metaObject());
+    Controller::apiInitialize(this, this->metaObject());
     return*this;
 }
 
-void QRPCController::apiInitialize(QObject*object, const QMetaObject*metaObject)
+void Controller::apiInitialize(QObject*object, const QMetaObject*metaObject)
 {
     staticApiInitialize(object, metaObject);
 }
 
-QString QRPCController::module() const
+QString Controller::module() const
 {
     return QString();
 }
 
-QUuid QRPCController::moduleUuid()const
+QUuid Controller::moduleUuid()const
 {
     return QUuid();
 }
 
-bool QRPCController::redirectCheck() const
+bool Controller::redirectCheck() const
 {
     return false;
 }
 
-QString QRPCController::description() const
+QString Controller::description() const
 {
     return QString();
 }
 
-ControllerSetting &QRPCController::controllerSetting()
+ControllerSetting &Controller::controllerSetting()
 {
     dPvt();
     return p.controllerSetting;
 }
 
-bool QRPCController::enabled() const
+bool Controller::enabled() const
 {
     dPvt();
     return p.enabled;
 }
 
-void QRPCController::setEnabled(bool enabled)
+void Controller::setEnabled(bool enabled)
 {
     dPvt();
     p.enabled=enabled;
 }
 
-bool QRPCController::routeRedirectCheckClass(const QByteArray &className)
+bool Controller::routeRedirectCheckClass(const QByteArray &className)
 {
     if(staticControllerRedirect->contains(className.toLower()))
         return true;
     return false;
 }
 
-bool QRPCController::routeRedirectCheckRoute(const QByteArray &className, const QByteArray &routePath)
+bool Controller::routeRedirectCheckRoute(const QByteArray &className, const QByteArray &routePath)
 {
     const auto classNameA=className.toLower();
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -336,14 +346,14 @@ bool QRPCController::routeRedirectCheckRoute(const QByteArray &className, const 
         const auto&vList=i.value();
         if(!className.isEmpty() && (classNameB!=classNameA))
             continue;
-        if(!QRPCRequest::startsWith(routePath, vList))
+        if(!Request::startsWith(routePath, vList))
             continue;
         return true;
     }
     return false;
 }
 
-bool QRPCController::routeRedirectMethod(const QByteArray &className, const QByteArray &routePath, QMetaMethod&method)
+bool Controller::routeRedirectMethod(const QByteArray &className, const QByteArray &routePath, QMetaMethod&method)
 {
     Q_UNUSED(className)
     Q_UNUSED(routePath)
@@ -351,7 +361,7 @@ bool QRPCController::routeRedirectMethod(const QByteArray &className, const QByt
     return true;
 }
 
-bool QRPCController::methodExists(const QByteArray &methodName)const
+bool Controller::methodExists(const QByteArray &methodName)const
 {
     auto _methodName=QRpc::Util::routeParser(methodName);
     auto __route=QRpc::Util::routeExtract(methodName);
@@ -373,36 +383,39 @@ bool QRPCController::methodExists(const QByteArray &methodName)const
     return false;
 }
 
-bool QRPCController::routeExists(const QByteArray &routePath)
+bool Controller::routeExists(const QByteArray &routePath)
 {
     auto __return=staticControllerRoutes->contains(routePath);
     return __return;
 }
 
-QRPCControllerMethods QRPCController::routeMethods(const QByteArray&className)
+ControllerMethods Controller::routeMethods(const QByteArray&className)
 {
     return staticControllerMethods->value(className.toLower().trimmed());
 }
 
-QRPCListenRequest &QRPCController::request()
+ListenRequest &Controller::request()
 {
     dPvt();
     return*p.request;
 }
 
-QRPCListenRequest &QRPCController::rq()
+ListenRequest &Controller::rq()
 {
     dPvt();
-    static QRPCListenRequest ____request;
+    static ListenRequest ____request;
     return (p.request==nullptr)?(____request):(*p.request);
 }
 
-bool QRPCController::canOperation()
+bool Controller::canOperation(const QMetaMethod &method)
 {
+    QVariantHash vNotation;
+    if(!staticApiNotationsMethod(method, vNotation))
+        return true;
     return true;
 }
 
-bool QRPCController::canAuthorization()
+bool Controller::canAuthorization()
 {
     auto&rq=this->rq();
     if(rq.isMethodOptions())
@@ -410,36 +423,36 @@ bool QRPCController::canAuthorization()
     return true;
 }
 
-bool QRPCController::canAuthorization(const QMetaMethod &method)
+bool Controller::canAuthorization(const QMetaMethod &method)
 {
-    if(!staticControllerNotationMethodsMaked->contains(method.name()))
+    QVariantHash vNotation;
+    if(!staticApiNotationsMethod(method, vNotation))
         return true;
+    return true;
+}
 
-    auto vNotations=staticControllerNotationMethodsMaked->value(method.name());
+bool Controller::beforeAuthorization()
+{
+    return true;
+}
 
-    if(vNotations.isEmpty())
-        return true;
+bool Controller::authorization()
+{
+    return true;
+}
 
+bool Controller::authorization(const QMetaMethod &method)
+{
     Q_UNUSED(method)
     return true;
 }
 
-bool QRPCController::beforeAuthorization()
+bool Controller::afterAuthorization()
 {
     return true;
 }
 
-bool QRPCController::authorization()
-{
-    return true;
-}
-
-bool QRPCController::afterAuthorization()
-{
-    return true;
-}
-
-bool QRPCController::requestBeforeInvoke()
+bool Controller::requestBeforeInvoke()
 {
     auto&rq=this->rq();
     auto vHearder = rq.requestHeader();
@@ -508,23 +521,23 @@ bool QRPCController::requestBeforeInvoke()
 
 }
 
-bool QRPCController::requestRedirect()
+bool Controller::requestRedirect()
 {
     return false;
 }
 
-bool QRPCController::requestAfterInvoke()
+bool Controller::requestAfterInvoke()
 {
     return true;
 }
 
-QRPCServer *QRPCController::server()
+Server *Controller::server()
 {
     dPvt();
     return p.server;
 }
 
-int QRPCController::interfaceRegister(const QMetaObject &metaObject)
+int Controller::interfaceRegister(const QMetaObject &metaObject)
 {
     if(!staticRegisterInterfaceMetaObject->contains(&metaObject)){
 #if Q_RPC_LOG_VERBOSE
@@ -537,7 +550,7 @@ int QRPCController::interfaceRegister(const QMetaObject &metaObject)
     return staticRegisterInterfaceMetaObject->indexOf(&metaObject);
 }
 
-int QRPCController::parserRequestRegister(const QMetaObject &metaObject)
+int Controller::parserRequestRegister(const QMetaObject &metaObject)
 {
     if(!staticParserRequestMetaObjects->contains(&metaObject)){
 #if Q_RPC_LOG_VERBOSE
@@ -551,29 +564,29 @@ int QRPCController::parserRequestRegister(const QMetaObject &metaObject)
 }
 
 
-QVector<const QMetaObject*>&QRPCController::staticInterfaceList()
+QVector<const QMetaObject*>&Controller::staticInterfaceList()
 {
     return *staticRegisterInterfaceMetaObject;
 }
 
-QVector<const QMetaObject *> &QRPCController::staticParserRequestList()
+QVector<const QMetaObject *> &Controller::staticParserRequestList()
 {
     return *staticParserRequestMetaObjects;
 }
 
-void QRPCController::setServer(QRPCServer *server)
+void Controller::setServer(Server *server)
 {
     dPvt();
     p.server=server;
 }
 
-void QRPCController::setRequest(QRPCListenRequest &request)
+void Controller::setRequest(ListenRequest &request)
 {
     dPvt();
     p.request=&request;
 }
 
-QVariantHash QRPCController::routeFlags(const QString &route) const
+QVariantHash Controller::routeFlags(const QString &route) const
 {
     QString __method=QRpc::Util::routeParser(route);
     if((__method.contains(qsl("/")))){
@@ -594,7 +607,7 @@ QVariantHash QRPCController::routeFlags(const QString &route) const
     return {};
 }
 
-const QVariantHash QRPCController::routeFlagsMaker(const QString &request_path, const QVariant &flag)
+const QVariantHash Controller::routeFlagsMaker(const QString &request_path, const QVariant &flag)
 {
     QString __route;
     auto __method=request_path.trimmed().toLower();
@@ -616,9 +629,10 @@ const QVariantHash QRPCController::routeFlagsMaker(const QString &request_path, 
     return QJsonDocument::fromJson(flag.toString().toUtf8()).toVariant().toHash();
 }
 
-const QVector<QByteArray> &QRPCController::methodBlackList()
+const QVector<QByteArray> &Controller::methodBlackList()
 {
     return *staticControllerMethodBlackList;
 }
 
 }
+

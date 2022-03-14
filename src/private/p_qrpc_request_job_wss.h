@@ -12,22 +12,22 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestJobWSS class
+//! \brief The RequestJobWSS class
 //!
-class QRPCRequestJobWSS : public QRPCRequestJobProtocol
+class RequestJobWSS : public RequestJobProtocol
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit QRPCRequestJobWSS(QObject*parent);
+    Q_INVOKABLE explicit RequestJobWSS(QObject*parent);
 
-    ~QRPCRequestJobWSS();
+    ~RequestJobWSS();
 
-    QRPCRequestJobResponse*response=nullptr;
+    RequestJobResponse*response=nullptr;
     QWebSocket*m_socket=nullptr;
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response)override;
+    virtual bool call(RequestJobResponse*response)override;
 
 private slots:
 

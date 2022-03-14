@@ -23,9 +23,9 @@ public:
     QList<QLocalServer*> clients;
     QMap<QUuid, QLocalSocket*> clientsMap;
 
-    QRPCListenLocalSocket&listen()
+    ListenLocalSocket&listen()
     {
-        auto _listen=dynamic_cast<QRPCListenLocalSocket*>(this->parent());
+        auto _listen=dynamic_cast<ListenLocalSocket*>(this->parent());
         return*_listen;
     }
 
@@ -96,7 +96,7 @@ public:
         return true;
     };
 
-    void onRpcFinish(QRPCListenRequest&request)
+    void onRpcFinish(ListenRequest&request)
     {
         if(!request.isValid())
             return;
@@ -111,7 +111,7 @@ public:
         emit request.finish();
     }
 
-    void onRpcRequest(QRPCListenRequest&request)
+    void onRpcRequest(ListenRequest&request)
     {
         if(!request.isValid()){
             request.co().setBadRequest();
@@ -179,17 +179,17 @@ public slots:
 
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenLocalSocketPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenLocalSocketPvt*>(this->p)
 
-class QRPCListenLocalSocketPvt:public QObject{
+class ListenLocalSocketPvt:public QObject{
 public:
     LocalSocketServer*_listenServer=nullptr;
 
-    explicit QRPCListenLocalSocketPvt(QRPCListenLocalSocket*parent):QObject(parent)
+    explicit ListenLocalSocketPvt(ListenLocalSocket*parent):QObject(parent)
     {
         this->_listenServer = new LocalSocketServer(parent);
     }
-    virtual ~QRPCListenLocalSocketPvt()
+    virtual ~ListenLocalSocketPvt()
     {
         this->_listenServer->stop();
         delete this->_listenServer;
@@ -197,29 +197,29 @@ public:
     }
 };
 
-QRPCListenLocalSocket::QRPCListenLocalSocket(QObject *parent):QRPCListen(parent)
+ListenLocalSocket::ListenLocalSocket(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenLocalSocketPvt(this);
+    this->p = new ListenLocalSocketPvt(this);
 }
 
-QRPCListenLocalSocket::~QRPCListenLocalSocket()
+ListenLocalSocket::~ListenLocalSocket()
 {
     dPvt();
     p._listenServer->stop();
     delete&p;
 }
 
-bool QRPCListenLocalSocket::start()
+bool ListenLocalSocket::start()
 {
     dPvt();
     this->stop();
-    QRPCListen::start();
+    Listen::start();
     p._listenServer = new LocalSocketServer(this);
-    connect(this, &QRPCListen::rpcResponse, p._listenServer, &LocalSocketServer::onRpcResponse);
+    connect(this, &Listen::rpcResponse, p._listenServer, &LocalSocketServer::onRpcResponse);
     return p._listenServer->start();
 }
 
-bool QRPCListenLocalSocket::stop()
+bool ListenLocalSocket::stop()
 {
     dPvt();
     return p._listenServer->stop();

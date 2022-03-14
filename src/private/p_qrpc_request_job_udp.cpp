@@ -2,27 +2,27 @@
 
 namespace QRpc {
 
-QRPCRequestJobUDP::QRPCRequestJobUDP(QObject *parent):QRPCRequestJobProtocol(parent)
+RequestJobUDP::RequestJobUDP(QObject *parent):RequestJobProtocol(parent)
 {
 }
 
-QRPCRequestJobUDP::~QRPCRequestJobUDP(){
+RequestJobUDP::~RequestJobUDP(){
 }
 
-bool QRPCRequestJobUDP::call(QRPCRequestJobResponse *response)
+bool RequestJobUDP::call(RequestJobResponse *response)
 {
     this->response=response;
     if(m_socket!=nullptr)
         delete m_socket;
     m_socket = new QUdpSocket();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QUdpSocket::errorOccurred), this, &QRPCRequestJobUDP::onReplyError);
+    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QUdpSocket::errorOccurred), this, &RequestJobUDP::onReplyError);
 #else
-    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QUdpSocket::error), this, &QRPCRequestJobUDP::onReplyError);
+    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QUdpSocket::error), this, &RequestJobUDP::onReplyError);
 #endif
-    QObject::connect(m_socket, &QUdpSocket::connected, this, &QRPCRequestJobUDP::onConnected);
-    QObject::connect(m_socket, &QUdpSocket::disconnected, this, &QRPCRequestJobUDP::onClosed);
-    QObject::connect(m_socket, &QUdpSocket::readChannelFinished, this, &QRPCRequestJobUDP::onFinish);
+    QObject::connect(m_socket, &QUdpSocket::connected, this, &RequestJobUDP::onConnected);
+    QObject::connect(m_socket, &QUdpSocket::disconnected, this, &RequestJobUDP::onClosed);
+    QObject::connect(m_socket, &QUdpSocket::readChannelFinished, this, &RequestJobUDP::onFinish);
     QUrl url(this->response->request_url.toUrl());
     const QString hostName=url.host(QUrl::FullyDecoded);
     const int port=url.port();
@@ -30,7 +30,7 @@ bool QRPCRequestJobUDP::call(QRPCRequestJobResponse *response)
     return true;
 }
 
-void QRPCRequestJobUDP::onConnected()
+void RequestJobUDP::onConnected()
 {
     this->buffer.clear();
     if(!m_socket->waitForConnected(response->activityLimit)){
@@ -38,7 +38,7 @@ void QRPCRequestJobUDP::onConnected()
         response->response_status_code=501;
     }
     else{
-        QRPCListenRequest request(response->request_body);
+        ListenRequest request(response->request_body);
         auto body=request.toJson();
         m_socket->write(body);
         m_socket->flush();
@@ -59,12 +59,12 @@ void QRPCRequestJobUDP::onConnected()
     this->onFinish();
 }
 
-void QRPCRequestJobUDP::onClosed()
+void RequestJobUDP::onClosed()
 {
     //emit this->callback(QVariant());
 }
 
-void QRPCRequestJobUDP::onReplyError(QAbstractSocket::SocketError e)
+void RequestJobUDP::onReplyError(QAbstractSocket::SocketError e)
 {
     Q_UNUSED(e)
     if(e!=QAbstractSocket::SocketError::RemoteHostClosedError){
@@ -74,9 +74,9 @@ void QRPCRequestJobUDP::onReplyError(QAbstractSocket::SocketError e)
     }
 }
 
-void QRPCRequestJobUDP::onFinish()
+void RequestJobUDP::onFinish()
 {
-    QRPCListenRequest request(this->buffer);
+    ListenRequest request(this->buffer);
     if(!request.isValid()){
         response->response_qt_status_code=QNetworkReply::InternalServerError;
         response->response_status_code=404;

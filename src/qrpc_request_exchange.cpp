@@ -3,43 +3,43 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCRequestExchangePvt*>(this->p)
+    auto&p =*reinterpret_cast<RequestExchangePvt*>(this->p)
 
-class QRPCRequestExchangePvt{
+class RequestExchangePvt{
 public:
-    QRPCRequestExchange*parent=nullptr;
-    QRPCRequestExchangeSetting call;
-    QRPCRequestExchangeSetting back;
+    RequestExchange*parent=nullptr;
+    RequestExchangeSetting call;
+    RequestExchangeSetting back;
 
-    explicit QRPCRequestExchangePvt(QRPCRequestExchange*parent):call(parent), back(parent)
+    explicit RequestExchangePvt(RequestExchange*parent):call(parent), back(parent)
     {
         this->parent=parent;
     }
 
-    virtual ~QRPCRequestExchangePvt()
+    virtual ~RequestExchangePvt()
     {
     }
 };
 
-QRPCRequestExchange::QRPCRequestExchange(QObject *parent):QObject(parent)
+RequestExchange::RequestExchange(QObject *parent):QObject(parent)
 {
-    this->p = new QRPCRequestExchangePvt(this);
+    this->p = new RequestExchangePvt(this);
 }
 
-QRPCRequestExchange::QRPCRequestExchange(QRPCRequestExchange &exchange, QObject *parent):QObject(parent)
+RequestExchange::RequestExchange(RequestExchange &exchange, QObject *parent):QObject(parent)
 {
-    this->p = new QRPCRequestExchangePvt(this);
+    this->p = new RequestExchangePvt(this);
     dPvt();
     p.call=exchange.call();
     p.back=exchange.back();
 }
 
-QRPCRequestExchange::~QRPCRequestExchange()
+RequestExchange::~RequestExchange()
 {
     dPvt();delete&p;
 }
 
-QRPCRequestExchange&QRPCRequestExchange::operator =(QRPCRequestExchange &e)
+RequestExchange&RequestExchange::operator =(RequestExchange &e)
 {
     dPvt();
     p.call=e.call();
@@ -47,7 +47,7 @@ QRPCRequestExchange&QRPCRequestExchange::operator =(QRPCRequestExchange &e)
     return*this;
 }
 
-QRPCRequestExchange &QRPCRequestExchange::clear()
+RequestExchange &RequestExchange::clear()
 {
     dPvt();
     p.call.clear();
@@ -55,38 +55,38 @@ QRPCRequestExchange &QRPCRequestExchange::clear()
     return*this;
 }
 
-QRPCRequestExchangeSetting &QRPCRequestExchange::call()
+RequestExchangeSetting &RequestExchange::call()
 {
     dPvt();
     return p.call;
 }
 
-QRPCRequestExchangeSetting &QRPCRequestExchange::back()
+RequestExchangeSetting &RequestExchange::back()
 {
     dPvt();
     return p.back;
 }
 
-QVariantMap QRPCRequestExchange::toMap() const
+QVariantMap RequestExchange::toMap() const
 {
     dPvt();
     return QVariantMap{{qsl("call"),p.call.toHash()}, {qsl("back"),p.back.toHash()}};
 }
 
-QVariantHash QRPCRequestExchange::toHash() const
+QVariantHash RequestExchange::toHash() const
 {
     dPvt();
     return QVariantHash{{qsl("call"),p.call.toHash()}, {qsl("back"),p.back.toHash()}};
 }
 
-QRPCRequestExchange &QRPCRequestExchange::print(const QString &output)
+RequestExchange &RequestExchange::print(const QString &output)
 {
     for(auto&v:this->printOut(output))
         sInfo()<<v;
     return*this;
 }
 
-QStringList QRPCRequestExchange::printOut(const QString &output)
+QStringList RequestExchange::printOut(const QString &output)
 {
     dPvt();
     QStringList out;
@@ -106,37 +106,37 @@ QStringList QRPCRequestExchange::printOut(const QString &output)
     return out;
 }
 
-void QRPCRequestExchange::setProtocol(const QVariant &value)
+void RequestExchange::setProtocol(const QVariant &value)
 {
     this->call().setProtocol(value);
 }
 
-void QRPCRequestExchange::setProtocol(const QRPCProtocol &value)
+void RequestExchange::setProtocol(const QRPCProtocol &value)
 {
     this->call().setProtocol(value);
 }
 
-void QRPCRequestExchange::setMethod(const QString &value)
+void RequestExchange::setMethod(const QString &value)
 {
     return this->call().setMethod(value);
 }
 
-void QRPCRequestExchange::setMethod(const QRPCRequestMethod &value)
+void RequestExchange::setMethod(const RequestMethod &value)
 {
     this->call().setMethod(value);
 }
 
-void QRPCRequestExchange::setHostName(const QString &value)
+void RequestExchange::setHostName(const QString &value)
 {
     this->call().setHostName(value);
 }
 
-void QRPCRequestExchange::setRoute(const QVariant &value)
+void RequestExchange::setRoute(const QVariant &value)
 {
     this->call().setRoute(value);
 }
 
-void QRPCRequestExchange::setPort(const int &value)
+void RequestExchange::setPort(const int &value)
 {
     this->call().setPort(value);
 }

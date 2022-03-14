@@ -2,12 +2,12 @@
 
 namespace QRpc {
 
-QRPCRequestJobHttp::QRPCRequestJobHttp(QObject *parent):QRPCRequestJobProtocol(parent)
+RequestJobHttp::RequestJobHttp(QObject *parent):RequestJobProtocol(parent)
 {
     this->tempLocation=qsl("%1/%2.%3.tmp").arg(QStandardPaths::writableLocation(QStandardPaths::TempLocation), qAppName().replace(qsl_space, qsl_underline),qsl("%1"));
 }
 
-QRPCRequestJobHttp::~QRPCRequestJobHttp()
+RequestJobHttp::~RequestJobHttp()
 {
     this->fileFree();
 
@@ -15,7 +15,7 @@ QRPCRequestJobHttp::~QRPCRequestJobHttp()
         this->nam->deleteLater();
 }
 
-void QRPCRequestJobHttp::fileMake()
+void RequestJobHttp::fileMake()
 {
     this->fileFree();
     static int fileTempNumber=0;
@@ -24,7 +24,7 @@ void QRPCRequestJobHttp::fileMake()
     this->fileTemp.setFileName(fileTemp);
 }
 
-void QRPCRequestJobHttp::fileFree()
+void RequestJobHttp::fileFree()
 {
     if(this->fileTemp.isOpen())
         this->fileTemp.close();
@@ -33,7 +33,7 @@ void QRPCRequestJobHttp::fileFree()
         this->fileTemp.remove();
 }
 
-bool QRPCRequestJobHttp::call(QRPCRequestJobResponse *response)
+bool RequestJobHttp::call(RequestJobResponse *response)
 {
     static const QStringList removeHeaders={{qsl("host")},{qsl("content-length")}};
     static const QStringList ignoreHeaders={{ContentDispositionName}, {ContentTypeName}, {QString(ContentDispositionName).toLower()}, {QString(ContentTypeName).toLower()}};
@@ -129,7 +129,7 @@ bool QRPCRequestJobHttp::call(QRPCRequestJobResponse *response)
     };
 
     switch (action) {
-    case QRPCRequest::acUpload:
+    case Request::acUpload:
     {
         if(this->fileUpload.isOpen())
             this->fileUpload.close();
@@ -162,11 +162,11 @@ bool QRPCRequestJobHttp::call(QRPCRequestJobResponse *response)
             multiPart->append(httpPart);
             this->reply=nam->post(this->request, multiPart);
             multiPart->setParent(reply);
-            QObject::connect(this->reply, &QNetworkReply::uploadProgress , this, &QRPCRequestJobHttp::onReplyProgressUpload);
+            QObject::connect(this->reply, &QNetworkReply::uploadProgress , this, &RequestJobHttp::onReplyProgressUpload);
         }
         break;
     }
-    case QRPCRequest::acDownload:
+    case Request::acDownload:
     {
         configureHeadersIgnored();
         this->fileMake();
@@ -187,7 +187,7 @@ bool QRPCRequestJobHttp::call(QRPCRequestJobResponse *response)
         }
         else{
             this->reply=nam->get(this->request);
-            QObject::connect(this->reply, &QNetworkReply::downloadProgress , this, &QRPCRequestJobHttp::onReplyProgressDownload);
+            QObject::connect(this->reply, &QNetworkReply::downloadProgress , this, &RequestJobHttp::onReplyProgressDownload);
         }
         break;
     }
@@ -243,41 +243,41 @@ bool QRPCRequestJobHttp::call(QRPCRequestJobResponse *response)
     response->response_qt_status_code=QNetworkReply::NoError;
     response->response_status_code=0;
 
-    QObject::connect(this->reply, &QNetworkReply::destroyed, this, &QRPCRequestJobHttp::onReplyDelete);
-    QObject::connect(this->reply, &QNetworkReply::finished, this, &QRPCRequestJobHttp::onReplyFinish);
+    QObject::connect(this->reply, &QNetworkReply::destroyed, this, &RequestJobHttp::onReplyDelete);
+    QObject::connect(this->reply, &QNetworkReply::finished, this, &RequestJobHttp::onReplyFinish);
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    QObject::connect(this->reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred), this, &QRPCRequestJobHttp::onReplyError);
+    QObject::connect(this->reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred), this, &RequestJobHttp::onReplyError);
 #else
-    QObject::connect(this->reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), this, &QRPCRequestJobHttp::onReplyError);
+    QObject::connect(this->reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), this, &RequestJobHttp::onReplyError);
 #endif
     this->reply->ignoreSslErrors();
 
     return true;
 }
 
-void QRPCRequestJobHttp::timeout_start()
+void RequestJobHttp::timeout_start()
 {
     if(response->activityLimit<=0)
         return;
 
     this->__timeout=new QTimer(nullptr);
     this->__timeout->setInterval(response->activityLimit);
-    QObject::connect(this->__timeout, &QTimer::timeout, this, &QRPCRequestJobHttp::onReplyTimeout);
+    QObject::connect(this->__timeout, &QTimer::timeout, this, &RequestJobHttp::onReplyTimeout);
     this->__timeout->start();
 }
 
-void QRPCRequestJobHttp::timeout_stop()
+void RequestJobHttp::timeout_stop()
 {
     auto timer=this->__timeout;
     this->__timeout=nullptr;
     if(timer!=nullptr){
         timer->stop();
-        QObject::disconnect(timer, &QTimer::timeout, this, &QRPCRequestJobHttp::onReplyTimeout);
+        QObject::disconnect(timer, &QTimer::timeout, this, &RequestJobHttp::onReplyTimeout);
         timer->deleteLater();
     }
 }
 
-void QRPCRequestJobHttp::onReplyError(QNetworkReply::NetworkError e)
+void RequestJobHttp::onReplyError(QNetworkReply::NetworkError e)
 {
     if(response->response_qt_status_code==QNetworkReply::NoError)
         response->response_qt_status_code=e;
@@ -285,7 +285,7 @@ void QRPCRequestJobHttp::onReplyError(QNetworkReply::NetworkError e)
     this->onFinish();
 }
 
-void QRPCRequestJobHttp::onReplyFinish()
+void RequestJobHttp::onReplyFinish()
 {
     if(this->reply==nullptr)
         return;
@@ -300,7 +300,7 @@ void QRPCRequestJobHttp::onReplyFinish()
 
 }
 
-void QRPCRequestJobHttp::onReplyTimeout()
+void RequestJobHttp::onReplyTimeout()
 {
     {
         QMutexLOCKER locker(&mutexRequestFinished);
@@ -318,18 +318,18 @@ void QRPCRequestJobHttp::onReplyTimeout()
     emit this->callback(QVariant());
 }
 
-void QRPCRequestJobHttp::onReplyDelete()
+void RequestJobHttp::onReplyDelete()
 {
     this->reply=nullptr;
 }
 
-void QRPCRequestJobHttp::onReplyProgressUpload(qint64 bytesSent, qint64 bytesTotal)
+void RequestJobHttp::onReplyProgressUpload(qint64 bytesSent, qint64 bytesTotal)
 {
     Q_UNUSED(bytesSent)
     Q_UNUSED(bytesTotal)
 }
 
-void QRPCRequestJobHttp::onReplyProgressDownload(qint64 bytesReceived, qint64 bytesTotal)
+void RequestJobHttp::onReplyProgressDownload(qint64 bytesReceived, qint64 bytesTotal)
 {
     Q_UNUSED(bytesReceived)
     Q_UNUSED(bytesTotal)
@@ -345,7 +345,7 @@ void QRPCRequestJobHttp::onReplyProgressDownload(qint64 bytesReceived, qint64 by
     this->fileTemp.flush();
 }
 
-void QRPCRequestJobHttp::onFinish()
+void RequestJobHttp::onFinish()
 {
     this->timeout_stop();
 

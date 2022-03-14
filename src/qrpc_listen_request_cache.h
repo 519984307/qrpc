@@ -5,25 +5,25 @@
 
 namespace QRpc {
 
-class QRPCListen;
-class QRPCListenRequest;
+class Listen;
+class ListenRequest;
 //!
-//! \brief The QRPCListenRequestCache class
+//! \brief The ListenRequestCache class
 //!
-class Q_RPC_EXPORT QRPCListenRequestCache:public QObject{
+class Q_RPC_EXPORT ListenRequestCache:public QObject{
     Q_OBJECT
 public:
 
     //!
-    //! \brief QRPCListenRequestCache
+    //! \brief ListenRequestCache
     //! \param parent
     //!
-    explicit QRPCListenRequestCache(QRPCListen*parent=nullptr);
+    explicit ListenRequestCache(Listen*parent=nullptr);
 
     //!
-    //! \brief ~QRPCListenRequestCache
+    //! \brief ~ListenRequestCache
     //!
-    ~QRPCListenRequestCache();
+    ~ListenRequestCache();
 
     //!
     //! \brief clear
@@ -35,20 +35,20 @@ public:
     //! \param uuid
     //! \return
     //!
-    QRPCListenRequest&toRequest(const QUuid &uuid);
+    ListenRequest&toRequest(const QUuid &uuid);
 
     //!
     //! \brief createRequest
     //! \return
     //!
-    QRPCListenRequest&createRequest();
+    ListenRequest&createRequest();
 
     //!
     //! \brief createRequest
     //! \param vRequest
     //! \return
     //!
-    QRPCListenRequest&createRequest(const QVariant&vRequest);
+    ListenRequest&createRequest(const QVariant&vRequest);
 
 private:
     void*p=nullptr;

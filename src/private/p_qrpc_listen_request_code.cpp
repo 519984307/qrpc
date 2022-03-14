@@ -202,19 +202,19 @@ static QMap<QNetworkReply::NetworkError, QString>&makeStaticError(){
 
 const static auto&staticErrors=makeStaticError();
 
-QRPCListenRequestCode::QRPCListenRequestCode(QObject *parent) : QObject(parent)
+ListenRequestCode::ListenRequestCode(QObject *parent) : QObject(parent)
 {
     if(parent==nullptr){
         qFatal("invalid object");
     }
 }
 
-QRPCListenRequestCode::~QRPCListenRequestCode()
+ListenRequestCode::~ListenRequestCode()
 {
 
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::operator=(const QVariant &v)
+ListenRequestCode &ListenRequestCode::operator=(const QVariant &v)
 {
     QVariant code;
     QVariant phrase;
@@ -237,54 +237,54 @@ QRPCListenRequestCode &QRPCListenRequestCode::operator=(const QVariant &v)
     return*this;
 }
 
-QVariant QRPCListenRequestCode::emptyData()
+QVariant ListenRequestCode::emptyData()
 {
     return {};
 }
 
-bool QRPCListenRequestCode::isOK()
+bool ListenRequestCode::isOK()
 {
     auto code=this->code(ssOK);
     return code==ssOK;
 }
 
-int QRPCListenRequestCode::code()
+int ListenRequestCode::code()
 {
     auto parent=this->parent();
-    auto request=(parent==nullptr)?nullptr:dynamic_cast<QRPCListenRequest*>(parent);
+    auto request=(parent==nullptr)?nullptr:dynamic_cast<ListenRequest*>(parent);
     if(request==nullptr)
         qFatal("invalid object");
     return request->responseCode();
 }
 
-int QRPCListenRequestCode::code(const QVariant&code)
+int ListenRequestCode::code(const QVariant&code)
 {
     auto parent=this->parent();
-    auto request=(parent==nullptr)?nullptr:dynamic_cast<QRPCListenRequest*>(parent);
+    auto request=(parent==nullptr)?nullptr:dynamic_cast<ListenRequest*>(parent);
     if(request==nullptr)
         qFatal("invalid object");
     return request->responseCode(code.toInt());
 }
 
-QString QRPCListenRequestCode::reasonPhrase()
+QString ListenRequestCode::reasonPhrase()
 {
     return stateCodes.value(this->code());
 }
 
-const QString QRPCListenRequestCode::reasonPhrase(const int stateCode)
+const QString ListenRequestCode::reasonPhrase(const int stateCode)
 {
     return stateCodes.value(stateCode);
 }
 
-const QString QRPCListenRequestCode::qt_network_error_phrase(const QNetworkReply::NetworkError networkError)
+const QString ListenRequestCode::qt_network_error_phrase(const QNetworkReply::NetworkError networkError)
 {
     return staticErrors.value(networkError);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setCode(QVariant code, const QString&phrase)
+ListenRequestCode &ListenRequestCode::setCode(QVariant code, const QString&phrase)
 {
     auto parent=this->parent();
-    auto request=(parent==nullptr)?nullptr:dynamic_cast<QRPCListenRequest*>(parent);
+    auto request=(parent==nullptr)?nullptr:dynamic_cast<ListenRequest*>(parent);
     if(request==nullptr)
         qFatal("invalid object");
     request->setResponseCode(code.toInt());
@@ -292,207 +292,207 @@ QRPCListenRequestCode &QRPCListenRequestCode::setCode(QVariant code, const QStri
     return*this;
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setContinue(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setContinue(const QString&phrase)
 {
     return this->setCode(ssContinue, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setSwitchingProtocols(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setSwitchingProtocols(const QString&phrase)
 {
     return this->setCode(ssSwitchingProtocols, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setOK(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setOK(const QString&phrase)
 {
     return this->setCode(ssOK, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setCreated(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setCreated(const QString&phrase)
 {
     return this->setCode(ssCreated, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setAccepted(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setAccepted(const QString&phrase)
 {
     return this->setCode(ssAccepted, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setNonAuthoritativeInformation(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNonAuthoritativeInformation(const QString&phrase)
 {
     return this->setCode(ssNonAuthoritativeInformation, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setNoContent(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNoContent(const QString&phrase)
 {
     return this->setCode(ssNoContent, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setResetContent(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setResetContent(const QString&phrase)
 {
     return this->setCode(ssResetContent, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setPartialContent(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPartialContent(const QString&phrase)
 {
     return this->setCode(ssPartialContent, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setMultipleChoices(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setMultipleChoices(const QString&phrase)
 {
     return this->setCode(ssMultipleChoices, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setMovedPermanently(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setMovedPermanently(const QString&phrase)
 {
     return this->setCode(ssMovedPermanently, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setFound(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setFound(const QString&phrase)
 {
     return this->setCode(ssFound, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setSeeOther(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setSeeOther(const QString&phrase)
 {
     return this->setCode(ssSeeOther, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setNotModified(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotModified(const QString&phrase)
 {
     return this->setCode(ssNotModified, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setUseProxy(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUseProxy(const QString&phrase)
 {
     return this->setCode(ssUseProxy, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setTemporaryRedirect(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setTemporaryRedirect(const QString&phrase)
 {
     return this->setCode(ssTemporaryRedirect, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setBadRequest(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setBadRequest(const QString&phrase)
 {
     return this->setCode(ssBadRequest, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setUnauthorized(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUnauthorized(const QString&phrase)
 {
     return this->setCode(ssUnauthorized, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setPaymentRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPaymentRequired(const QString&phrase)
 {
     return this->setCode(ssPaymentRequired, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setForbidden(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setForbidden(const QString&phrase)
 {
     return this->setCode(ssPaymentRequired, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setNotFound(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotFound(const QString&phrase)
 {
     return this->setCode(ssNotFound, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setMethodNotAllowed(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setMethodNotAllowed(const QString&phrase)
 {
     return this->setCode(ssMethodNotAllowed, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setNotAcceptable(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotAcceptable(const QString&phrase)
 {
     return this->setCode(ssNotAcceptable, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setProxyAuthenticationRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setProxyAuthenticationRequired(const QString&phrase)
 {
     return this->setCode(ssProxyAuthenticationRequired, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setRequestTimeout(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setRequestTimeout(const QString&phrase)
 {
     return this->setCode(ssRequestTimeout, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setConflict(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setConflict(const QString&phrase)
 {
     return this->setCode(ssConflict, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setGone(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setGone(const QString&phrase)
 {
     return this->setCode(ssGone, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setLengthRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setLengthRequired(const QString&phrase)
 {
     return this->setCode(ssLengthRequired, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setPreconditionFailed(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPreconditionFailed(const QString&phrase)
 {
     return this->setCode(ssPreconditionFailed, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setPayloadTooLarge(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPayloadTooLarge(const QString&phrase)
 {
     return this->setCode(ssPayloadTooLarge, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setURITooLong(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setURITooLong(const QString&phrase)
 {
     return this->setCode(ssURITooLong, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setUnsupportedMediaType(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUnsupportedMediaType(const QString&phrase)
 {
     return this->setCode(ssURITooLong, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setRangeNotSatisfiable(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setRangeNotSatisfiable(const QString&phrase)
 {
     return this->setCode(ssRangeNotSatisfiable, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setExpectationFailed(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setExpectationFailed(const QString&phrase)
 {
     return this->setCode(ssRangeNotSatisfiable, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setUpgradeRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUpgradeRequired(const QString&phrase)
 {
     return this->setCode(ssUpgradeRequired, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setInternalServerError(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setInternalServerError(const QString&phrase)
 {
     return this->setCode(ssInternalServerError, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setNotImplemented(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotImplemented(const QString&phrase)
 {
     return this->setCode(ssNotImplemented, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setBadGateway(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setBadGateway(const QString&phrase)
 {
     return this->setCode(ssBadGateway, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setServiceUnavailable(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setServiceUnavailable(const QString&phrase)
 {
     return this->setCode(ssServiceUnavailable, phrase);
 }
 
-QRPCListenRequestCode &QRPCListenRequestCode::setGatewayTimeout(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setGatewayTimeout(const QString&phrase)
 {
     return this->setCode(ssGatewayTimeout, phrase);
 }
 
-QRPCListenRequestCode&QRPCListenRequestCode::setHTTPVersionNotSupported(const QString&phrase)
+ListenRequestCode&ListenRequestCode::setHTTPVersionNotSupported(const QString&phrase)
 {
     return this->setCode(ssHTTPVersionNotSupported, phrase);
 }

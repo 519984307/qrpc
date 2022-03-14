@@ -2,11 +2,11 @@
 
 namespace QRpc {
 
-QRPCRequestJobResponse::QRPCRequestJobResponse(QObject *parent):QObject(parent)
+RequestJobResponse::RequestJobResponse(QObject *parent):QObject(parent)
 {
 }
 
-QRPCRequestJobResponse::QRPCRequestJobResponse(const QVariantHash &request_header, const QVariant &vUrl, QRPCRequest &request, QObject *parent):QObject(parent)
+RequestJobResponse::RequestJobResponse(const QVariantHash &request_header, const QVariant &vUrl, Request &request, QObject *parent):QObject(parent)
 {
     this->request_url = vUrl;
     this->request_header = request_header;
@@ -16,11 +16,11 @@ QRPCRequestJobResponse::QRPCRequestJobResponse(const QVariantHash &request_heade
     this->request_exchange = request.exchange();
 }
 
-QRPCRequestJobResponse::~QRPCRequestJobResponse()
+RequestJobResponse::~RequestJobResponse()
 {
 }
 
-QRPCRequestJobResponse &QRPCRequestJobResponse::operator =(QRPCRequestJobResponse &e)
+RequestJobResponse &RequestJobResponse::operator =(RequestJobResponse &e)
 {
     this->request_exchange=e.request_exchange;
     this->qrpcRequest=e.qrpcRequest;
@@ -37,7 +37,7 @@ QRPCRequestJobResponse &QRPCRequestJobResponse::operator =(QRPCRequestJobRespons
     return*this;
 }
 
-void QRPCRequestJobResponse::clear()
+void RequestJobResponse::clear()
 {
     this->request_exchange.clear();
     this->qrpcRequest=nullptr;
@@ -56,13 +56,13 @@ void QRPCRequestJobResponse::clear()
     this->responseHeader.clear();
 }
 
-QVariantHash QRPCRequestJobResponse::toMapResquest()
+QVariantHash RequestJobResponse::toMapResquest()
 {
     auto method=this->request_exchange.call().method();
     return Util::toMapResquest(method,request_url,request_body,request_parameters,response_body,request_header,request_start,request_finish);
 }
 
-QVariantHash QRPCRequestJobResponse::toMapResponse()
+QVariantHash RequestJobResponse::toMapResponse()
 {
     QVariantHash map;
     Q_DECLARE_VU;
@@ -75,7 +75,7 @@ QVariantHash QRPCRequestJobResponse::toMapResponse()
     return map;
 }
 
-QVariantHash QRPCRequestJobResponse::toVariant()
+QVariantHash RequestJobResponse::toVariant()
 {
     auto rpclog = QVariantList{qvh{{qsl("resquest"), this->toMapResquest()}},qvh{ {qsl("response"), this->toMapResponse()}}};
     ///*{"openapi", this->toMapOpenAPI()}*,/

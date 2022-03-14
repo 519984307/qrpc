@@ -28,9 +28,9 @@ public:
      * @brief listen
      * @return
      */
-    QRPCListenWebSocket&listen()
+    ListenWebSocket&listen()
     {
-        auto _listen=dynamic_cast<QRPCListenWebSocket*>(this->parent());
+        auto _listen=dynamic_cast<ListenWebSocket*>(this->parent());
         return*_listen;
     }
 
@@ -125,7 +125,7 @@ public:
         return true;
     };
 
-    void onRpcFinish(QRPCListenRequest&request)
+    void onRpcFinish(ListenRequest&request)
     {
         if(request.isValid())
             return;
@@ -139,7 +139,7 @@ public:
         emit request.finish();
     }
 
-    void onRpcRequest(QRPCListenRequest&request)
+    void onRpcRequest(ListenRequest&request)
     {
         if(!request.isValid()){
             request.co().setBadRequest();
@@ -214,18 +214,18 @@ public slots:
 
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenWebSocketPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenWebSocketPvt*>(this->p)
 
-class QRPCListenWebSocketPvt:public QObject{
+class ListenWebSocketPvt:public QObject{
 public:
     WebSocketServer*_listenServer=nullptr;
 
-    explicit QRPCListenWebSocketPvt(QRPCListenWebSocket*parent):QObject(parent)
+    explicit ListenWebSocketPvt(ListenWebSocket*parent):QObject(parent)
     {
         this->_listenServer = new WebSocketServer(parent);
     }
 
-    virtual ~QRPCListenWebSocketPvt()
+    virtual ~ListenWebSocketPvt()
     {
         this->_listenServer->stop();
         delete this->_listenServer;
@@ -233,29 +233,29 @@ public:
     }
 };
 
-QRPCListenWebSocket::QRPCListenWebSocket(QObject *parent):QRPCListen(parent)
+ListenWebSocket::ListenWebSocket(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenWebSocketPvt(this);
+    this->p = new ListenWebSocketPvt(this);
 }
 
-QRPCListenWebSocket::~QRPCListenWebSocket()
+ListenWebSocket::~ListenWebSocket()
 {
     dPvt();
     p._listenServer->stop();
     delete&p;
 }
 
-bool QRPCListenWebSocket::start()
+bool ListenWebSocket::start()
 {
     dPvt();
     this->stop();
-    QRPCListen::start();
+    Listen::start();
     p._listenServer = new WebSocketServer(this);
-    connect(this, &QRPCListen::rpcResponse, p._listenServer, &WebSocketServer::onRpcResponse);
+    connect(this, &Listen::rpcResponse, p._listenServer, &WebSocketServer::onRpcResponse);
     return p._listenServer->start();
 }
 
-bool QRPCListenWebSocket::stop()
+bool ListenWebSocket::stop()
 {
     dPvt();
     return p._listenServer->stop();

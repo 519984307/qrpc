@@ -21,33 +21,33 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenColletionsPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenColletionsPvt*>(this->p)
 
-class QRPCListenColletionsPvt:public QObject{
+class ListenColletionsPvt:public QObject{
 public:
     QMutex lockMake;
     QMutex lockWaitRun;
     QMutex lockWaitQuit;
     QMutex lockRunning;
-    QHash<int,QRPCListen*> listensActive;
-    QRPCListenProtocols listenProtocol;
-    QRPCServer*server=nullptr;
+    QHash<int,Listen*> listensActive;
+    ListenProtocols listenProtocol;
+    Server*server=nullptr;
     QVariantHash settings;
 
-    QRPCListenColletions *collections()
+    ListenColletions *collections()
     {
-        auto collections=dynamic_cast<QRPCListenColletions*>(this->parent());
+        auto collections=dynamic_cast<ListenColletions*>(this->parent());
         return collections;
     }
 
-    explicit QRPCListenColletionsPvt(QRPCServer*server, const QVariantHash&settings, QRPCListenColletions*parent):QObject(parent)
+    explicit ListenColletionsPvt(Server*server, const QVariantHash&settings, ListenColletions*parent):QObject(parent)
     {
         this->server=server;
         this->settings=settings;
         this->makeListens();
     }
 
-    ~QRPCListenColletionsPvt()
+    ~ListenColletionsPvt()
     {
     }
 
@@ -74,20 +74,20 @@ public:
 
     void makeListens()
     {
-        auto vList=QRPCListen::interfaceCollection();
+        auto vList=Listen::interfaceCollection();
         for(auto&item:vList){
             this->makeOption(item.first, *item.second);
         }
-//        this->makeOption(0, QRPCListenQRPC::staticMetaObject);
-//        this->makeOption(QRPCProtocol::TcpSocket, QRPCListenTCP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::UdpSocket, QRPCListenUDP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::WebSocket, QRPCListenWebSocket::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Mqtt, QRPCListenBrokerMQTT::staticMetaObject);
-//        //this->makeOption(QRPCProtocol::DataBase, QRPCListenBrokerDataBase::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Amqp, QRPCListenBrokerAMQP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Kafka, QRPCListenBrokerKAFKA::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Http, QRPCListenHTTP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Https, QRPCListenHTTP::staticMetaObject);
+//        this->makeOption(0, ListenQRPC::staticMetaObject);
+//        this->makeOption(QRPCProtocol::TcpSocket, ListenTCP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::UdpSocket, ListenUDP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::WebSocket, ListenWebSocket::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Mqtt, ListenBrokerMQTT::staticMetaObject);
+//        //this->makeOption(QRPCProtocol::DataBase, ListenBrokerDataBase::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Amqp, ListenBrokerAMQP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Kafka, ListenBrokerKAFKA::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Http, ListenHTTP::staticMetaObject);
+//        this->makeOption(QRPCProtocol::Https, ListenHTTP::staticMetaObject);
         this->loadSettings();
     }
 
@@ -97,7 +97,7 @@ public:
         if(this->listenProtocol.contains(protocol))
             return true;
 
-        auto option = new QRPCListenProtocol(protocol, metaObject, this->parent());
+        auto option = new ListenProtocol(protocol, metaObject, this->parent());
         option->setObjectName(qsl("set_%1").arg(QString::fromUtf8(option->protocolName())));
         this->listenProtocol.insert(option->protocol(), option);
         return true;
@@ -169,28 +169,28 @@ public:
 
 };
 
-QRPCListenColletions::QRPCListenColletions(QRPCServer *server):QThread(nullptr)
+ListenColletions::ListenColletions(Server *server):QThread(nullptr)
 {
-    this->p = new QRPCListenColletionsPvt(server, QVariantHash(),this);
+    this->p = new ListenColletionsPvt(server, QVariantHash(),this);
 }
 
-QRPCListenColletions::QRPCListenColletions(const QVariantHash&settings, QRPCServer *server)
+ListenColletions::ListenColletions(const QVariantHash&settings, Server *server)
 {
-    this->p = new QRPCListenColletionsPvt(server, settings, this);
+    this->p = new ListenColletionsPvt(server, settings, this);
 }
 
-QRPCListenColletions::~QRPCListenColletions()
+ListenColletions::~ListenColletions()
 {
     dPvt();
     delete&p;
 }
 
-QRPCListenProtocol &QRPCListenColletions::protocol()
+ListenProtocol &ListenColletions::protocol()
 {
     return this->protocol(QRPCProtocol::Http);
 }
 
-QRPCListenProtocol &QRPCListenColletions::protocol(const QRPCProtocol &protocol)
+ListenProtocol &ListenColletions::protocol(const QRPCProtocol &protocol)
 {
     if((protocol>=rpcProtocolMin) && (protocol<=rpcProtocolMax)){
         dPvt();
@@ -205,17 +205,17 @@ QRPCListenProtocol &QRPCListenColletions::protocol(const QRPCProtocol &protocol)
         if(___return!=nullptr)
             return*___return;
     }
-    static QRPCListenProtocol __protocol;
+    static ListenProtocol __protocol;
     return __protocol;
 }
 
-QRPCListenProtocols &QRPCListenColletions::protocols()
+ListenProtocols &ListenColletions::protocols()
 {
     dPvt();
     return p.listenProtocol;
 }
 
-void QRPCListenColletions::run()
+void ListenColletions::run()
 {
     dPvt();
     p.listenStart();
@@ -225,45 +225,45 @@ void QRPCListenColletions::run()
     p.lockWaitQuit.unlock();
 }
 
-void QRPCListenColletions::requestEnabled()
+void ListenColletions::requestEnabled()
 {
     //criar mutex de controle nos listens
 }
 
-void QRPCListenColletions::requestDisable()
+void ListenColletions::requestDisable()
 {
     //criar mutex de controle nos listens
 }
 
-QRPCServer *QRPCListenColletions::server()
+Server *ListenColletions::server()
 {
     dPvt();
     return p.server;
 }
 
-void QRPCListenColletions::setSettings(const QVariantHash &settings)const
+void ListenColletions::setSettings(const QVariantHash &settings)const
 {
     dPvt();
     return p.setSettings(settings);
 }
 
-QRPCListenQRPC *QRPCListenColletions::listenPool()
+ListenQRPC *ListenColletions::listenPool()
 {
     dPvt();
-    QHashIterator<int, QRPCListen*> i(p.listensActive);
+    QHashIterator<int, Listen*> i(p.listensActive);
     while (i.hasNext()) {
         i.next();
         if(i.value()==nullptr)
             continue;
 
-        auto listen = dynamic_cast<QRPCListenQRPC*>(i.value());
+        auto listen = dynamic_cast<ListenQRPC*>(i.value());
         if(listen!=nullptr)
             return listen;
     }
     return nullptr;
 }
 
-bool QRPCListenColletions::start()
+bool ListenColletions::start()
 {
     dPvt();
     bool __return=false;
@@ -276,12 +276,12 @@ bool QRPCListenColletions::start()
     return __return;
 }
 
-bool QRPCListenColletions::stop()
+bool ListenColletions::stop()
 {
     return this->quit();
 }
 
-bool QRPCListenColletions::quit()
+bool ListenColletions::quit()
 {
     dPvt();
     p.lockWaitQuit.lock();

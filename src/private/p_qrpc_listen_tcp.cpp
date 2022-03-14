@@ -25,9 +25,9 @@ public:
      * @brief listen
      * @return
      */
-    QRPCListen&listen()
+    Listen&listen()
     {
-        auto _listen=dynamic_cast<QRPCListen*>(this->parent());
+        auto _listen=dynamic_cast<Listen*>(this->parent());
         return*_listen;
     }
 
@@ -99,7 +99,7 @@ public:
 
 public slots:
 
-    void onRpcFinish(QRpc::QRPCListenRequest*request)
+    void onRpcFinish(QRpc::ListenRequest*request)
     {
         Q_UNUSED(request)
         if(request->isValid()){
@@ -124,7 +124,7 @@ public slots:
         }
     }
 
-    void onRpcRequest(QRpc::QRPCListenRequest*request)
+    void onRpcRequest(QRpc::ListenRequest*request)
     {
         Q_UNUSED(request)
         if(!request->isValid()){
@@ -145,7 +145,7 @@ public slots:
         connect(socket, &QTcpSocket::disconnected, this, &ServerTCPSocket::onClientDisconnected);
         while(socket->waitForReadyRead()){
             this->buffer.append(socket->readAll());
-            QRPCListenRequest request;
+            ListenRequest request;
             if(request.fromJson(this->buffer))
                 break;
         }
@@ -168,17 +168,17 @@ public slots:
 };
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenTCPPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenTCPPvt*>(this->p)
 
-class QRPCListenTCPPvt:public QObject{
+class ListenTCPPvt:public QObject{
 public:
     ServerTCPSocket*_listenServer=nullptr;
 
-    explicit QRPCListenTCPPvt(QRPCListenTCP*parent):QObject(parent)
+    explicit ListenTCPPvt(ListenTCP*parent):QObject(parent)
     {
         this->_listenServer = new ServerTCPSocket(parent);
     }
-    virtual ~QRPCListenTCPPvt()
+    virtual ~ListenTCPPvt()
     {
         this->_listenServer->stop();
         delete this->_listenServer;
@@ -186,26 +186,26 @@ public:
     }
 };
 
-QRPCListenTCP::QRPCListenTCP(QObject *parent):QRPCListen(parent)
+ListenTCP::ListenTCP(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenTCPPvt(this);
+    this->p = new ListenTCPPvt(this);
 }
 
-QRPCListenTCP::~QRPCListenTCP()
+ListenTCP::~ListenTCP()
 {
     dPvt();
     p._listenServer->stop();
     delete&p;
 }
 
-bool QRPCListenTCP::start()
+bool ListenTCP::start()
 {
     dPvt();
-    connect(this, &QRPCListen::rpcResponse, p._listenServer, &ServerTCPSocket::onRpcResponse);
+    connect(this, &Listen::rpcResponse, p._listenServer, &ServerTCPSocket::onRpcResponse);
     return p._listenServer->start();
 }
 
-bool QRPCListenTCP::stop()
+bool ListenTCP::stop()
 {
     dPvt();
     return p._listenServer->stop();

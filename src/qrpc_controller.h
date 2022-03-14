@@ -11,22 +11,22 @@
 
 namespace QRpc {
 
-typedef QMultiHash<QByteArray, QMetaMethod> QRPCControllerMethods;
+typedef QMultiHash<QByteArray, QMetaMethod> ControllerMethods;
 
-class QRPCListenRequest;
-class QRPCListenRequestParser;
-class QRPCServer;
+class ListenRequest;
+class ListenRequestParser;
+class Server;
 
 //!
-//! \brief The QRPCController class
+//! \brief The Controller class
 //!
-class Q_RPC_EXPORT QRPCController: public QObject, public NotationsExtended
+class Q_RPC_EXPORT Controller: public QObject, public NotationsExtended
 {
     Q_OBJECT
-    friend class QRPCServer;
-    friend class QRPCRequest;
-    friend class QRPCListenQRPC;
-    friend class QRPCListenQRPCSlotPvt;
+    friend class Server;
+    friend class Request;
+    friend class ListenQRPC;
+    friend class ListenQRPCSlotPvt;
 
     Q_PROPERTY(QVariant basePath READ basePath CONSTANT)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
@@ -35,15 +35,15 @@ class Q_RPC_EXPORT QRPCController: public QObject, public NotationsExtended
 
 public:
     //!
-    //! \brief QRPCController
+    //! \brief Controller
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCController(QObject *parent=nullptr);
+    Q_INVOKABLE explicit Controller(QObject *parent=nullptr);
 
     //!
-    //! \brief ~QRPCController
+    //! \brief ~Controller
     //!
-    ~QRPCController();
+    ~Controller();
 
     //!
     //! \brief basePath
@@ -62,7 +62,7 @@ public:
     //! \brief apiInitialize
     //! \return
     //!
-    virtual QRPCController &apiInitialize();
+    virtual Controller &apiInitialize();
 
     //!
     //! \brief apiInitialize
@@ -151,25 +151,26 @@ public:
     //! \param className
     //! \return
     //!
-    static QRPCControllerMethods routeMethods(const QByteArray &className);
+    static ControllerMethods routeMethods(const QByteArray &className);
 
     //!
     //! \brief request
     //! \return
     //!
-    virtual QRPCListenRequest&request();
+    virtual ListenRequest &request();
 
     //!
     //! \brief rq
     //! \return
     //!
-    virtual QRPCListenRequest&rq();
+    virtual ListenRequest &rq();
 
     //!
     //! \brief canOperation
+    //! \param method
     //! \return
     //!
-    virtual bool canOperation();
+    virtual bool canOperation(const QMetaMethod &method);
 
     //!
     //! \brief canAuthorization
@@ -195,6 +196,13 @@ public:
     //! \return
     //!
     virtual bool authorization();
+
+    //!
+    //! \brief authorization
+    //! \param method
+    //! \return
+    //!
+    virtual bool authorization(const QMetaMethod &method);
 
     //!
     //! \brief afterAuthorization
@@ -224,7 +232,7 @@ public:
     //! \brief server
     //! \return
     //!
-    virtual QRPCServer*server();
+    virtual Server*server();
 
     //!
     //! \brief interfaceRegister
@@ -264,13 +272,13 @@ protected:
     //! \brief setServer
     //! \param server
     //!
-    virtual void setServer(QRPCServer*server);
+    virtual void setServer(Server*server);
 
     //!
     //! \brief setRequest
     //! \param request
     //!
-    virtual void setRequest(QRPCListenRequest&request);
+    virtual void setRequest(ListenRequest &request);
 
     //!
     //! \brief routeFlags
@@ -301,5 +309,7 @@ private:
     void*p = nullptr;
     QRPCProtocol acceptedProtocols;
 };
+
+typedef Controller QRPCController;
 
 }

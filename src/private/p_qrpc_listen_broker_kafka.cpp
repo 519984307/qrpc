@@ -4,25 +4,25 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenBrokerKAFKAPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenBrokerKAFKAPvt*>(this->p)
 
-class QRPCListenBrokerKAFKAPvt{
+class ListenBrokerKAFKAPvt{
 public:
-    explicit QRPCListenBrokerKAFKAPvt(QRPCListenBrokerKAFKA*object)
+    explicit ListenBrokerKAFKAPvt(ListenBrokerKAFKA*object)
     {
         Q_UNUSED(object)
     }
-    virtual ~QRPCListenBrokerKAFKAPvt()
+    virtual ~ListenBrokerKAFKAPvt()
     {
     }
 };
 
-QRPCListenBrokerKAFKA::QRPCListenBrokerKAFKA(QObject *parent):QRPCListen(parent)
+ListenBrokerKAFKA::ListenBrokerKAFKA(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenBrokerKAFKAPvt(this);
+    this->p = new ListenBrokerKAFKAPvt(this);
 }
 
-QRPCListenBrokerKAFKA::~QRPCListenBrokerKAFKA()
+ListenBrokerKAFKA::~ListenBrokerKAFKA()
 {
     dPvt();delete&p;
 }

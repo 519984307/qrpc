@@ -2,15 +2,15 @@
 
 namespace QRpc {
 
-QRPCRequestJobWSS::QRPCRequestJobWSS(QObject *parent):QRPCRequestJobProtocol(parent)
+RequestJobWSS::RequestJobWSS(QObject *parent):RequestJobProtocol(parent)
 {
 }
 
-QRPCRequestJobWSS::~QRPCRequestJobWSS()
+RequestJobWSS::~RequestJobWSS()
 {
 }
 
-bool QRPCRequestJobWSS::call(QRPCRequestJobResponse *response)
+bool RequestJobWSS::call(RequestJobResponse *response)
 {
 
     this->response=response;
@@ -36,12 +36,12 @@ bool QRPCRequestJobWSS::call(QRPCRequestJobResponse *response)
 
         QUrl url(response->request_url.toUrl());
         m_socket = new QWebSocket();
-        QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &QRPCRequestJobWSS::onReplyError);
-        QObject::connect(m_socket, &QWebSocket::connected, this, &QRPCRequestJobWSS::onConnected);
-        QObject::connect(m_socket, &QWebSocket::disconnected, this, &QRPCRequestJobWSS::onClosed);
-        QObject::connect(m_socket, &QWebSocket::binaryMessageReceived, this, &QRPCRequestJobWSS::onBinaryMessageReceived);
-        QObject::connect(m_socket, &QWebSocket::pong, this, &QRPCRequestJobWSS::onReplyPong);
-        QObject::connect(m_socket, &QWebSocket::readChannelFinished, this, &QRPCRequestJobWSS::onReplyReadFinished);
+        QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &RequestJobWSS::onReplyError);
+        QObject::connect(m_socket, &QWebSocket::connected, this, &RequestJobWSS::onConnected);
+        QObject::connect(m_socket, &QWebSocket::disconnected, this, &RequestJobWSS::onClosed);
+        QObject::connect(m_socket, &QWebSocket::binaryMessageReceived, this, &RequestJobWSS::onBinaryMessageReceived);
+        QObject::connect(m_socket, &QWebSocket::pong, this, &RequestJobWSS::onReplyPong);
+        QObject::connect(m_socket, &QWebSocket::readChannelFinished, this, &RequestJobWSS::onReplyReadFinished);
         /*
             m_socket->setSslConfiguration(sslConfiguration);
 */
@@ -52,26 +52,26 @@ bool QRPCRequestJobWSS::call(QRPCRequestJobResponse *response)
 
 }
 
-void QRPCRequestJobWSS::onConnected()
+void RequestJobWSS::onConnected()
 {
-    QRPCListenRequest request(response->request_body);
+    ListenRequest request(response->request_body);
     auto body=request.toJson();
     m_socket->sendBinaryMessage(body);
 }
 
-void QRPCRequestJobWSS::onClosed()
+void RequestJobWSS::onClosed()
 {
     //emit this->callback(QVariant());
 }
 
-void QRPCRequestJobWSS::onReplyError(QAbstractSocket::SocketError e)
+void RequestJobWSS::onReplyError(QAbstractSocket::SocketError e)
 {
     Q_UNUSED(e)
     response->response_qt_status_code=QNetworkReply::UnknownServerError;
     emit this->callback(QVariant());
 }
 
-void QRPCRequestJobWSS::onBinaryMessageReceived(const QByteArray &message)
+void RequestJobWSS::onBinaryMessageReceived(const QByteArray &message)
 {
     auto socket=dynamic_cast<QWebSocket*>(QObject::sender());
     if(socket!=nullptr){
@@ -81,27 +81,27 @@ void QRPCRequestJobWSS::onBinaryMessageReceived(const QByteArray &message)
     }
 }
 
-void QRPCRequestJobWSS::onReplyTimeout()
+void RequestJobWSS::onReplyTimeout()
 {
     response->response_qt_status_code=QNetworkReply::TimeoutError;
     emit this->callback(QVariant());
 }
 
-void QRPCRequestJobWSS::onReplyPong(quint64 elapsedTime, const QByteArray &payload)
+void RequestJobWSS::onReplyPong(quint64 elapsedTime, const QByteArray &payload)
 {
     Q_UNUSED(elapsedTime)
     Q_UNUSED(payload)
 }
 
-void QRPCRequestJobWSS::onReplyReadFinished(){
+void RequestJobWSS::onReplyReadFinished(){
     //        if(response->response_qt_status_code!=QNetworkReply::TimeoutError)
     //            response->response_qt_status_code = this->reply->error();
     this->onFinish();
 }
 
-void QRPCRequestJobWSS::onFinish()
+void RequestJobWSS::onFinish()
 {
-    QRPCListenRequest request(this->buffer);
+    ListenRequest request(this->buffer);
     if(!request.isValid()){
         response->response_qt_status_code=QNetworkReply::InternalServerError;
         response->response_status_code=404;
@@ -120,7 +120,7 @@ void QRPCRequestJobWSS::onFinish()
     emit this->callback(QVariant());
 }
 
-void QRPCRequestJobWSS::onReplySslError(const QList<QSslError> &errors)
+void RequestJobWSS::onReplySslError(const QList<QSslError> &errors)
 {
     Q_UNUSED(errors);
 #ifdef QT_DEBUG

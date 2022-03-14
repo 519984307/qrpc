@@ -27,13 +27,13 @@ public:\
 
 #define QRPC_DECLARE_CONSTRUCTOR(classBase)\
 public:\
-    Q_INVOKABLE explicit classBase(QObject *parent=nullptr):QRpc::QRPCRequest(parent){\
+    Q_INVOKABLE explicit classBase(QObject *parent=nullptr):QRpc::Request(parent){\
     }\
     ~classBase(){\
     }
 
 #define QRPC_DECLARE_REQUEST_CLASS(classBase,ContentType,route)\
-class classBase:public QRpc::QRPCRequest{\
+class classBase:public QRpc::Request{\
 public:\
     QRPC_DECLARE_CONTENT_TYPE(ContentType)\
     QRPC_DECLARE_BASE_ROUTE(route)\
@@ -52,12 +52,12 @@ public:\
         return QByteArrayLiteral(#v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
     }\
 
-class QRPCListenRequest;
+class ListenRequest;
 
 //!
-//! \brief The QRPCRequest class
+//! \brief The Request class
 //!
-class Q_RPC_EXPORT QRPCRequest: public QObject
+class Q_RPC_EXPORT Request: public QObject
 {
     Q_OBJECT
 public:
@@ -76,7 +76,7 @@ public:
     //! \brief The Body class
     //!
     class Q_RPC_EXPORT Body: public QObject{
-        friend class QRPCRequestPvt;
+        friend class RequestPvt;
     public:
 
         //!
@@ -127,15 +127,15 @@ public:
         //! \brief rq
         //! \return
         //!
-        QRPCRequest&rq();
+        Request&rq();
     private:
         void*p = nullptr;
     };
 
 public:
-    Q_INVOKABLE explicit QRPCRequest(QObject *parent=nullptr);
-    //explicit QRPCRequest(const ServiceSetting &setting, QObject *parent=nullptr);
-    ~QRPCRequest();
+    Q_INVOKABLE explicit Request(QObject *parent=nullptr);
+    //explicit Request(const ServiceSetting &setting, QObject *parent=nullptr);
+    ~Request();
 
     //!
     //! \brief startsWith
@@ -165,8 +165,8 @@ public:
     //! \param setting
     //! \return
     //!
-    virtual QRPCRequest&setSettings(const ServiceSetting&setting);
-    virtual QRPCRequest&setSettings(const QVariantHash&setting);
+    virtual Request&setSettings(const ServiceSetting&setting);
+    virtual Request&setSettings(const QVariantHash&setting);
 
     //!
     //! \brief url
@@ -181,96 +181,96 @@ public:
     //!
     virtual QRPCProtocol protocol() const;
     virtual QString protocolName() const;
-    virtual QRPCRequest&setProtocol(const QVariant &value);
+    virtual Request&setProtocol(const QVariant &value);
 
     //!
     //! \brief method
     //! \return
     //!
-    virtual QRPCRequestMethod method() const;
-    virtual QRPCRequest&setMethod(const QString &value);
-    virtual QRPCRequest&setMethod(const QByteArray &value);
-    virtual QRPCRequest&setMethod(const int &value);
+    virtual RequestMethod method() const;
+    virtual Request&setMethod(const QString &value);
+    virtual Request&setMethod(const QByteArray &value);
+    virtual Request&setMethod(const int &value);
 
     //!
     //! \brief driver
     //! \return
     //!
     virtual QString driver() const;
-    virtual QRPCRequest&setDriver(const QString &value);
+    virtual Request&setDriver(const QString &value);
 
     //!
     //! \brief hostName
     //! \return
     //!
     virtual QString hostName() const;
-    virtual QRPCRequest&setHostName(const QString &value);
+    virtual Request&setHostName(const QString &value);
 
     //!
     //! \brief userName
     //! \return
     //!
     virtual QString userName() const;
-    virtual QRPCRequest&setUserName(const QString &value);
+    virtual Request&setUserName(const QString &value);
 
     //!
     //! \brief password
     //! \return
     //!
     virtual QString password() const;
-    virtual QRPCRequest&setPassword(const QString &value);
+    virtual Request&setPassword(const QString &value);
 
     //!
     //! \brief route
     //! \return
     //!
     virtual QString &route() const;
-    virtual QRPCRequest&setRoute(const QVariant &value);
+    virtual Request&setRoute(const QVariant &value);
 
     //!
     //! \brief body
     //! \return
     //!
     virtual QVariant body() const;
-    virtual QRPCRequest&setBody(const QVariant &value);
+    virtual Request&setBody(const QVariant &value);
 
     //!
     //! \brief port
     //! \return
     //!
     virtual QVariant port() const;
-    virtual QRPCRequest&setPort(const QVariant &value);
+    virtual Request&setPort(const QVariant &value);
 
     //!
     //! \brief activityLimit
     //! \return
     //!
     virtual qlonglong activityLimit() const;
-    virtual QRPCRequest&setActivityLimit(const QVariant &value);
+    virtual Request&setActivityLimit(const QVariant &value);
 
     //!
     //! \brief exchange
     //! \return
     //!
-    virtual QRPCRequestExchange&exchange();
+    virtual RequestExchange&exchange();
 
     //!
     //! \brief header
     //! \return
     //!
-    virtual QRPCHttpHeaders&header();
+    virtual HttpHeaders&header();
 
     //!
     //! \brief body
     //! \return
     //!
-    virtual QRPCRequest::Body&body();
+    virtual Request::Body&body();
 
     //!
     //! \brief response
     //! \return
     //!
-    virtual QRPCHttpResponse &response();
+    virtual HttpResponse &response();
 
     //!
     //! \brief requestRecovery
@@ -284,15 +284,15 @@ public:
     //! \param repeatCount
     //! \return
     //! re-run request on response specific status code
-    virtual QRPCRequest&setRequestRecovery(int statusCode);
-    virtual QRPCRequest&setRequestRecovery(int statusCode, int repeatCount=1);
+    virtual Request&setRequestRecovery(int statusCode);
+    virtual Request&setRequestRecovery(int statusCode, int repeatCount=1);
 
     //!
     //! \brief setRequestRecoveryOnBadGateway
     //! \param repeatCount
     //! \return
     //! re-run request on response status code 502 ou message BadRequest
-    virtual QRPCRequest&setRequestRecoveryOnBadGateway(int repeatCount=1);
+    virtual Request&setRequestRecoveryOnBadGateway(int repeatCount=1);
 
     //!
     //! \brief lastError
@@ -304,14 +304,14 @@ public:
     //! \brief call
     //! \return
     //!
-    virtual QRPCHttpResponse&call();
+    virtual HttpResponse&call();
 
     //!
     //! \brief call
     //! \param route
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QVariant &route);
+    virtual HttpResponse&call(const QVariant &route);
 
     //!
     //! \brief call
@@ -319,7 +319,7 @@ public:
     //! \param body
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QVariant &route, const QVariant&body);
+    virtual HttpResponse&call(const QVariant &route, const QVariant&body);
 
     //!
     //! \brief call
@@ -328,14 +328,14 @@ public:
     //! \param body
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QRPCRequestMethod&method, const QString&route, const QVariant&body);
+    virtual HttpResponse&call(const RequestMethod&method, const QString&route, const QVariant&body);
 
     //!
     //! \brief call
     //! \param method
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QRPCRequestMethod&method);
+    virtual HttpResponse&call(const RequestMethod&method);
 
     //!
     //! \brief call
@@ -345,7 +345,7 @@ public:
     //! \param parameter
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QVariant &route, const QVariant&body, const QString &method, const QVariantHash parameter);
+    virtual HttpResponse&call(const QVariant &route, const QVariant&body, const QString &method, const QVariantHash parameter);
 
     //!
     //! \brief call
@@ -353,7 +353,7 @@ public:
     //! \param objectBody
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QVariant &route, const QObject&objectBody);
+    virtual HttpResponse&call(const QVariant &route, const QObject&objectBody);
 
     //!
     //! \brief call
@@ -362,7 +362,7 @@ public:
     //! \param objectBody
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QRPCRequestMethod&method, const QString&route, const QObject&objectBody);
+    virtual HttpResponse&call(const RequestMethod&method, const QString&route, const QObject&objectBody);
 
     //!
     //! \brief call
@@ -370,7 +370,7 @@ public:
     //! \param ioDeviceBody
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QVariant &route, QIODevice&ioDeviceBody);
+    virtual HttpResponse&call(const QVariant &route, QIODevice&ioDeviceBody);
 
     //!
     //! \brief call
@@ -378,7 +378,7 @@ public:
     //! \param route
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QRPCRequestMethod&method, const QString&route);
+    virtual HttpResponse&call(const RequestMethod&method, const QString&route);
 
     //!
     //! \brief call
@@ -387,21 +387,21 @@ public:
     //! \param ioDeviceBody
     //! \return
     //!
-    virtual QRPCHttpResponse&call(const QRPCRequestMethod&method, const QString&route, QIODevice&ioDeviceBody);
+    virtual HttpResponse&call(const RequestMethod&method, const QString&route, QIODevice&ioDeviceBody);
 
     //!
     //! \brief operator =
     //! \param value
     //! \return
     //!
-    QRPCRequest&operator=(const ServiceSetting &value);
+    Request&operator=(const ServiceSetting &value);
 
     //!
     //! \brief upload
     //! \param file
     //! \return
     //!
-    virtual QRPCHttpResponse&upload(QFile &file);
+    virtual HttpResponse&upload(QFile &file);
 
     //!
     //! \brief upload
@@ -409,7 +409,7 @@ public:
     //! \param buffer
     //! \return
     //!
-    virtual QRPCHttpResponse&upload(const QVariant &route, const QByteArray &buffer);
+    virtual HttpResponse&upload(const QVariant &route, const QByteArray &buffer);
 
     //!
     //! \brief upload
@@ -417,7 +417,7 @@ public:
     //! \param file
     //! \return
     //!
-    virtual QRPCHttpResponse&upload(const QVariant &route, QFile &file);
+    virtual HttpResponse&upload(const QVariant &route, QFile &file);
 
     //!
     //! \brief upload
@@ -426,14 +426,14 @@ public:
     //! \param file
     //! \return
     //!
-    virtual QRPCHttpResponse&upload(const QVariant &route, QString&fileName, QFile &file);
+    virtual HttpResponse&upload(const QVariant &route, QString&fileName, QFile &file);
 
     //!
     //! \brief download
     //! \param fileName
     //! \return
     //!
-    virtual QRPCHttpResponse&download(QString &fileName);
+    virtual HttpResponse&download(QString &fileName);
 
     //!
     //! \brief download
@@ -441,7 +441,7 @@ public:
     //! \param fileName
     //! \return
     //!
-    virtual QRPCHttpResponse&download(const QVariant &route, QString&fileName);
+    virtual HttpResponse&download(const QVariant &route, QString&fileName);
 
     //!
     //! \brief download
@@ -450,13 +450,13 @@ public:
     //! \param parameter
     //! \return
     //!
-    virtual QRPCHttpResponse&download(const QVariant &route, QString&fileName, const QVariant &parameter);
+    virtual HttpResponse&download(const QVariant &route, QString&fileName, const QVariant &parameter);
 
     //!
     //! \brief autoSetCookie
     //! \return
     //!
-    virtual QRPCRequest&autoSetCookie();
+    virtual Request&autoSetCookie();
 
     //!
     //! \brief toString
@@ -475,13 +475,13 @@ public:
     //! \return
     //!
     virtual QSslConfiguration&sslConfiguration();
-    virtual QRPCRequest &setSslConfiguration(const QSslConfiguration &value);
+    virtual Request &setSslConfiguration(const QSslConfiguration &value);
 
     //!
     //! \brief print
     //! \return
     //!
-    virtual QRPCRequest &print();
+    virtual Request &print();
 
     //!
     //! \brief printOut
@@ -492,5 +492,8 @@ public:
 private:
     void*p = nullptr;
 };
+
+QT_DEPRECATED_X("Use QRpc::Request")
+typedef Request QRPCListen;
 
 }

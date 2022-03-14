@@ -7,27 +7,27 @@
 #include <QMetaMethod>
 
 #define QRPC_CONTROLLER_ROUTER_REGISTER(className)\
-const auto __router_register##className=QRpc::QRPCControllerRouter::installDefaultRouter(&className::staticMetaObject);
+const auto __router_register##className=QRpc::ControllerRouter::installDefaultRouter(&className::staticMetaObject);
 
 namespace QRpc {
-class QRPCListenRequest;
+class ListenRequest;
 //!
-//! \brief The QRPCControllerRouter class
+//! \brief The ControllerRouter class
 //!
-class Q_RPC_EXPORT QRPCControllerRouter: public QStm::Object
+class Q_RPC_EXPORT ControllerRouter: public QStm::Object
 {
     Q_OBJECT
 public:
     //!
-    //! \brief QRPCControllerRouter
+    //! \brief ControllerRouter
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCControllerRouter(QObject *parent=nullptr);
+    Q_INVOKABLE explicit ControllerRouter(QObject *parent=nullptr);
 
     //!
-    //! \brief ~QRPCControllerRouter
+    //! \brief ~ControllerRouter
     //!
-    ~QRPCControllerRouter();
+    ~ControllerRouter();
 
     //!
     //! \brief router
@@ -35,7 +35,7 @@ public:
     //! \param metaMethod
     //! \return
     //!
-    virtual ResultValue&router(QRPCListenRequest *request, QMetaMethod&metaMethod);
+    virtual ResultValue&router(ListenRequest *request, QMetaMethod&metaMethod);
 
     //!
     //! \brief installDefaultRouter
@@ -49,7 +49,7 @@ public:
     //! \param parent
     //! \return
     //!
-    static QRPCControllerRouter*newRouter(QObject *parent);
+    static ControllerRouter*newRouter(QObject *parent);
 
 private:
     void*p=nullptr;

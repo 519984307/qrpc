@@ -12,37 +12,37 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenQRPCPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenQRPCPvt*>(this->p)
 
-typedef QVector<QRPCListenQRPCSlot*> QRPCListenSlotList;
-typedef QHash<QByteArray, QRPCListenSlotList*> QRPCListenSlotCache;
+typedef QVector<ListenQRPCSlot*> ListenSlotList;
+typedef QHash<QByteArray, ListenSlotList*> ListenSlotCache;
 
-class QRPCListenQRPCPvt: public QObject{
+class ListenQRPCPvt: public QObject{
 public:
     QMutex mutexRunning;
     QMutex mutexMapLocker;
     QHash<QByteArray, const QMetaObject*> controller;
     QHash<QByteArray, const QMetaObject*> parsers;
-    QRPCListenSlotCache listenSlotCache;
-    QRPCListenQRPC*listenQRPC=nullptr;
-    QMap<QUuid, QRPCListen*> listens;
-    QRPCServer*server=nullptr;
+    ListenSlotCache listenSlotCache;
+    ListenQRPC*listenQRPC=nullptr;
+    QMap<QUuid, Listen*> listens;
+    Server*server=nullptr;
 
-    explicit QRPCListenQRPCPvt(QRPCListenQRPC*parent):QObject(parent)
+    explicit ListenQRPCPvt(ListenQRPC*parent):QObject(parent)
     {
-        this->listenQRPC = dynamic_cast<QRPCListenQRPC*>(this->parent());
+        this->listenQRPC = dynamic_cast<ListenQRPC*>(this->parent());
         if(this->listenQRPC!=nullptr)
             this->server = this->listenQRPC->server();
     }
 
-    virtual ~QRPCListenQRPCPvt()
+    virtual ~ListenQRPCPvt()
     {
         auto list=listenSlotCache.values();
         listenSlotCache.clear();
         qDeleteAll(list);
     }
 
-    void registerListen(QRPCListen*listen)
+    void registerListen(Listen*listen)
     {
         auto listenQRPC=this->listenQRPC;
         if(listen==listenQRPC)
@@ -51,13 +51,13 @@ public:
             return;
         this->listens.insert(listen->uuid(), listen);
         listen->registerListenPool(listenQRPC);
-        QObject::connect(listen, &QRPCListen::rpcRequest, this, &QRPCListenQRPCPvt::onRpcRequest);
+        QObject::connect(listen, &Listen::rpcRequest, this, &ListenQRPCPvt::onRpcRequest);
     }
 
 public slots:
     void onRpcRequest(QVariantHash vRequest, const QVariant&uploadedFiles)
     {
-        QRPCListenRequest request;
+        ListenRequest request;
         if(!request.fromHash(vRequest)){
             if(request.co().isOK())
                 request.co().setBadRequest();
@@ -71,18 +71,18 @@ public slots:
         }
 
         auto vHash=request.toHash();
-        QRPCListenSlotList*listenSlotList=nullptr;
+        ListenSlotList*listenSlotList=nullptr;
         {//locker
             QMutexLOCKER locker(&mutexMapLocker);
             auto md5=request.hash();
             listenSlotList=this->listenSlotCache.value(md5);
             if(listenSlotList==nullptr){
-                listenSlotList = new QRPCListenSlotList();
+                listenSlotList = new ListenSlotList();
                 this->listenSlotCache[md5]=listenSlotList;
             }
         }
 
-        auto requestInvoke=[&listenSlotList, &vHash, &uploadedFiles](QRPCListenQRPCSlot*&thread){
+        auto requestInvoke=[&listenSlotList, &vHash, &uploadedFiles](ListenQRPCSlot*&thread){
             thread=nullptr;
             for(auto&v:*listenSlotList){
                 if(!v->canRequestInvoke(vHash, uploadedFiles))
@@ -93,10 +93,10 @@ public slots:
             return false;
         };
 
-        QRPCListenQRPCSlot*thread=nullptr;
+        ListenQRPCSlot*thread=nullptr;
         while(!requestInvoke(thread)){
             QMutexLOCKER locker(&mutexMapLocker);
-            auto thread=new QRPCListenQRPCSlot(this->listenQRPC);
+            auto thread=new ListenQRPCSlot(this->listenQRPC);
             thread->start();
             listenSlotList->append(thread);
         }
@@ -104,19 +104,19 @@ public slots:
     }
 };
 
-QRPCListenQRPC::QRPCListenQRPC(QObject *parent):QRPCListen(nullptr){
+ListenQRPC::ListenQRPC(QObject *parent):Listen(nullptr){
     Q_UNUSED(parent)
-    this->p = new QRPCListenQRPCPvt(this);
+    this->p = new ListenQRPCPvt(this);
 }
 
-QRPCListenQRPC::~QRPCListenQRPC()
+ListenQRPC::~ListenQRPC()
 {
     dPvt();
     QMutexLOCKER(&p.mutexRunning);
     delete&p;
 }
 
-void QRPCListenQRPC::run()
+void ListenQRPC::run()
 {
     dPvt();
     p.mutexRunning.lock();
@@ -143,7 +143,7 @@ void QRPCListenQRPC::run()
             if(object==nullptr)
                 continue;
 
-            auto controller=dynamic_cast<QRPCListenRequestParser*>(object);
+            auto controller=dynamic_cast<ListenRequestParser*>(object);
             if(controller!=nullptr)
                 p.parsers.insert(name,mObj);
             delete object;
@@ -159,7 +159,7 @@ void QRPCListenQRPC::run()
             auto object=mObj->newInstance(Q_ARG(QObject*, nullptr ));
             if(object==nullptr)
                 continue;
-            auto controller=dynamic_cast<QRPCController*>(object);
+            auto controller=dynamic_cast<Controller*>(object);
             if(controller!=nullptr){
                 controller->apiInitialize();
                 p.controller.insert(name,mObj);
@@ -169,7 +169,7 @@ void QRPCListenQRPC::run()
         }
     }
 
-    QRPCListen::run();
+    Listen::run();
 
 
     {//free thread
@@ -193,13 +193,13 @@ void QRPCListenQRPC::run()
     p.mutexRunning.unlock();
 }
 
-void QRPCListenQRPC::registerListen(QRPCListen *listen)
+void ListenQRPC::registerListen(Listen *listen)
 {
     dPvt();
     p.registerListen(listen);
 }
 
-QRPCListen *QRPCListenQRPC::childrenListen(QUuid uuid)
+Listen *ListenQRPC::childrenListen(QUuid uuid)
 {
     dPvt();
     auto listen = p.listens.value(uuid);

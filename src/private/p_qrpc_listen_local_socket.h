@@ -5,22 +5,22 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenLocalSocket class
+//! \brief The ListenLocalSocket class
 //!
-class Q_RPC_EXPORT QRPCListenLocalSocket:public QRPCListen{
+class Q_RPC_EXPORT ListenLocalSocket:public Listen{
     Q_OBJECT
 public:
 
     //!
-    //! \brief QRPCListenLocalSocket
+    //! \brief ListenLocalSocket
     //! \param parent
     //!
-    explicit QRPCListenLocalSocket(QObject*parent=nullptr);
+    explicit ListenLocalSocket(QObject*parent=nullptr);
 
     //!
-    //! \brief ~QRPCListenLocalSocket
+    //! \brief ~ListenLocalSocket
     //!
-    ~QRPCListenLocalSocket();
+    ~ListenLocalSocket();
 
     /**
      * @brief start
@@ -37,6 +37,6 @@ private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(LocalSocket,QRPCListenLocalSocket)
+QRPC_LISTTEN_AUTO_REGISTER(LocalSocket,ListenLocalSocket)
 
 }

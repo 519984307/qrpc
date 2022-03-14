@@ -8,7 +8,7 @@ namespace QRpc {
 class Q_RPC_RequestFunctionalCORS : public SDKGoogleTestFunctional {
 public:
 
-    bool checkResponseHeader(QRPCHttpResponse &response){
+    bool checkResponseHeader(HttpResponse &response){
 
         const auto&responseHeader=response.header().rawHeader();
         static auto headersName=QStringList{qsl("Date"),qsl("Server"),qsl("Access-Control-Allow-Origin"),qsl("Access-Control-Allow-Methods"),qsl("Access-Control-Allow-Headers"),qsl("Access-Control-Max-Age"),qsl("Vary")};

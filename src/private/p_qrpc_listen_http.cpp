@@ -98,9 +98,9 @@ public:
         qDeleteAll(aux);
     }
 
-    QRPCListenHTTP*listen()
+    ListenHTTP*listen()
     {
-        auto _listen=dynamic_cast<QRPCListenHTTP*>(this->parent());
+        auto _listen=dynamic_cast<ListenHTTP*>(this->parent());
         return _listen;
     }
 
@@ -254,7 +254,7 @@ public:
                     rpc_url.headers().insert(k,v);
                 }
 
-                QRPCHttpHeaders headers(rpc_url.headers());
+                HttpHeaders headers(rpc_url.headers());
                 if(!headers.contentDisposition().isValid()){
                     auto fileName=rpc_url.toLocalFile().split(qsl("/")).last();
                     rpc_url.headers().insert(QString(ContentDispositionName).toUtf8(), qsl("inline; filename=\"%1\"").arg(fileName).toUtf8());
@@ -301,19 +301,19 @@ public slots:
 
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenHTTPPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenHTTPPvt*>(this->p)
 
-class QRPCListenHTTPPvt:public QObject{
+class ListenHTTPPvt:public QObject{
 public:
     HttpServer3rdparty*_listenServer=nullptr;
-    QRPCListenHTTP*parent=nullptr;
+    ListenHTTP*parent=nullptr;
 
-    explicit QRPCListenHTTPPvt(QRPCListenHTTP*parent):QObject(parent)
+    explicit ListenHTTPPvt(ListenHTTP*parent):QObject(parent)
     {
         this->parent=parent;
     }
 
-    virtual ~QRPCListenHTTPPvt()
+    virtual ~ListenHTTPPvt()
     {
     }
 
@@ -321,7 +321,7 @@ public:
     {
         auto&p=*this;
         p._listenServer = new HttpServer3rdparty(this->parent);
-        QObject::connect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3rdparty::onRpcResponse);
+        QObject::connect(this->parent, &Listen::rpcResponse, p._listenServer, &HttpServer3rdparty::onRpcResponse);
         return p._listenServer->isListening();
     }
 
@@ -329,7 +329,7 @@ public:
     {
         auto&p=*this;
         if(p._listenServer!=nullptr){
-            QObject::disconnect(this->parent, &QRPCListen::rpcResponse, p._listenServer, &HttpServer3rdparty::onRpcResponse);
+            QObject::disconnect(this->parent, &Listen::rpcResponse, p._listenServer, &HttpServer3rdparty::onRpcResponse);
             delete p._listenServer;
         }
         p._listenServer=nullptr;
@@ -337,26 +337,26 @@ public:
     }
 };
 
-QRPCListenHTTP::QRPCListenHTTP(QObject *parent):QRPCListen(parent)
+ListenHTTP::ListenHTTP(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenHTTPPvt(this);
+    this->p = new ListenHTTPPvt(this);
 }
 
-QRPCListenHTTP::~QRPCListenHTTP()
+ListenHTTP::~ListenHTTP()
 {
     dPvt();
     p.stop();
     delete&p;
 }
 
-bool QRPCListenHTTP::start(){
+bool ListenHTTP::start(){
     dPvt();
-    QRPCListen::start();
+    Listen::start();
     return p.start();
 }
 
-bool QRPCListenHTTP::stop(){
-    QRPCListen::stop();
+bool ListenHTTP::stop(){
+    Listen::stop();
     dPvt();
     return p.stop();
 }

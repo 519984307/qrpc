@@ -2,14 +2,14 @@
 
 namespace QRpc {
 
-QRPCRequestJobDataBase::QRPCRequestJobDataBase(QObject *parent):QRPCRequestJobProtocol(parent), listen_request(this), listen_response(this)
+RequestJobDataBase::RequestJobDataBase(QObject *parent):RequestJobProtocol(parent), listen_request(this), listen_response(this)
 {
 }
 
-QRPCRequestJobDataBase::~QRPCRequestJobDataBase(){
+RequestJobDataBase::~RequestJobDataBase(){
 }
 
-QRPCListenRequest &QRPCRequestJobDataBase::requestMake(QRPCRequestJobResponse *response){
+ListenRequest &RequestJobDataBase::requestMake(RequestJobResponse *response){
 
     const auto&request_url=response->request_url;
     this->response=response;
@@ -99,7 +99,7 @@ QRPCListenRequest &QRPCRequestJobDataBase::requestMake(QRPCRequestJobResponse *r
     return this->listen_request;
 }
 
-void QRPCRequestJobDataBase::connectionClose()
+void RequestJobDataBase::connectionClose()
 {
     auto cnn=QSqlDatabase::database(this->sqlConnectionName);
     if(cnn.isValid()){
@@ -112,7 +112,7 @@ void QRPCRequestJobDataBase::connectionClose()
     this->dbDriverType=QSqlDriver::UnknownDbms;
 }
 
-bool QRPCRequestJobDataBase::connectionMake(QSqlDatabase &outConnection)
+bool RequestJobDataBase::connectionMake(QSqlDatabase &outConnection)
 {
     this->connectionClose();
 
@@ -163,14 +163,14 @@ bool QRPCRequestJobDataBase::connectionMake(QSqlDatabase &outConnection)
             this->onBrokerError(msg);
         }
         else{
-            QObject::connect(sqlDriver, QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &QRPCRequestJobDataBase::onReceiveBroker);
+            QObject::connect(sqlDriver, QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &RequestJobDataBase::onReceiveBroker);
         }
     }
     outConnection=__connection;
     return outConnection.isOpen();
 }
 
-bool QRPCRequestJobDataBase::call(QRPCRequestJobResponse *response)
+bool RequestJobDataBase::call(RequestJobResponse *response)
 {
     this->response=response;
     auto&request=this->requestMake(response);
@@ -213,7 +213,7 @@ bool QRPCRequestJobDataBase::call(QRPCRequestJobResponse *response)
 
 }
 
-void QRPCRequestJobDataBase::onReceiveBroker(const QString &responseTopic, QSqlDriver::NotificationSource, const QVariant &responseBody)
+void RequestJobDataBase::onReceiveBroker(const QString &responseTopic, QSqlDriver::NotificationSource, const QVariant &responseBody)
 {
     Q_DECLARE_VU;
     if(!this->listen_response.fromHash(responseBody.toHash())){
@@ -239,16 +239,16 @@ void QRPCRequestJobDataBase::onReceiveBroker(const QString &responseTopic, QSqlD
     this->onFinish();
 }
 
-void QRPCRequestJobDataBase::onBrokerError(const QString &error)
+void RequestJobDataBase::onBrokerError(const QString &error)
 {
     response->response_qt_status_code=QNetworkReply::InternalServerError;
     response->response_status_reason_phrase=error.toUtf8();
     this->onFinish();
 }
 
-void QRPCRequestJobDataBase::onFinish()
+void RequestJobDataBase::onFinish()
 {
-    QObject::disconnect(this->sqlDriver, QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &QRPCRequestJobDataBase::onReceiveBroker);
+    QObject::disconnect(this->sqlDriver, QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &RequestJobDataBase::onReceiveBroker);
     auto __connection=QSqlDatabase::database(this->sqlConnectionName);
     if(__connection.isValid()){
         __connection.close();

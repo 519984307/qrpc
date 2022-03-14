@@ -4,78 +4,80 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCControllerRouterPvt*>(this->p)
+    auto&p =*reinterpret_cast<ControllerRouterPvt*>(this->p)
 
-class ConstsQRPCControllerRouter{
+class ConstsControllerRouter{
 public:
     QList<const QMetaObject*> defaultRouters;
-    explicit ConstsQRPCControllerRouter()
+    explicit ConstsControllerRouter()
     {
-        defaultRouters<<&QRPCControllerRouter::staticMetaObject;
+        defaultRouters<<&ControllerRouter::staticMetaObject;
     }
-    virtual ~ConstsQRPCControllerRouter()
+    virtual ~ConstsControllerRouter()
     {
     }
 };
-Q_GLOBAL_STATIC_WITH_ARGS(ConstsQRPCControllerRouter, __constsQRPCControllerRouter, (ConstsQRPCControllerRouter()))
-static auto&constsQRPCControllerRouter=*__constsQRPCControllerRouter;
+Q_GLOBAL_STATIC_WITH_ARGS(ConstsControllerRouter, __constsControllerRouter, (ConstsControllerRouter()))
+static auto&constsControllerRouter=*__constsControllerRouter;
 
-class QRPCControllerRouterPvt{
+class ControllerRouterPvt{
 public:
-    QRPCControllerRouter*ControllerRouter=nullptr;
-    explicit QRPCControllerRouterPvt(QRPCControllerRouter*parent)
+    QRpc::ControllerRouter*ControllerRouter=nullptr;
+    explicit ControllerRouterPvt(QRpc::ControllerRouter*parent)
     {
         this->ControllerRouter=parent;
     }
 
-    virtual ~QRPCControllerRouterPvt(){
+    virtual ~ControllerRouterPvt(){
     }
 };
 
-QRPCControllerRouter::QRPCControllerRouter(QObject *parent):QStm::Object(parent)
+ControllerRouter::ControllerRouter(QObject *parent):QStm::Object(parent)
 {
-    this->p = new QRPCControllerRouterPvt(this);
+    this->p = new ControllerRouterPvt(this);
 }
 
-QRPCControllerRouter::~QRPCControllerRouter()
+ControllerRouter::~ControllerRouter()
 {
     dPvt();delete&p;
 }
 
-ResultValue &QRPCControllerRouter::router(QRpc::QRPCListenRequest*request, QMetaMethod &metaMethod)
+ResultValue &ControllerRouter::router(QRpc::ListenRequest*request, QMetaMethod &metaMethod)
 {
     Q_UNUSED(request)
     Q_UNUSED(metaMethod)
     return this->lr();
 }
 
-bool QRPCControllerRouter::installDefaultRouter(const QMetaObject*metaObject)
+bool ControllerRouter::installDefaultRouter(const QMetaObject*metaObject)
 {
-    constsQRPCControllerRouter.defaultRouters.clear();
+    constsControllerRouter.defaultRouters.clear();
     if(metaObject!=nullptr){
-        constsQRPCControllerRouter.defaultRouters<<metaObject;
+        constsControllerRouter.defaultRouters<<metaObject;
         return true;
     }
-    constsQRPCControllerRouter.defaultRouters<<&QRPCControllerRouter::staticMetaObject;
+    constsControllerRouter.defaultRouters<<&ControllerRouter::staticMetaObject;
     return false;
 }
 
-QRPCControllerRouter *QRPCControllerRouter::newRouter(QObject *parent)
+ControllerRouter *ControllerRouter::newRouter(QObject *parent)
 {
-    QRPCControllerRouter*router=nullptr;
+    ControllerRouter*router=nullptr;
 
-    auto&defaultRouters=constsQRPCControllerRouter.defaultRouters;
+    auto&defaultRouters=constsControllerRouter.defaultRouters;
     auto&defaultRouter=defaultRouters.first();
 
     if(defaultRouters.isEmpty())
-        return new QRPCControllerRouter(parent);
+        return new ControllerRouter(parent);
 
     auto object=defaultRouter->newInstance(Q_ARG(QObject*, parent));
-    router=dynamic_cast<QRPCControllerRouter*>(object);
+    router=dynamic_cast<ControllerRouter*>(object);
     if(router!=nullptr)
         return router;
+
     if(object!=nullptr)
         delete object;
+
     return nullptr;
 }
 

@@ -28,18 +28,18 @@ namespace QRpc {
 
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCRequestPvt*>(this->p)
+    auto&p =*reinterpret_cast<RequestPvt*>(this->p)
 
-class QRPCRequestPvt:public QObject{
+class RequestPvt:public QObject{
     Q_OBJECT
 public:
-    QRPCRequest*parent=nullptr;
+    Request*parent=nullptr;
     QHash<int,int> requestRecovery;
 
-    QRPCRequestExchange exchange;
-    QRpc::QRPCHttpHeaders qrpcHeader;
-    QRPCRequest::Body qrpcBody;
-    QRpc::QRPCHttpResponse qrpcResponse;
+    RequestExchange exchange;
+    QRpc::HttpHeaders qrpcHeader;
+    Request::Body qrpcBody;
+    QRpc::HttpResponse qrpcResponse;
     QRpc::LastError qrpcLastError;
 
     QUrl request_url;
@@ -47,30 +47,30 @@ public:
 
     QNetworkReply::NetworkError response_qt_status_code=QNetworkReply::NoError;
     QString response_reason_phrase;
-    QRPCListenRequest*request=nullptr;
+    ListenRequest*request=nullptr;
 
     QString fileLog;
 
     QSslConfiguration sslConfiguration;
 
-    explicit QRPCRequestPvt(QRPCRequest*parent);
+    explicit RequestPvt(Request*parent);
 
-    virtual ~QRPCRequestPvt();
+    virtual ~RequestPvt();
 
     void setSettings(const ServiceSetting &setting);
 
 
     QString parseFileName(const QString&fileName);
 
-    void writeLog(QRPCRequestJobResponse&response, const QVariant&request);
+    void writeLog(RequestJobResponse&response, const QVariant&request);
 
-    QRPCHttpResponse &upload(const QString &route, const QString&fileName);
+    HttpResponse &upload(const QString &route, const QString&fileName);
 
-    QRPCHttpResponse &download(const QString &route, const QString&fileName);
+    HttpResponse &download(const QString &route, const QString&fileName);
 
-    QRPCHttpResponse&call(const QRPCRequestMethod&method, const QVariant &vRoute, const QVariant &body);
+    HttpResponse&call(const RequestMethod&method, const QVariant &vRoute, const QVariant &body);
 signals:
-    void runJob(const QSslConfiguration*sslConfig, const QVariantHash&headers, const QVariant&url, const QString&fileName, QRpc::QRPCRequest*request);
+    void runJob(const QSslConfiguration*sslConfig, const QVariantHash&headers, const QVariant&url, const QString&fileName, QRpc::Request*request);
 };
 
 }

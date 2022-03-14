@@ -13,35 +13,35 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestJobDataBase class
+//! \brief The RequestJobDataBase class
 //!
-class QRPCRequestJobDataBase : public QRPCRequestJobProtocol
+class RequestJobDataBase : public RequestJobProtocol
 {
     Q_OBJECT
 public:
     QVariantHash settings;
-    QRPCListenRequest listen_request;
-    QRPCListenRequest listen_response;
-    QRPCRequestJobResponse*response=nullptr;
+    ListenRequest listen_request;
+    ListenRequest listen_response;
+    RequestJobResponse*response=nullptr;
     QSqlDriver::DbmsType dbDriverType=QSqlDriver::UnknownDbms;
     QString sqlConnectionName=nullptr;
     QString requestPath;
     QString responsePath;
     QSqlDriver*sqlDriver=nullptr;
 
-    Q_INVOKABLE explicit QRPCRequestJobDataBase(QObject*parent);
+    Q_INVOKABLE explicit RequestJobDataBase(QObject*parent);
 
-    ~QRPCRequestJobDataBase();
+    ~RequestJobDataBase();
 
 
-    QRPCListenRequest&requestMake(QRPCRequestJobResponse*response);
+    ListenRequest&requestMake(RequestJobResponse*response);
 
     void connectionClose();
 
 
     bool connectionMake(QSqlDatabase&outConnection);
 
-    virtual bool call(QRPCRequestJobResponse*response)override;
+    virtual bool call(RequestJobResponse*response)override;
 
 private slots:
 

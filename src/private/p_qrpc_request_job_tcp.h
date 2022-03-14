@@ -8,20 +8,20 @@
 
 namespace QRpc {
 
-class QRPCRequestJobTcp : public QRPCRequestJobProtocol
+class RequestJobTcp : public RequestJobProtocol
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit QRPCRequestJobTcp(QObject*parent);
+    Q_INVOKABLE explicit RequestJobTcp(QObject*parent);
 
-    ~QRPCRequestJobTcp();
+    ~RequestJobTcp();
 
-    QRPCRequestJobResponse*response=nullptr;
+    RequestJobResponse*response=nullptr;
     QTcpSocket*m_socket=nullptr;
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response)override;
+    virtual bool call(RequestJobResponse*response)override;
 
 private slots:
 

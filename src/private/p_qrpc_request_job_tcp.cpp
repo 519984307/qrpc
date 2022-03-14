@@ -2,28 +2,28 @@
 
 namespace QRpc {
 
-QRPCRequestJobTcp::QRPCRequestJobTcp(QObject *parent):QRPCRequestJobProtocol(parent)
+RequestJobTcp::RequestJobTcp(QObject *parent):RequestJobProtocol(parent)
 {
 }
 
-QRPCRequestJobTcp::~QRPCRequestJobTcp()
+RequestJobTcp::~RequestJobTcp()
 {
 }
 
-bool QRPCRequestJobTcp::call(QRPCRequestJobResponse *response)
+bool RequestJobTcp::call(RequestJobResponse *response)
 {
     this->response=response;
     if(m_socket!=nullptr)
         delete m_socket;
     m_socket = new QTcpSocket();
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::errorOccurred), this, &QRPCRequestJobTcp::onReplyError);
+    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::errorOccurred), this, &RequestJobTcp::onReplyError);
 #else
-    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this, &QRPCRequestJobTcp::onReplyError);
+    QObject::connect(m_socket, QOverload<QAbstractSocket::SocketError>::of(&QTcpSocket::error), this, &RequestJobTcp::onReplyError);
 #endif
-    QObject::connect(m_socket, &QTcpSocket::connected, this, &QRPCRequestJobTcp::onConnected);
-    QObject::connect(m_socket, &QTcpSocket::disconnected, this, &QRPCRequestJobTcp::onClosed);
-    QObject::connect(m_socket, &QTcpSocket::readChannelFinished, this, &QRPCRequestJobTcp::onFinish);
+    QObject::connect(m_socket, &QTcpSocket::connected, this, &RequestJobTcp::onConnected);
+    QObject::connect(m_socket, &QTcpSocket::disconnected, this, &RequestJobTcp::onClosed);
+    QObject::connect(m_socket, &QTcpSocket::readChannelFinished, this, &RequestJobTcp::onFinish);
     QUrl url(this->response->request_url.toUrl());
     const QString hostName=url.host(QUrl::FullyDecoded);
     const int port=url.port();
@@ -31,7 +31,7 @@ bool QRPCRequestJobTcp::call(QRPCRequestJobResponse *response)
     return true;
 }
 
-void QRPCRequestJobTcp::onConnected()
+void RequestJobTcp::onConnected()
 {
     this->buffer.clear();
     if(!m_socket->waitForConnected(response->activityLimit)){
@@ -39,7 +39,7 @@ void QRPCRequestJobTcp::onConnected()
         response->response_status_code=501;
     }
     else{
-        QRPCListenRequest request(response->request_body);
+        ListenRequest request(response->request_body);
         auto body=request.toJson();
         m_socket->write(body);
         m_socket->flush();
@@ -60,12 +60,12 @@ void QRPCRequestJobTcp::onConnected()
     this->onFinish();
 }
 
-void QRPCRequestJobTcp::onClosed()
+void RequestJobTcp::onClosed()
 {
     //emit this->callback(QVariant());
 }
 
-void QRPCRequestJobTcp::onReplyError(QAbstractSocket::SocketError e)
+void RequestJobTcp::onReplyError(QAbstractSocket::SocketError e)
 {
     Q_UNUSED(e)
     if(e!=QAbstractSocket::SocketError::RemoteHostClosedError){
@@ -75,8 +75,8 @@ void QRPCRequestJobTcp::onReplyError(QAbstractSocket::SocketError e)
     }
 }
 
-void QRPCRequestJobTcp::onFinish(){
-    QRPCListenRequest request(this->buffer);
+void RequestJobTcp::onFinish(){
+    ListenRequest request(this->buffer);
     if(!request.isValid()){
         response->response_qt_status_code=QNetworkReply::InternalServerError;
         response->response_status_code=404;

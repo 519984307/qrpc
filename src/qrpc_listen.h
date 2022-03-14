@@ -7,31 +7,31 @@
 #include <QTemporaryFile>
 
 namespace QRpc {
-class QRPCServer;
-class QRPCListenQRPC;
-class QRPCListenColletions;
-class QRPCListenRequestCache;
+class Server;
+class ListenQRPC;
+class ListenColletions;
+class ListenRequestCache;
 
 //!
-//! \brief The QRPCListen class
+//! \brief The Listen class
 //!
-class Q_RPC_EXPORT QRPCListen: public QThread
+class Q_RPC_EXPORT Listen: public QThread
 {
     Q_OBJECT
-    friend class QRPCListenColletions;
-    friend class QRPCListenColletionsPvt;
+    friend class ListenColletions;
+    friend class ListenColletionsPvt;
 public:
 
     //!
-    //! \brief QRPCListen
+    //! \brief Listen
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListen(QObject *parent=nullptr);
+    Q_INVOKABLE explicit Listen(QObject *parent=nullptr);
 
     //!
-    //! \brief ~QRPCListen
+    //! \brief ~Listen
     //!
-    ~QRPCListen();
+    ~Listen();
 
     //!
     //! \brief interfaceRegister
@@ -51,7 +51,7 @@ public:
     //! \brief uuid
     //! \return
     //!
-    virtual QUuid uuid() const;
+    virtual QUuid &uuid() const;
 
     //!
     //! \brief parent
@@ -85,31 +85,31 @@ public:
     //! \brief server
     //! \return
     //!
-    virtual QRPCServer*server();
+    virtual Server*server();
 
     //!
     //! \brief colletions
     //! \return
     //!
-    virtual QRPCListenColletions*colletions();
+    virtual ListenColletions*colletions();
 
     //!
     //! \brief cacheRequest
     //! \return
     //!
-    virtual QRPCListenRequestCache*cacheRequest();
+    virtual ListenRequestCache*cacheRequest();
 
     //!
     //! \brief registerListenPool
     //! \param listenPool
     //!
-    virtual void registerListenPool(QRPCListen*listenPool);
+    virtual void registerListenPool(Listen*listenPool);
 
     //!
     //! \brief listenPool
     //! \return
     //!
-    virtual QRPCListen&listenPool();
+    virtual Listen &listenPool();
 signals:
 
     //!
@@ -135,13 +135,13 @@ protected:
     //! \brief setServer
     //! \param server
     //!
-    void setServer(QRPCServer*server);
+    void setServer(Server*server);
 
     //!
     //! \brief setColletions
     //! \param colletions
     //!
-    void setColletions(QRPCListenColletions*colletions);
+    void setColletions(ListenColletions*colletions);
 private:
     void*p=nullptr;
 };

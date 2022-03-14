@@ -15,9 +15,9 @@ public:
      * @brief listen
      * @return
      */
-    QRPCListen&listen()
+    Listen&listen()
     {
-        auto _listen=dynamic_cast<QRPCListen*>(this->parent());
+        auto _listen=dynamic_cast<Listen*>(this->parent());
         return*_listen;
     }
 
@@ -102,18 +102,18 @@ public slots:
 };
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenUDPPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenUDPPvt*>(this->p)
 
-class QRPCListenUDPPvt:public QObject{
+class ListenUDPPvt:public QObject{
 public:
     ServerUDPSocket*_listenServer=nullptr;
 
-    explicit QRPCListenUDPPvt(QRPCListenUDP*parent):QObject(parent)
+    explicit ListenUDPPvt(ListenUDP*parent):QObject(parent)
     {
         this->_listenServer = new ServerUDPSocket(parent);
     }
 
-    virtual ~QRPCListenUDPPvt()
+    virtual ~ListenUDPPvt()
     {
         this->_listenServer->stop();
         delete this->_listenServer;
@@ -121,25 +121,25 @@ public:
     }
 };
 
-QRPCListenUDP::QRPCListenUDP(QObject *parent):QRPCListen(parent)
+ListenUDP::ListenUDP(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenUDPPvt(this);
+    this->p = new ListenUDPPvt(this);
 }
 
-QRPCListenUDP::~QRPCListenUDP()
+ListenUDP::~ListenUDP()
 {
     dPvt();
     p._listenServer->stop();
     delete&p;
 }
 
-bool QRPCListenUDP::start()
+bool ListenUDP::start()
 {
     dPvt();
     return p._listenServer->start();
 }
 
-bool QRPCListenUDP::stop()
+bool ListenUDP::stop()
 {
     dPvt();
     return p._listenServer->stop();

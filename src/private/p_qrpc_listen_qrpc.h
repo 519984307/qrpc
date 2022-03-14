@@ -5,25 +5,25 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenQRPC class
+//! \brief The ListenQRPC class
 //!
-class Q_RPC_EXPORT QRPCListenQRPC:public QRPCListen
+class Q_RPC_EXPORT ListenQRPC:public Listen
 {
     Q_OBJECT
-    friend class QRPCListenColletionsPvt;
-    friend class QRPCListenQRPCSlotPvt;
+    friend class ListenColletionsPvt;
+    friend class ListenQRPCSlotPvt;
 public:
 
     //!
-    //! \brief QRPCListenQRPC
+    //! \brief ListenQRPC
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenQRPC(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenQRPC(QObject*parent=nullptr);
 
     //!
-    //! \brief ~QRPCListenQRPC
+    //! \brief ~ListenQRPC
     //!
-    ~QRPCListenQRPC();
+    ~ListenQRPC();
 
     //!
     //! \brief run
@@ -35,19 +35,19 @@ protected:
     //! \brief registerListen
     //! \param listen
     //!
-    void registerListen(QRPCListen *listen);
+    void registerListen(Listen *listen);
 
     //!
     //! \brief childrenListen
     //! \param uuid
     //! \return
     //!
-    virtual QRPCListen*childrenListen(QUuid uuid);
+    virtual Listen*childrenListen(QUuid uuid);
 
 private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(0, QRPCListenQRPC)
+QRPC_LISTTEN_AUTO_REGISTER(0, ListenQRPC)
 
 }

@@ -5,14 +5,14 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenHTTP class
+//! \brief The ListenHTTP class
 //!
-class Q_RPC_EXPORT QRPCListenHTTP:public QRPCListen{
+class Q_RPC_EXPORT ListenHTTP:public Listen{
     Q_OBJECT
 public:
 
-    Q_INVOKABLE explicit QRPCListenHTTP(QObject*parent=nullptr);
-    ~QRPCListenHTTP();
+    Q_INVOKABLE explicit ListenHTTP(QObject*parent=nullptr);
+    ~ListenHTTP();
 
     //!
     //! \brief start
@@ -29,8 +29,8 @@ private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(Http, QRPCListenHTTP)
-//QRPC_LISTTEN_AUTO_REGISTER(Https, QRPCListenHTTP)
+QRPC_LISTTEN_AUTO_REGISTER(Http, ListenHTTP)
+//QRPC_LISTTEN_AUTO_REGISTER(Https, ListenHTTP)
 
 
 }

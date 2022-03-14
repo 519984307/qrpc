@@ -16,31 +16,31 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCServerPvt class
+//! \brief The ServerPvt class
 //!
-class Q_RPC_EXPORT QRPCServerPvt: public QObject
+class Q_RPC_EXPORT ServerPvt: public QObject
 {
 public:
     ControllerOptions controllerOptions;
     QString serverName;
     bool enabledInterfaces=true;
     QVariant settingsFileName;
-    QRPCListenColletions*listenColletions=nullptr;
-    QRPCServer*server=nullptr;
+    ListenColletions*listenColletions=nullptr;
+    Server*server=nullptr;
     //!
-    //! \brief QRPCServerPvt
+    //! \brief ServerPvt
     //! \param server
     //!
-    explicit QRPCServerPvt(QRPCServer*server=nullptr):QObject(server)
+    explicit ServerPvt(Server*server=nullptr):QObject(server)
     {
         this->server=server;
-        this->listenColletions = new QRPCListenColletions(server);
+        this->listenColletions = new ListenColletions(server);
     }
 
     //!
-    //! \brief ~QRPCServerPvt
+    //! \brief ~ServerPvt
     //!
-    virtual ~QRPCServerPvt()
+    virtual ~ServerPvt()
     {
         this->stop();
         delete this->listenColletions;
@@ -70,7 +70,7 @@ public:
     {
         if(this->server->objectName().isEmpty()){
             static int countServerName=0;
-            auto name=qsl("QRPCServer_%1").arg(++countServerName);
+            auto name=qsl("Server_%1").arg(++countServerName);
             this->server->setObjectName(name);
         }
 

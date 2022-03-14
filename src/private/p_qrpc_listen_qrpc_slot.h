@@ -10,14 +10,14 @@ namespace QRpc {
 #include <QEventLoop>
 
 //!
-//! \brief The QRPCListenQRPCSlot class
+//! \brief The ListenQRPCSlot class
 //!
-class Q_RPC_EXPORT QRPCListenQRPCSlot:public QThread
+class Q_RPC_EXPORT ListenQRPCSlot:public QThread
 {
     Q_OBJECT
 public:
-    explicit QRPCListenQRPCSlot(QRPCListenQRPC *listenQRPC=nullptr);
-    ~QRPCListenQRPCSlot();
+    explicit ListenQRPCSlot(ListenQRPC *listenQRPC=nullptr);
+    ~ListenQRPCSlot();
 
     //!
     //! \brief run

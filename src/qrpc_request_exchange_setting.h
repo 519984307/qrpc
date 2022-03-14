@@ -7,9 +7,9 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestExchangeSetting class
+//! \brief The RequestExchangeSetting class
 //!
-class Q_RPC_EXPORT QRPCRequestExchangeSetting: public QObject
+class Q_RPC_EXPORT RequestExchangeSetting: public QObject
 {
     Q_OBJECT
 public:
@@ -27,32 +27,32 @@ public:
     Q_PROPERTY(QVariant activityLimit READ activityLimit WRITE setActivityLimit NOTIFY activityLimitChanged )
 
     //!
-    //! \brief QRPCRequestExchangeSetting
+    //! \brief RequestExchangeSetting
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCRequestExchangeSetting(QObject *parent=nullptr);
+    Q_INVOKABLE explicit RequestExchangeSetting(QObject *parent=nullptr);
 
     //!
-    //! \brief QRPCRequestExchangeSetting
+    //! \brief RequestExchangeSetting
     //! \param e
     //! \param parent
     //!
-    explicit QRPCRequestExchangeSetting(QRPCRequestExchangeSetting&e, QObject *parent=nullptr);
-    ~QRPCRequestExchangeSetting();
+    explicit RequestExchangeSetting(RequestExchangeSetting&e, QObject *parent=nullptr);
+    ~RequestExchangeSetting();
 
     //!
     //! \brief operator =
     //! \param e
     //! \return
     //!
-    QRPCRequestExchangeSetting&operator=(const QRPCRequestExchangeSetting&e);
-    QRPCRequestExchangeSetting&operator=(const QVariantHash&e);
+    RequestExchangeSetting&operator=(const RequestExchangeSetting&e);
+    RequestExchangeSetting&operator=(const QVariantHash&e);
 
     //!
     //! \brief clear
     //! \return
     //!
-    virtual QRPCRequestExchangeSetting&clear();
+    virtual RequestExchangeSetting&clear();
 
     //!
     //! \brief toMap
@@ -83,7 +83,7 @@ public:
     //! \param output
     //! \return
     //!
-    virtual QRPCRequestExchangeSetting&print(const QString&output=QString());
+    virtual RequestExchangeSetting&print(const QString&output=QString());
 
     //!
     //! \brief printOut
@@ -96,7 +96,7 @@ public:
     //! \brief method
     //! \return
     //!
-    virtual QRPCRequestMethod method() const;
+    virtual RequestMethod method() const;
     virtual void setMethod(const int&value);
     virtual void setMethod(const QString&value);
 

@@ -24,38 +24,38 @@
 namespace QRpc {
 
 Q_GLOBAL_STATIC(QMutex, requestJobMutex)
-Q_GLOBAL_STATIC(QVector<QRPCRequestJob*>, requestJobPool)
+Q_GLOBAL_STATIC(QVector<RequestJob*>, requestJobPool)
 
 
 #define dPvt()\
-auto&p =*reinterpret_cast<QRPCRequestJobPvt*>(this->p)
+auto&p =*reinterpret_cast<RequestJobPvt*>(this->p)
 
-class QRPCRequestJobPvt:public QObject{
+class RequestJobPvt:public QObject{
 public:
-    QRPCRequestJob*parent=nullptr;
+    RequestJob*parent=nullptr;
 
 #ifdef Q_RPC_HTTP
-    QRPCRequestJobHttp _requestJobHttp;
+    RequestJobHttp _requestJobHttp;
 #endif
 #ifdef Q_RPC_WEBSOCKET
-    QRPCRequestJobWSS _requestJobWSS;
+    RequestJobWSS _requestJobWSS;
 #endif
 #ifdef Q_RPC_TCP
-    QRPCRequestJobTcp _requestJobTcp;
+    RequestJobTcp _requestJobTcp;
 #endif
 #ifdef Q_RPC_LOCALSOCKET
-    QRPCRequestJobLocalSocket _requestJobLocalSocket;
+    RequestJobLocalSocket _requestJobLocalSocket;
 #endif
 #ifdef Q_RPC_DATABASE
-    QRPCRequestJobDataBase _requestJobDataBase;
+    RequestJobDataBase _requestJobDataBase;
 #endif
-    QRPCRequest::Action action=QRPCRequest::acRequest;
+    Request::Action action=Request::acRequest;
     QString action_fileName;
     QSslConfiguration sslConfiguration;
-    QHash<int,QRPCRequestJobProtocol*> _requestJobProtocolHash;
-    QRPCRequestJobResponse _response;
+    QHash<int,RequestJobProtocol*> _requestJobProtocolHash;
+    RequestJobResponse _response;
 
-    explicit QRPCRequestJobPvt(QRPCRequestJob*parent):QObject(parent),
+    explicit RequestJobPvt(RequestJob*parent):QObject(parent),
 #ifdef Q_RPC_HTTP
         _requestJobHttp(this),
 #endif
@@ -90,19 +90,19 @@ public:
 #ifdef Q_RPC_DATABASE
         _requestJobProtocolMap[QRpc::DataBase]=&this->_requestJobDataBase;
 #endif
-        QHashIterator<int, QRPCRequestJobProtocol*> i(_requestJobProtocolHash);
+        QHashIterator<int, RequestJobProtocol*> i(_requestJobProtocolHash);
         while (i.hasNext()){
             i.next();
-            QObject::connect(i.value(), &QRPCRequestJobProtocol::callback, parent, &QRPCRequestJob::onRunCallback);
+            QObject::connect(i.value(), &RequestJobProtocol::callback, parent, &RequestJob::onRunCallback);
         }
     }
 
-    virtual ~QRPCRequestJobPvt()
+    virtual ~RequestJobPvt()
     {
-        QHashIterator<int, QRPCRequestJobProtocol*> i(_requestJobProtocolHash);
+        QHashIterator<int, RequestJobProtocol*> i(_requestJobProtocolHash);
         while (i.hasNext()){
             i.next();
-            QObject::disconnect(i.value(), &QRPCRequestJobProtocol::callback, this->parent, &QRPCRequestJob::onRunCallback);
+            QObject::disconnect(i.value(), &RequestJobProtocol::callback, this->parent, &RequestJob::onRunCallback);
         }
     }
 
@@ -121,55 +121,55 @@ public:
         _requestJobLocalSocket.clear();
 #endif
 #ifdef Q_RPC_DATABASE
-        QRPCRequestJobDataBase _requestJobDataBase;
+        RequestJobDataBase _requestJobDataBase;
 #endif
         this->_response.clear();
-        this->action=QRPCRequest::acRequest;
+        this->action=Request::acRequest;
         this->action_fileName.clear();
         this->sslConfiguration=QSslConfiguration();
     }
 };
 
-QRPCRequestJob::QRPCRequestJob():QThread(nullptr)
+RequestJob::RequestJob():QThread(nullptr)
 {
-    this->p=new QRPCRequestJobPvt(this);
+    this->p=new RequestJobPvt(this);
     this->moveToThread(this);
     static qlonglong taskCount=0;
     this->setObjectName(qsl("ReqJob%1").arg(++taskCount));
 }
 
-QRPCRequestJob::~QRPCRequestJob()
+RequestJob::~RequestJob()
 {
     dPvt();
     delete&p;
 }
 
-void QRPCRequestJob::run()
+void RequestJob::run()
 {
     this->exec();
 }
 
-QRPCRequestJob *QRPCRequestJob::newJob(QRPCRequest::Action action, const QString &action_fileName)
+RequestJob *RequestJob::newJob(Request::Action action, const QString &action_fileName)
 {
-    QRPCRequestJob*job=nullptr;
+    RequestJob*job=nullptr;
     if(!requestJobMutex->tryLock(10))
-        job=new QRPCRequestJob();
+        job=new RequestJob();
     else{
         if(requestJobPool->isEmpty()){
-            job=new QRPCRequestJob();
+            job=new RequestJob();
         }
         else{
             job=requestJobPool->takeFirst();
         }
         requestJobMutex->unlock();
     }
-    auto&p=*static_cast<QRPCRequestJobPvt*>(job->p);
+    auto&p=*static_cast<RequestJobPvt*>(job->p);
     p.action=action;
     p.action_fileName=action_fileName;
     return job;
 }
 
-QRPCRequestJob *QRPCRequestJob::runJob(QRPCRequestJob*job)
+RequestJob *RequestJob::runJob(RequestJob*job)
 {
     if(job->isRunning()){
         job->quit();
@@ -179,7 +179,7 @@ QRPCRequestJob *QRPCRequestJob::runJob(QRPCRequestJob*job)
     return job;
 }
 
-QRPCRequestJob &QRPCRequestJob::start()
+RequestJob &RequestJob::start()
 {
     QThread::start();
     while(this->eventDispatcher()==nullptr){
@@ -188,43 +188,43 @@ QRPCRequestJob &QRPCRequestJob::start()
     return*this;
 }
 
-QRPCRequestJob &QRPCRequestJob::release()
+RequestJob &RequestJob::release()
 {
     QMutexLOCKER locker(requestJobMutex);
     requestJobPool->append(this);
     return *this;
 }
 
-QRPCRequestJobResponse &QRPCRequestJob::response()
+RequestJobResponse &RequestJob::response()
 {
     dPvt();
     return p._response;
 }
 
-void QRPCRequestJob::setResponse(QRPCRequestJobResponse &value)
+void RequestJob::setResponse(RequestJobResponse &value)
 {
     dPvt();
     p._response = value;
 }
 
-void QRPCRequestJob::onRunJob(const QSslConfiguration *sslConfiguration, const QVariantHash &headers, const QVariant &vUrl, const QString &fileName, QRPCRequest *request)
+void RequestJob::onRunJob(const QSslConfiguration *sslConfiguration, const QVariantHash &headers, const QVariant &vUrl, const QString &fileName, Request *request)
 {
     dPvt();
     p.sslConfiguration=QSslConfiguration(*sslConfiguration);
     auto url=vUrl.toUrl();
     p.action_fileName=fileName;
-    QRPCRequestJobResponse response(headers, url, *request, this);
+    RequestJobResponse response(headers, url, *request, this);
     this->setResponse(response);
     this->onRun();
 }
 
-void QRPCRequestJob::onRunCallback(const QVariant &v)
+void RequestJob::onRunCallback(const QVariant &v)
 {
     Q_UNUSED(v)
     this->quit();
 }
 
-void QRPCRequestJob::onRun()
+void RequestJob::onRun()
 {
     dPvt();
     const auto&e=this->response().request_exchange.call();

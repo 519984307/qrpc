@@ -8,30 +8,30 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCServer class
+//! \brief The Server class
 //!
-class Q_RPC_EXPORT QRPCServer: public QObject
+class Q_RPC_EXPORT Server: public QObject
 {
     Q_OBJECT
 public:
 
     //!
-    //! \brief QRPCServer
+    //! \brief Server
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCServer(QObject *parent=nullptr);
+    Q_INVOKABLE explicit Server(QObject *parent=nullptr);
 
     //!
-    //! \brief QRPCServer
+    //! \brief Server
     //! \param settings
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCServer(const QVariant &settings,  QObject *parent=nullptr);
+    Q_INVOKABLE explicit Server(const QVariant &settings,  QObject *parent=nullptr);
 
     //!
-    //! \brief ~QRPCServer
+    //! \brief ~Server
     //!
-    ~QRPCServer();
+    ~Server();
 
     //!
     //! \brief controllerOptions
@@ -67,13 +67,13 @@ public:
     //! \brief interfacesStart
     //! \return
     //!
-    virtual QRPCServer &interfacesStart();
+    virtual Server &interfacesStart();
 
     //!
     //! \brief interfacesStop
     //! \return
     //!
-    virtual QRPCServer &interfacesStop();
+    virtual Server &interfacesStop();
 
     //!
     //! \brief interfacesRunning
@@ -108,7 +108,7 @@ public:
     //! \brief colletions
     //! \return
     //!
-    virtual QRPCListenColletions&colletions();
+    virtual ListenColletions&colletions();
 
     //!
     //! \brief settingsFileName
@@ -135,7 +135,7 @@ public:
     //! \param request
     //! \return
     //!
-    virtual bool authorizationRequest(const QRPCListenRequest&request) const;
+    virtual bool authorizationRequest(const ListenRequest&request) const;
 
     //!
     //! \brief serverName
@@ -153,5 +153,7 @@ private:
     QObject*p = nullptr;
 
 };
+
+//typedef QRpc::Server QRPCServer;
 
 }

@@ -67,7 +67,7 @@ static void static_log_init_dir()
 Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir)
 
 
-QRPCRequestPvt::QRPCRequestPvt(QRPCRequest *parent):
+RequestPvt::RequestPvt(Request *parent):
     QObject(parent),
     exchange(parent),
     qrpcHeader(parent),
@@ -85,11 +85,11 @@ QRPCRequestPvt::QRPCRequestPvt(QRPCRequest *parent):
     this->qrpcBody.p=this;
 }
 
-QRPCRequestPvt::~QRPCRequestPvt()
+RequestPvt::~RequestPvt()
 {
 }
 
-void QRPCRequestPvt::setSettings(const ServiceSetting &setting)
+void RequestPvt::setSettings(const ServiceSetting &setting)
 {
     auto __header=setting.headers();
     parent->header().setRawHeader(__header);
@@ -101,7 +101,7 @@ void QRPCRequestPvt::setSettings(const ServiceSetting &setting)
     parent->setRoute(setting.route());
 }
 
-QString QRPCRequestPvt::parseFileName(const QString &fileName)
+QString RequestPvt::parseFileName(const QString &fileName)
 {
     auto _fileName=fileName.trimmed();
     if(_fileName.isEmpty()){
@@ -113,7 +113,7 @@ QString QRPCRequestPvt::parseFileName(const QString &fileName)
     return _fileName;
 }
 
-void QRPCRequestPvt::writeLog(QRPCRequestJobResponse &response, const QVariant &request)
+void RequestPvt::writeLog(RequestJobResponse &response, const QVariant &request)
 {
     if(!static_log_register)
         return;
@@ -127,7 +127,7 @@ void QRPCRequestPvt::writeLog(QRPCRequestJobResponse &response, const QVariant &
 
     QTextStream outText(&file);
     auto&e=response.request_exchange.call();
-    outText << QRPCRequestMethodName[e.method()]<<qsl(": ")<<response.request_url.toString()<<qsl("\n");
+    outText << RequestMethodName[e.method()]<<qsl(": ")<<response.request_url.toString()<<qsl("\n");
     outText << QJsonDocument::fromVariant(request).toJson(QJsonDocument::Indented);
     outText << qsl("\n");
     outText << qsl("\n");
@@ -135,7 +135,7 @@ void QRPCRequestPvt::writeLog(QRPCRequestJobResponse &response, const QVariant &
     file.close();
 }
 
-QRPCHttpResponse &QRPCRequestPvt::upload(const QString &route, const QString &fileName)
+HttpResponse &RequestPvt::upload(const QString &route, const QString &fileName)
 {
     this->qrpcLastError.clear();
 
@@ -189,19 +189,19 @@ QRPCHttpResponse &QRPCRequestPvt::upload(const QString &route, const QString &fi
         this->request_url=QUrl(request_url);
     }
 
-    auto job = QRPCRequestJob::newJob(QRPCRequest::acUpload);
-    QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
+    auto job = RequestJob::newJob(Request::acUpload);
+    QObject::connect(this, &RequestPvt::runJob, job, &RequestJob::onRunJob);
     job->start();
     emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
     job->wait();
-    QObject::disconnect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
+    QObject::disconnect(this, &RequestPvt::runJob, job, &RequestJob::onRunJob);
     this->qrpcResponse.setResponse(&job->response());
     this->writeLog(job->response(), job->response().toVariant());
     job->release();
     return this->qrpcResponse;
 }
 
-QRPCHttpResponse &QRPCRequestPvt::download(const QString &route, const QString &fileName)
+HttpResponse &RequestPvt::download(const QString &route, const QString &fileName)
 {
 
     if(!this->qrpcHeader.contentType().isValid())
@@ -283,19 +283,19 @@ QRPCHttpResponse &QRPCRequestPvt::download(const QString &route, const QString &
         this->request_url=QUrl(request_url);
     }
 
-    auto job = QRPCRequestJob::newJob(QRPCRequest::acDownload, fileName);
-    QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
+    auto job = RequestJob::newJob(Request::acDownload, fileName);
+    QObject::connect(this, &RequestPvt::runJob, job, &RequestJob::onRunJob);
     job->start();
     emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, fileName, this->parent);
     job->wait();
-    QObject::disconnect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
+    QObject::disconnect(this, &RequestPvt::runJob, job, &RequestJob::onRunJob);
     this->qrpcResponse.setResponse(&job->response());
     this->writeLog(job->response(), job->response().toVariant());
     job->release();
     return this->qrpcResponse;
 }
 
-QRPCHttpResponse &QRPCRequestPvt::call(const QRPCRequestMethod &method, const QVariant &vRoute, const QVariant &body)
+HttpResponse &RequestPvt::call(const RequestMethod &method, const QVariant &vRoute, const QVariant &body)
 {
     this->qrpcLastError.clear();
 
@@ -417,7 +417,7 @@ QRPCHttpResponse &QRPCRequestPvt::call(const QRPCRequestMethod &method, const QV
         }
 
         auto base=QUuid::createUuid().toString() + QDateTime::currentDateTime().toString();
-        QRPCListenRequest request;
+        ListenRequest request;
         request.setRequestProtocol(e.protocol());
         request.setRequestUuid( QUuid::createUuidV3(QUuid::createUuid(), base.toUtf8()) );
         request.setRequestMethod(e.methodName().toUtf8().toLower());
@@ -431,11 +431,11 @@ QRPCHttpResponse &QRPCRequestPvt::call(const QRPCRequestMethod &method, const QV
         this->request_body = vBody;
     }
     const auto&requestRecovery=this->requestRecovery;
-    auto job = QRPCRequestJob::newJob(QRPCRequest::acRequest);
-    QObject::connect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
+    auto job = RequestJob::newJob(Request::acRequest);
+    QObject::connect(this, &RequestPvt::runJob, job, &RequestJob::onRunJob);
     int executeCount=0;
     forever{
-        job=QRPCRequestJob::runJob(job);
+        job=RequestJob::runJob(job);
         ++executeCount;
         emit runJob(&this->sslConfiguration, this->qrpcHeader.rawHeader(), this->request_url, qsl_null, this->parent);
         job->wait();
@@ -450,7 +450,7 @@ QRPCHttpResponse &QRPCRequestPvt::call(const QRPCRequestMethod &method, const QV
             bool doContinue=false;
             while(i.hasNext()){
                 i.next();
-                //auto reason_phrase=QRPCListenRequestCode::reasonPhrase(response_status_code).toLower().simplified();
+                //auto reason_phrase=ListenRequestCode::reasonPhrase(response_status_code).toLower().simplified();
                 if(response_status_reason_phrase.contains(i.value())){
                     doContinue=true;
                     break;
@@ -468,7 +468,7 @@ QRPCHttpResponse &QRPCRequestPvt::call(const QRPCRequestMethod &method, const QV
         if(recoveryCount<=executeCount)//if recovery limit then break
             break;
     }
-    QObject::disconnect(this, &QRPCRequestPvt::runJob, job, &QRPCRequestJob::onRunJob);
+    QObject::disconnect(this, &RequestPvt::runJob, job, &RequestJob::onRunJob);
     this->qrpcResponse.setResponse(&job->response());
     this->writeLog(job->response(), job->response().toVariant());
     job->release();

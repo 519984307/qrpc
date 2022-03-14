@@ -6,45 +6,45 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestExchange class
+//! \brief The RequestExchange class
 //!
-class Q_RPC_EXPORT QRPCRequestExchange: public QObject
+class Q_RPC_EXPORT RequestExchange: public QObject
 {
     Q_OBJECT
 public:
 
     //!
-    //! \brief QRPCRequestExchange
+    //! \brief RequestExchange
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCRequestExchange(QObject *parent=nullptr);
-    explicit QRPCRequestExchange(QRPCRequestExchange&exchange, QObject *parent);
-    ~QRPCRequestExchange();
+    Q_INVOKABLE explicit RequestExchange(QObject *parent=nullptr);
+    explicit RequestExchange(RequestExchange&exchange, QObject *parent);
+    ~RequestExchange();
 
     //!
     //! \brief operator =
     //! \param e
     //! \return
     //!
-    QRPCRequestExchange &operator =(QRPCRequestExchange &e);
+    RequestExchange &operator =(RequestExchange &e);
 
     //!
     //! \brief clear
     //! \return
     //!
-    virtual QRPCRequestExchange&clear();
+    virtual RequestExchange&clear();
 
     //!
     //! \brief call
     //! \return
     //!
-    virtual QRPCRequestExchangeSetting&call();
+    virtual RequestExchangeSetting&call();
 
     //!
     //! \brief back
     //! \return
     //!
-    virtual QRPCRequestExchangeSetting&back();
+    virtual RequestExchangeSetting&back();
 
     //!
     //! \brief toMap
@@ -63,7 +63,7 @@ public:
     //! \param output
     //! \return
     //!
-    virtual QRPCRequestExchange&print(const QString&output=QString());
+    virtual RequestExchange&print(const QString&output=QString());
 
     //!
     //! \brief printOut
@@ -84,7 +84,7 @@ public:
     //! \param value
     //!
     virtual void setMethod(const QString &value);
-    virtual void setMethod(const QRPCRequestMethod &value);
+    virtual void setMethod(const RequestMethod &value);
 
     //!
     //! \brief setHostName

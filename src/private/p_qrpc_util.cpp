@@ -66,7 +66,7 @@ const QString parseQueryItem(const QVariant&v)
 const QVariantHash toMapResquest(int method, const QVariant&request_url, const QString&request_body, const QVariantHash&request_parameters, const QString&response_body, const QVariantHash&request_header, const QDateTime&request_start, const QDateTime&request_finish)
 {
     Q_DECLARE_VU;
-    auto request_method=QRPCRequestMethodName.value(method).toUpper();
+    auto request_method=RequestMethodName.value(method).toUpper();
     QVariantHash map{
         {qsl("url"), request_url},
         {qsl("method"), request_method},

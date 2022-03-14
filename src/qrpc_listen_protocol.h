@@ -8,16 +8,16 @@
 class QSettings;
 
 namespace QRpc {
-class QRPCListen;
+class Listen;
 
 //!
-//! \brief The QRPCListenProtocol class
+//! \brief The ListenProtocol class
 //!
-class Q_RPC_EXPORT QRPCListenProtocol : public QObject
+class Q_RPC_EXPORT ListenProtocol : public QObject
 {
     Q_OBJECT
-    friend class QRPCListenColletions;
-    friend class QRPCListenColletionsPvt;
+    friend class ListenColletions;
+    friend class ListenColletionsPvt;
 public:
 
     Q_PROPERTY(int          protocol                READ protocol               WRITE setProtocol               NOTIFY changeProperty   )
@@ -42,18 +42,18 @@ public:
     Q_PROPERTY(bool         realMessageOnException  READ realMessageOnException WRITE setRealMessageOnException NOTIFY changeProperty   )
 
     //!
-    //! \brief QRPCListenProtocol
+    //! \brief ListenProtocol
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenProtocol(QObject *parent = nullptr);
+    Q_INVOKABLE explicit ListenProtocol(QObject *parent = nullptr);
 private:
     //!
-    //! \brief QRPCListenProtocol
+    //! \brief ListenProtocol
     //! \param protocol
     //! \param metaObject
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenProtocol(int protocol, const QMetaObject&metaObject, QObject *parent);
+    Q_INVOKABLE explicit ListenProtocol(int protocol, const QMetaObject&metaObject, QObject *parent);
 public:
 
     //!
@@ -66,7 +66,7 @@ public:
     //! \brief makeListen
     //! \return
     //!
-    virtual QRPCListen *makeListen();
+    virtual Listen *makeListen();
 
     //!
     //! \brief protocol

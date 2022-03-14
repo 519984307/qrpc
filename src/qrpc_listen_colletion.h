@@ -9,58 +9,58 @@
 class QSettings;
 
 namespace QRpc {
-class QRPCListenProtocol;
-class QRPCListenQRPC;
-class QRPCServer;
-class QRPCListen;
+class ListenProtocol;
+class ListenQRPC;
+class Server;
+class Listen;
 
 //!
-//! \brief QRPCListenProtocols
+//! \brief ListenProtocols
 //!
-typedef QHash<int, QRPCListenProtocol*> QRPCListenProtocols;
+typedef QHash<int, ListenProtocol*> ListenProtocols;
 
 //!
-//! \brief The QRPCListenColletions class
+//! \brief The ListenColletions class
 //!
-class Q_RPC_EXPORT QRPCListenColletions : public QThread{
+class Q_RPC_EXPORT ListenColletions : public QThread{
     Q_OBJECT
 public:
     //!
-    //! \brief QRPCListenColletions
+    //! \brief ListenColletions
     //! \param parent
     //!
-    explicit QRPCListenColletions(QRPCServer *parent = nullptr);
+    explicit ListenColletions(Server *parent = nullptr);
 
     //!
-    //! \brief QRPCListenColletions
+    //! \brief ListenColletions
     //! \param settings
     //! \param server
     //!
-    explicit QRPCListenColletions(const QVariantHash &settings, QRPCServer *server = nullptr);
+    explicit ListenColletions(const QVariantHash &settings, Server *server = nullptr);
 
     //!
-    //! \brief ~QRPCListenColletions
+    //! \brief ~ListenColletions
     //!
-    ~QRPCListenColletions();
+    ~ListenColletions();
 
     //!
     //! \brief protocol
     //! \return
     //!
-    virtual QRPCListenProtocol &protocol();
+    virtual ListenProtocol &protocol();
 
     //!
     //! \brief protocol
     //! \param protocol
     //! \return
     //!
-    virtual QRPCListenProtocol &protocol(const QRpc::QRPCProtocol&protocol);
+    virtual ListenProtocol &protocol(const QRpc::QRPCProtocol&protocol);
 
     //!
     //! \brief protocols
     //! \return
     //!
-    virtual QRPCListenProtocols&protocols();
+    virtual ListenProtocols&protocols();
 
     //!
     //! \brief run
@@ -81,7 +81,7 @@ public:
     //! \brief server
     //! \return
     //!
-    virtual QRPCServer *server();
+    virtual Server *server();
 
     //!
     //! \brief setSettings
@@ -93,7 +93,7 @@ public:
     //! \brief listenPool
     //! \return
     //!
-    virtual QRPCListenQRPC*listenPool();
+    virtual ListenQRPC*listenPool();
 
 public slots:
 

@@ -47,9 +47,9 @@ static const QByteArray makeBaseUuid(){
 static auto const baseUuid=makeBaseUuid();
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenRequestPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenRequestPvt*>(this->p)
 
-class QRPCListenRequestPvt:public QObject{
+class ListenRequestPvt:public QObject{
 public:
     QHash<QString, QFile *> uploadedFiles;
     QEventLoop eventLoop;
@@ -69,17 +69,17 @@ public:
     QVariant _responseBody;
     QByteArray _responsePhrase;
     QVariantHash _requestParamCache;
-    QRPCListenRequestCode listenCode;
+    ListenRequestCode listenCode;
     int _responseCode=0;
     int _requestTimeout=0;
     void*_data=nullptr;
-    QRPCListenRequest*parent=nullptr;
-    explicit QRPCListenRequestPvt(QRPCListenRequest*parent):QObject(parent), listenCode(parent)
+    ListenRequest*parent=nullptr;
+    explicit ListenRequestPvt(ListenRequest*parent):QObject(parent), listenCode(parent)
     {
         this->parent=parent;
-        QObject::connect(parent, &QRPCListenRequest::finish, this, &QRPCListenRequestPvt::onRequestFinish);
+        QObject::connect(parent, &ListenRequest::finish, this, &ListenRequestPvt::onRequestFinish);
     }
-    virtual ~QRPCListenRequestPvt()
+    virtual ~ListenRequestPvt()
     {
         this->freeFiles();
     }
@@ -236,124 +236,124 @@ public slots:
     }
 };
 
-QRPCListenRequest::QRPCListenRequest(QObject *parent):QObject(parent)
+ListenRequest::ListenRequest(QObject *parent):QObject(parent)
 {
-    this->p = new QRPCListenRequestPvt(this);
+    this->p = new ListenRequestPvt(this);
 }
 
-QRPCListenRequest::QRPCListenRequest(const QVariant &requestBody, QObject *parent):QObject(parent)
+ListenRequest::ListenRequest(const QVariant &requestBody, QObject *parent):QObject(parent)
 {
-    this->p = new QRPCListenRequestPvt(this);
+    this->p = new ListenRequestPvt(this);
     dPvt();
     p.mergeMap(requestBody);
 }
 
-QRPCListenRequest::QRPCListenRequest(const QVariant &requestBody, const ControllerSetting &setting, QObject *parent):QObject(parent)
+ListenRequest::ListenRequest(const QVariant &requestBody, const ControllerSetting &setting, QObject *parent):QObject(parent)
 {
-    this->p = new QRPCListenRequestPvt(this);
+    this->p = new ListenRequestPvt(this);
     if(setting.isValid())
         this->setControllerSetting(setting);
     dPvt();
     p.mergeMap(requestBody);
 }
 
-QRPCListenRequest::~QRPCListenRequest()
+ListenRequest::~ListenRequest()
 {
     dPvt();delete&p;
 }
 
-bool QRPCListenRequest::isMethodHead() const
+bool ListenRequest::isMethodHead() const
 {
     dPvt();
     return (p._requestMethod==qbl("head"));
 }
 
-bool QRPCListenRequest::isMethodGet()const
+bool ListenRequest::isMethodGet()const
 {
     dPvt();
     return (p._requestMethod==qbl("get"));
 }
 
-bool QRPCListenRequest::isMethodPost()const
+bool ListenRequest::isMethodPost()const
 {
     dPvt();
     return (p._requestMethod==qbl("post"));
 }
 
-bool QRPCListenRequest::isMethodPut() const
+bool ListenRequest::isMethodPut() const
 {
     dPvt();
     return (p._requestMethod==qbl("put"));
 }
 
-bool QRPCListenRequest::isMethodDelete() const
+bool ListenRequest::isMethodDelete() const
 {
     dPvt();
     return (p._requestMethod==qbl("delete"));
 }
 
-bool QRPCListenRequest::isMethodUpload() const
+bool ListenRequest::isMethodUpload() const
 {
     dPvt();
     return !p.uploadedFiles.isEmpty();
 }
 
-bool QRPCListenRequest::isMethodOptions() const
+bool ListenRequest::isMethodOptions() const
 {
     dPvt();
     return (p._requestMethod==qbl("options"));
 }
 
-bool QRPCListenRequest::canMethodHead()
+bool ListenRequest::canMethodHead()
 {
     if(!this->isMethodHead())
         return this->co().setBadGateway().isOK();
     return true;
 }
 
-bool QRPCListenRequest::canMethodGet()
+bool ListenRequest::canMethodGet()
 {
     if(!this->isMethodGet())
         return this->co().setBadGateway().isOK();
     return true;
 }
 
-bool QRPCListenRequest::canMethodPost()
+bool ListenRequest::canMethodPost()
 {
     if(!this->isMethodPost())
         return this->co().setBadGateway().isOK();
     return true;
 }
 
-bool QRPCListenRequest::canMethodPut()
+bool ListenRequest::canMethodPut()
 {
     if(!this->isMethodPut())
         return this->co().setBadGateway().isOK();
     return true;
 }
 
-bool QRPCListenRequest::canMethodDelete()
+bool ListenRequest::canMethodDelete()
 {
     if(!this->isMethodDelete())
         return this->co().setBadGateway().isOK();
     return true;
 }
 
-bool QRPCListenRequest::canMethodUpload()
+bool ListenRequest::canMethodUpload()
 {
     if(!this->isMethodUpload())
         return this->co().setBadGateway().isOK();
     return true;
 }
 
-bool QRPCListenRequest::canMethodOptions()
+bool ListenRequest::canMethodOptions()
 {
     if(!this->isMethodOptions())
         return this->co().setBadGateway().isOK();
     return true;
 }
 
-void QRPCListenRequest::start()
+void ListenRequest::start()
 {
     dPvt();
     auto onTimeOut=[this, &p]{
@@ -366,51 +366,51 @@ void QRPCListenRequest::start()
     p.eventLoop.exec();
 }
 
-void *QRPCListenRequest::data() const
+void *ListenRequest::data() const
 {
     dPvt();
     return p._data;
 }
 
-void QRPCListenRequest::setData(void *data)
+void ListenRequest::setData(void *data)
 {
     dPvt();
     p._data = data;
 }
 
-QRPCListenRequestCode &QRPCListenRequest::codeOption()
+ListenRequestCode &ListenRequest::codeOption()
 {
     dPvt();
     return p.listenCode;
 }
 
-QRPCListenRequestCode &QRPCListenRequest::co()
+ListenRequestCode &ListenRequest::co()
 {
     dPvt();
     return p.listenCode;
 }
 
-QRPCListenRequestCode &QRPCListenRequest::co(const QVariant &v)
+ListenRequestCode &ListenRequest::co(const QVariant &v)
 {
     dPvt();
     p.listenCode=v;
     return p.listenCode;
 }
 
-QByteArray QRPCListenRequest::hash() const
+QByteArray ListenRequest::hash() const
 {
     dPvt();
     auto bytes=p._requestPath;
     return QCryptographicHash::hash(bytes, QCryptographicHash::Md5).toHex();
 }
 
-bool QRPCListenRequest::isValid() const
+bool ListenRequest::isValid() const
 {
     dPvt();
     return !p._requestUuid.isNull();
 }
 
-bool QRPCListenRequest::isEmpty() const
+bool ListenRequest::isEmpty() const
 {
     dPvt();
     if(p._requestPath.trimmed().isEmpty())
@@ -422,13 +422,13 @@ bool QRPCListenRequest::isEmpty() const
     return true;
 }
 
-void QRPCListenRequest::clear()
+void ListenRequest::clear()
 {
     dPvt();
     p.clear();
 }
 
-bool QRPCListenRequest::fromRequest(const QRPCListenRequest &request)
+bool ListenRequest::fromRequest(const ListenRequest &request)
 {
     if(!this->fromHash(request.toHash()))
         return false;
@@ -438,14 +438,14 @@ bool QRPCListenRequest::fromRequest(const QRPCListenRequest &request)
     return true;
 }
 
-bool QRPCListenRequest::fromMap(const QVariantMap &vRequest)
+bool ListenRequest::fromMap(const QVariantMap &vRequest)
 {
     dPvt();
     p.clear();
     return this->mergeMap(vRequest);
 }
 
-bool QRPCListenRequest::mergeMap(const QVariantMap &vRequest)
+bool ListenRequest::mergeMap(const QVariantMap &vRequest)
 {
     auto&metaObject =*this->metaObject();
     for(auto i = metaObject.propertyOffset() ; i < metaObject.propertyCount() ; i++){
@@ -557,14 +557,14 @@ bool QRPCListenRequest::mergeMap(const QVariantMap &vRequest)
     return this->isValid();
 }
 
-bool QRPCListenRequest::fromHash(const QVariantHash &vRequest)
+bool ListenRequest::fromHash(const QVariantHash &vRequest)
 {
     dPvt();
     p.clear();
     return this->mergeHash(vRequest);
 }
 
-bool QRPCListenRequest::mergeHash(const QVariantHash &vRequest)
+bool ListenRequest::mergeHash(const QVariantHash &vRequest)
 {
     auto&metaObject =*this->metaObject();
     for(auto i = metaObject.propertyOffset() ; i < metaObject.propertyCount() ; i++){
@@ -677,7 +677,7 @@ bool QRPCListenRequest::mergeHash(const QVariantHash &vRequest)
     return this->isValid();
 }
 
-bool QRPCListenRequest::fromResponseMap(const QVariantHash &vRequest)
+bool ListenRequest::fromResponseMap(const QVariantHash &vRequest)
 {
     dPvt();
     p.clearResponse();
@@ -750,7 +750,7 @@ bool QRPCListenRequest::fromResponseMap(const QVariantHash &vRequest)
     return this->isValid();
 }
 
-bool QRPCListenRequest::fromResponseHash(const QVariantHash &vRequest)
+bool ListenRequest::fromResponseHash(const QVariantHash &vRequest)
 {
     dPvt();
     p.clearResponse();
@@ -823,33 +823,33 @@ bool QRPCListenRequest::fromResponseHash(const QVariantHash &vRequest)
     return this->isValid();
 }
 
-bool QRPCListenRequest::fromJson(const QByteArray &bytes)
+bool ListenRequest::fromJson(const QByteArray &bytes)
 {
     QJsonParseError*parser=nullptr;
     auto v=QJsonDocument::fromJson(bytes, parser).object().toVariantHash();
     return this->fromHash(v);
 }
 
-QByteArray QRPCListenRequest::toJson() const
+QByteArray ListenRequest::toJson() const
 {
     auto vMap=this->toHash();
     auto bytes=QJsonDocument::fromVariant(vMap).toJson(QJsonDocument::Compact);
     return bytes;
 }
 
-QVariantMap QRPCListenRequest::toMap() const
+QVariantMap ListenRequest::toMap() const
 {
     dPvt();
     return p.toVMap<QVariantMap>();
 }
 
-QVariantHash QRPCListenRequest::toHash() const
+QVariantHash ListenRequest::toHash() const
 {
     dPvt();
     return p.toVMap<QVariantHash>();
 }
 
-void QRPCListenRequest::requestStart()
+void ListenRequest::requestStart()
 {
     dPvt();
     emit
@@ -857,37 +857,37 @@ void QRPCListenRequest::requestStart()
     p.eventLoop.exec();
 }
 
-QUuid &QRPCListenRequest::listenUuid() const
+QUuid &ListenRequest::listenUuid() const
 {
     dPvt();
     return p._listenUuid;
 }
 
-void QRPCListenRequest::setListenUuid(const QUuid &value)
+void ListenRequest::setListenUuid(const QUuid &value)
 {
     dPvt();
     p._listenUuid=value;
 }
 
-QUuid &QRPCListenRequest::requestUuid() const
+QUuid &ListenRequest::requestUuid() const
 {
     dPvt();
     return p._requestUuid;
 }
 
-void QRPCListenRequest::setRequestUuid(const QUuid &value)
+void ListenRequest::setRequestUuid(const QUuid &value)
 {
     dPvt();
     p._requestUuid = value;
 }
 
-QByteArray &QRPCListenRequest::requestProtocol() const
+QByteArray &ListenRequest::requestProtocol() const
 {
     dPvt();
     return p._requestProtocol;
 }
 
-void QRPCListenRequest::setRequestProtocol(const QVariant &value)
+void ListenRequest::setRequestProtocol(const QVariant &value)
 {
     dPvt();
     auto ivalue=value.toLongLong();
@@ -900,66 +900,66 @@ void QRPCListenRequest::setRequestProtocol(const QVariant &value)
     }
 }
 
-QByteArray &QRPCListenRequest::requestPath() const
+QByteArray &ListenRequest::requestPath() const
 {
     dPvt();
     return p._requestPath;
 }
 
-void QRpc::QRPCListenRequest::setRequestPath(const QVariant &value)
+void QRpc::ListenRequest::setRequestPath(const QVariant &value)
 {
     dPvt();
     p._requestPath=value.toByteArray();
 }
 
-QByteArray &QRPCListenRequest::requestMethod() const
+QByteArray &ListenRequest::requestMethod() const
 {
     dPvt();
     return p._requestMethod;
 }
 
-void QRPCListenRequest::setRequestMethod(const QVariant &value)
+void ListenRequest::setRequestMethod(const QVariant &value)
 {
     dPvt();
     auto ivalue=value.toLongLong();
     if(ivalue>0)
-        p._requestMethod=QRPCRequestMethodName.value(ivalue).toUtf8();
+        p._requestMethod=RequestMethodName.value(ivalue).toUtf8();
     else
         p._requestMethod=value.toByteArray().toLower();
 }
 
-QVariantHash &QRPCListenRequest::requestHeader() const
+QVariantHash &ListenRequest::requestHeader() const
 {
     dPvt();
     return p._requestHeader;
 }
 
-void QRPCListenRequest::setRequestHeader(const QVariantHash &value)
+void ListenRequest::setRequestHeader(const QVariantHash &value)
 {
     dPvt();
     p.setRequestHeader(value);
 }
 
-QVariantHash &QRPCListenRequest::requestParameter() const
+QVariantHash &ListenRequest::requestParameter() const
 {
     dPvt();
     return p._requestParameter;
 }
 
-void QRPCListenRequest::setRequestParameter(const QVariantHash &value)
+void ListenRequest::setRequestParameter(const QVariantHash &value)
 {
     dPvt();
     p._requestParamCache.clear();
     p._requestParameter=value;
 }
 
-QVariant &QRPCListenRequest::requestBody() const
+QVariant &ListenRequest::requestBody() const
 {
     dPvt();
     return p._requestBody;
 }
 
-QVariantMap QRPCListenRequest::requestBodyMap() const
+QVariantMap ListenRequest::requestBodyMap() const
 {
     dPvt();
     switch (qTypeId(p._requestBody))
@@ -975,7 +975,7 @@ QVariantMap QRPCListenRequest::requestBodyMap() const
     }
 }
 
-QVariantHash QRPCListenRequest::requestBodyHash() const
+QVariantHash ListenRequest::requestBodyHash() const
 {
     dPvt();
     switch (qTypeId(p._requestBody))
@@ -991,7 +991,7 @@ QVariantHash QRPCListenRequest::requestBodyHash() const
     return {};
 }
 
-bool QRPCListenRequest::requestParserBodyMap()
+bool ListenRequest::requestParserBodyMap()
 {
     dPvt();
     QVariantMap body;
@@ -1001,13 +1001,13 @@ bool QRPCListenRequest::requestParserBodyMap()
     return true;
 }
 
-bool QRPCListenRequest::requestParserBodyMap(const QVariant &property)
+bool ListenRequest::requestParserBodyMap(const QVariant &property)
 {
     QVariantMap body;
     return this->requestParserBodyMap(property, body);
 }
 
-bool QRPCListenRequest::requestParserBodyMap(const QVariant &property, QVariantMap &body) const
+bool ListenRequest::requestParserBodyMap(const QVariant &property, QVariantMap &body) const
 {
     dPvt();
     bool __return=true;
@@ -1058,7 +1058,7 @@ bool QRPCListenRequest::requestParserBodyMap(const QVariant &property, QVariantM
     return __return;
 }
 
-bool QRPCListenRequest::requestParserBodyHash()
+bool ListenRequest::requestParserBodyHash()
 {
     dPvt();
     QVariantHash body;
@@ -1068,13 +1068,13 @@ bool QRPCListenRequest::requestParserBodyHash()
     return true;
 }
 
-bool QRPCListenRequest::requestParserBodyHash(const QVariant &property)
+bool ListenRequest::requestParserBodyHash(const QVariant &property)
 {
     QVariantHash body;
     return this->requestParserBodyHash(property, body);
 }
 
-bool QRPCListenRequest::requestParserBodyHash(const QVariant &property, QVariantHash &body) const
+bool ListenRequest::requestParserBodyHash(const QVariant &property, QVariantHash &body) const
 {
     dPvt();
     bool __return=true;
@@ -1125,25 +1125,25 @@ bool QRPCListenRequest::requestParserBodyHash(const QVariant &property, QVariant
     return __return;
 }
 
-QVariantList &QRPCListenRequest::requestParserProperty()
+QVariantList &ListenRequest::requestParserProperty()
 {
     dPvt();
     return p._requestParserProperty;
 }
 
-QVariant QRPCListenRequest::requestParamMap(const QByteArray &key) const
+QVariant ListenRequest::requestParamMap(const QByteArray &key) const
 {
     return this->requestParamHash(key);
 }
 
-QVariantMap QRPCListenRequest::requestParamMap()const
+QVariantMap ListenRequest::requestParamMap()const
 {
     if(this->isMethodPost() || this->isMethodPut())
         return this->requestBodyMap();
     return QVariant(this->requestParameter()).toMap();
 }
 
-QVariant QRPCListenRequest::requestParamHash(const QByteArray &key) const
+QVariant ListenRequest::requestParamHash(const QByteArray &key) const
 {
     dPvt();
     const auto&map=p.requestParamCache();
@@ -1172,13 +1172,13 @@ QVariant QRPCListenRequest::requestParamHash(const QByteArray &key) const
     return {};
 }
 
-QVariantHash QRPCListenRequest::requestParamHash() const
+QVariantHash ListenRequest::requestParamHash() const
 {
     dPvt();
     return p.requestParamCache();
 }
 
-QVariantList QRPCListenRequest::requestBodyList() const
+QVariantList ListenRequest::requestBodyList() const
 {
     dPvt();
     switch (qTypeId(p._requestBody)) {
@@ -1190,7 +1190,7 @@ QVariantList QRPCListenRequest::requestBodyList() const
     }
 }
 
-void QRPCListenRequest::setRequestBody(const QVariant &value)
+void ListenRequest::setRequestBody(const QVariant &value)
 {
     dPvt();
     QVariant _body;
@@ -1234,19 +1234,19 @@ void QRPCListenRequest::setRequestBody(const QVariant &value)
     p._requestBody=_body;
 }
 
-int QRPCListenRequest::requestTimeout() const
+int ListenRequest::requestTimeout() const
 {
     dPvt();
     return p._requestTimeout;
 }
 
-void QRPCListenRequest::setRequestTimeout(int value)
+void ListenRequest::setRequestTimeout(int value)
 {
     dPvt();
     p._requestTimeout = value;
 }
 
-QString QRPCListenRequest::uploadedFileName() const
+QString ListenRequest::uploadedFileName() const
 {
     dPvt();
     if(p.uploadedFiles.isEmpty())
@@ -1254,7 +1254,7 @@ QString QRPCListenRequest::uploadedFileName() const
     return p.uploadedFiles.begin().key();
 }
 
-QFile *QRPCListenRequest::uploadedFile() const
+QFile *ListenRequest::uploadedFile() const
 {
     dPvt();
     if(p.uploadedFiles.isEmpty())
@@ -1263,13 +1263,13 @@ QFile *QRPCListenRequest::uploadedFile() const
     return p.uploadedFiles.begin().value();
 }
 
-QHash<QString, QFile *> &QRPCListenRequest::uploadedFiles() const
+QHash<QString, QFile *> &ListenRequest::uploadedFiles() const
 {
     dPvt();
     return p.uploadedFiles;
 }
 
-void QRPCListenRequest::setUploadedFiles(const QVariant &vFiles)
+void ListenRequest::setUploadedFiles(const QVariant &vFiles)
 {
     dPvt();
     auto files=vFiles.toStringList();
@@ -1286,20 +1286,20 @@ void QRPCListenRequest::setUploadedFiles(const QVariant &vFiles)
     }
 }
 
-QFile *QRPCListenRequest::temporaryFile(const QString &fileName)
+QFile *ListenRequest::temporaryFile(const QString &fileName)
 {
     static QTemporaryFile f;
     dPvt();
     return p.uploadedFiles.value(fileName);
 }
 
-QVariantHash &QRPCListenRequest::responseHeader() const
+QVariantHash &ListenRequest::responseHeader() const
 {
     dPvt();
     return p._responseHeader;
 }
 
-void QRPCListenRequest::setResponseHeader(const QVariantHash &value)
+void ListenRequest::setResponseHeader(const QVariantHash &value)
 {
     dPvt();
     p._responseHeader.clear();
@@ -1312,30 +1312,30 @@ void QRPCListenRequest::setResponseHeader(const QVariantHash &value)
     }
 }
 
-void QRPCListenRequest::setResponseHeader(const QRPCHttpHeaders &value)
+void ListenRequest::setResponseHeader(const HttpHeaders &value)
 {
     this->setResponseHeader(value.rawHeader());
 }
 
-QVariantHash &QRPCListenRequest::responseCallback() const
+QVariantHash &ListenRequest::responseCallback() const
 {
     dPvt();
     return p._responseCallback;
 }
 
-void QRPCListenRequest::setResponseCallback(const QVariantHash &value)
+void ListenRequest::setResponseCallback(const QVariantHash &value)
 {
     dPvt();
     p._responseCallback=value;
 }
 
-QVariant&QRPCListenRequest::responseBody() const
+QVariant&ListenRequest::responseBody() const
 {
     dPvt();
     return p._responseBody;
 }
 
-QByteArray QRPCListenRequest::responseBodyBytes() const
+QByteArray ListenRequest::responseBodyBytes() const
 {
     dPvt();
     QVariant v;
@@ -1391,7 +1391,7 @@ QByteArray QRPCListenRequest::responseBodyBytes() const
     return {};
 }
 
-void QRPCListenRequest::setResponseBody(const QVariant &value)
+void ListenRequest::setResponseBody(const QVariant &value)
 {
     dPvt();
     switch (qTypeId(value)) {
@@ -1411,52 +1411,52 @@ void QRPCListenRequest::setResponseBody(const QVariant &value)
     }
 }
 
-int QRPCListenRequest::responseCode(int code) const
+int ListenRequest::responseCode(int code) const
 {
     dPvt();
     return (p._responseCode>0)?p._responseCode:code;
 }
 
-void QRPCListenRequest::setResponseCode(const int &value)
+void ListenRequest::setResponseCode(const int &value)
 {
     dPvt();
     p._responseCode = value;
 }
 
-QByteArray QRPCListenRequest::responsePhrase() const
+QByteArray ListenRequest::responsePhrase() const
 {
     dPvt();
     if(p._responsePhrase.isEmpty())
-        return QRPCListenRequestCode::reasonPhrase(this->responseCode()).toUtf8();
+        return ListenRequestCode::reasonPhrase(this->responseCode()).toUtf8();
     return p._responsePhrase;
 }
 
-QByteArray QRPCListenRequest::responsePhrase(const int code)const
+QByteArray ListenRequest::responsePhrase(const int code)const
 {
     auto c=(code>0)?code:this->responseCode();
-    return QRPCListenRequestCode::reasonPhrase(c).toUtf8();
+    return ListenRequestCode::reasonPhrase(c).toUtf8();
 }
 
-void QRPCListenRequest::setResponsePhrase(const QByteArray &value)
+void ListenRequest::setResponsePhrase(const QByteArray &value)
 {
     dPvt();
     p._responsePhrase = value;
 }
 
-const QUuid QRPCListenRequest::makeUuid()
+const QUuid ListenRequest::makeUuid()
 {
     dPvt();
     p.makeUuid();
     return p._requestUuid;
 }
 
-int QRPCListenRequest::requestContentType() const
+int ListenRequest::requestContentType() const
 {
     dPvt();
     return p._requestContentType;
 }
 
-void QRPCListenRequest::setRequestContentType(const QVariant &value)
+void ListenRequest::setRequestContentType(const QVariant &value)
 {
     dPvt();
     auto content_type=ContentType(value.toInt());
@@ -1466,9 +1466,9 @@ void QRPCListenRequest::setRequestContentType(const QVariant &value)
         p._requestContentType = content_type;
 }
 
-void QRPCListenRequest::setRequestResponse(QObject *request)
+void ListenRequest::setRequestResponse(QObject *request)
 {
-    auto writeResponse=[this](QRPCHttpResponse*response){
+    auto writeResponse=[this](HttpResponse*response){
         if(response!=nullptr){
             this->setResponseHeader(response->header());
             this->setResponseBody(response->body());
@@ -1476,15 +1476,15 @@ void QRPCListenRequest::setRequestResponse(QObject *request)
         }
     };
 
-    QRPCHttpResponse*response=nullptr;
-    if(request->metaObject()->className()==QRPCRequest::staticMetaObject.className())
-        response=&dynamic_cast<QRPCRequest*>(request)->response();
+    HttpResponse*response=nullptr;
+    if(request->metaObject()->className()==Request::staticMetaObject.className())
+        response=&dynamic_cast<Request*>(request)->response();
     else
-        response=dynamic_cast<QRPCHttpResponse*>(request);
+        response=dynamic_cast<HttpResponse*>(request);
     writeResponse(response);
 }
 
-void QRPCListenRequest::setControllerSetting(const ControllerSetting&setting)
+void ListenRequest::setControllerSetting(const ControllerSetting&setting)
 {
     if(!setting.enabled())
         return;
@@ -1506,19 +1506,19 @@ void QRPCListenRequest::setControllerSetting(const ControllerSetting&setting)
     }
 }
 
-QString QRpc::QRPCListenRequest::authorizationBasic() const
+QString QRpc::ListenRequest::authorizationBasic() const
 {
     dPvt();
     return p.authorizationParser(qbl("Basic"));
 }
 
-QString QRPCListenRequest::authorizationBearer() const
+QString ListenRequest::authorizationBearer() const
 {
     dPvt();
     return p.authorizationParser(qbl("Bearer"));
 }
 
-QString QRPCListenRequest::authorizationService() const
+QString ListenRequest::authorizationService() const
 {
     dPvt();
     return p.authorizationParser(qbl("Service"));

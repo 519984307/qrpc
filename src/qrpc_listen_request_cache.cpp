@@ -8,23 +8,23 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenRequestCachePvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenRequestCachePvt*>(this->p)
 
-class QRPCListenRequestCachePvt:public QObject{
+class ListenRequestCachePvt:public QObject{
 public:
     QMutex lock;
-    QHash<QString, QRPCListenRequest*> cache;
-    QRPCListen*listen()
+    QHash<QString, ListenRequest*> cache;
+    Listen*listen()
     {
-        auto listen=dynamic_cast<QRPCListen*>(this->parent()->parent());
+        auto listen=dynamic_cast<Listen*>(this->parent()->parent());
         return listen;
     }
 
-    explicit QRPCListenRequestCachePvt(QObject*parent):QObject(parent)
+    explicit ListenRequestCachePvt(QObject*parent):QObject(parent)
     {
     }
 
-    virtual ~QRPCListenRequestCachePvt()
+    virtual ~ListenRequestCachePvt()
     {
         this->clear();
     }
@@ -38,44 +38,44 @@ public:
     }
 };
 
-QRPCListenRequestCache::QRPCListenRequestCache(QRPCListen *parent):QObject(parent)
+ListenRequestCache::ListenRequestCache(Listen *parent):QObject(parent)
 {
-    this->p=new QRPCListenRequestCachePvt(this);
+    this->p=new ListenRequestCachePvt(this);
 }
 
-QRPCListenRequestCache::~QRPCListenRequestCache()
+ListenRequestCache::~ListenRequestCache()
 {
     dPvt();delete&p;
 }
 
-void QRPCListenRequestCache::clear()
+void ListenRequestCache::clear()
 {
     dPvt();
     p.clear();
 }
 
-QRPCListenRequest &QRPCListenRequestCache::toRequest(const QUuid &uuid)
+ListenRequest &ListenRequestCache::toRequest(const QUuid &uuid)
 {
     dPvt();
     QMutexLOCKER locker(&p.lock);
-    static QRPCListenRequest ___QRPCListenRequest;
+    static ListenRequest ___ListenRequest;
     auto request=p.cache.value(uuid.toString());
     if(request!=nullptr)
         return*request;
-    return ___QRPCListenRequest;
+    return ___ListenRequest;
 }
 
-QRPCListenRequest &QRPCListenRequestCache::createRequest()
+ListenRequest &ListenRequestCache::createRequest()
 {
     QVariant vRequest;
     return this->createRequest(vRequest);
 }
 
-QRPCListenRequest &QRPCListenRequestCache::createRequest(const QVariant &vRequest)
+ListenRequest &ListenRequestCache::createRequest(const QVariant &vRequest)
 {
     dPvt();
     QMutexLOCKER locker(&p.lock);
-    auto request = new QRPCListenRequest(vRequest);
+    auto request = new ListenRequest(vRequest);
     request->setListenUuid(p.listen()->uuid());
     if(request->isEmpty() || !request->isValid())
         request->setRequestBody(vRequest);

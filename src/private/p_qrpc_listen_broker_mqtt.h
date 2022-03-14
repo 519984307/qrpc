@@ -5,26 +5,26 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenBrokerMQTT class
+//! \brief The ListenBrokerMQTT class
 //!
-class Q_RPC_EXPORT QRPCListenBrokerMQTT:public QRPCListen
+class Q_RPC_EXPORT ListenBrokerMQTT:public Listen
 {
     Q_OBJECT
 public:
     //!
-    //! \brief QRPCListenBrokerMQTT
+    //! \brief ListenBrokerMQTT
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenBrokerMQTT(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenBrokerMQTT(QObject*parent=nullptr);
 
     //!
-    //! \brief ~QRPCListenBrokerMQTT
+    //! \brief ~ListenBrokerMQTT
     //!
-    ~QRPCListenBrokerMQTT();
+    ~ListenBrokerMQTT();
 private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(Mqtt, QRPCListenBrokerMQTT)
+QRPC_LISTTEN_AUTO_REGISTER(Mqtt, ListenBrokerMQTT)
 
 }

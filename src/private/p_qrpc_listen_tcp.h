@@ -8,14 +8,14 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenTCP class
+//! \brief The ListenTCP class
 //!
-class Q_RPC_EXPORT QRPCListenTCP:public QRPCListen{
+class Q_RPC_EXPORT ListenTCP:public Listen{
     Q_OBJECT
 public:
 
-    explicit QRPCListenTCP(QObject*parent=nullptr);
-    ~QRPCListenTCP();
+    explicit ListenTCP(QObject*parent=nullptr);
+    ~ListenTCP();
 
     //!
     //! \brief start
@@ -32,6 +32,6 @@ private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(TcpSocket, QRPCListenTCP)
+QRPC_LISTTEN_AUTO_REGISTER(TcpSocket, ListenTCP)
 
 }

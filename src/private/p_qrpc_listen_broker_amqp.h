@@ -5,27 +5,27 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenBrokerAMQP class
+//! \brief The ListenBrokerAMQP class
 //!
-class Q_RPC_EXPORT QRPCListenBrokerAMQP:public QRPCListen
+class Q_RPC_EXPORT ListenBrokerAMQP:public Listen
 {
     Q_OBJECT
 public:
 
     //!
-    //! \brief QRPCListenBrokerAMQP
+    //! \brief ListenBrokerAMQP
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenBrokerAMQP(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenBrokerAMQP(QObject*parent=nullptr);
 
     //!
-    //! \brief ~QRPCListenBrokerAMQP
+    //! \brief ~ListenBrokerAMQP
     //!
-    ~QRPCListenBrokerAMQP();
+    ~ListenBrokerAMQP();
 private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(Amqp, QRPCListenBrokerAMQP)
+QRPC_LISTTEN_AUTO_REGISTER(Amqp, ListenBrokerAMQP)
 
 }

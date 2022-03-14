@@ -13,17 +13,17 @@
 
 namespace QRpc {
 
-class QRPCRequest;
+class Request;
 //!
-//! \brief The QRPCListenRequest class
+//! \brief The ListenRequest class
 //!
-class Q_RPC_EXPORT QRPCListenRequest: public QObject
+class Q_RPC_EXPORT ListenRequest: public QObject
 {
     Q_OBJECT
     friend class QRPCServer;
-    friend class QRPCListenRequestCache;
-    friend class QRPCListenQRPCSlotPvt;
-    friend class QRPCRequestPvt;
+    friend class ListenRequestCache;
+    friend class ListenQRPCSlotPvt;
+    friend class RequestPvt;
 public:
 
     Q_PROPERTY(QUuid listenUuid READ listenUuid WRITE setListenUuid NOTIFY listenUuidChanged )
@@ -44,28 +44,28 @@ public:
 
 public:
     //!
-    //! \brief QRPCListenRequest
+    //! \brief ListenRequest
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenRequest(QObject *parent=nullptr);
+    Q_INVOKABLE explicit ListenRequest(QObject *parent=nullptr);
 
     //!
-    //! \brief QRPCListenRequest
+    //! \brief ListenRequest
     //! \param requestBody
     //! \param parent
     //!
-    explicit QRPCListenRequest(const QVariant &requestBody, QObject *parent=nullptr);
+    explicit ListenRequest(const QVariant &requestBody, QObject *parent=nullptr);
 
     //!
-    //! \brief QRPCListenRequest
+    //! \brief ListenRequest
     //! \param requestBody
     //! \param setting
     //! \param parent
     //!
-    explicit QRPCListenRequest(const QVariant &requestBody, const ControllerSetting &setting, QObject *parent=nullptr);
+    explicit ListenRequest(const QVariant &requestBody, const ControllerSetting &setting, QObject *parent=nullptr);
 
 
-    ~QRPCListenRequest();
+    ~ListenRequest();
 public:
     //!
     Q_DECLARE_VU;
@@ -185,14 +185,14 @@ public:
     //! \brief codeOption
     //! \return
     //!
-    QRPCListenRequestCode&codeOption();
+    ListenRequestCode&codeOption();
 
     //!
     //! \brief co
     //! \return
     //!
-    QRPCListenRequestCode&co();
-    QRPCListenRequestCode&co(const QVariant &v);
+    ListenRequestCode&co();
+    ListenRequestCode&co(const QVariant &v);
 
     //!
     //! \brief hash
@@ -222,7 +222,7 @@ public:
     //! \param request
     //! \return
     //!
-    bool fromRequest(const QRPCListenRequest &request);
+    bool fromRequest(const ListenRequest &request);
 
     //!
     //! \brief fromMap
@@ -511,7 +511,7 @@ public:
     //!
     QVariantHash&responseHeader() const;
     void setResponseHeader(const QVariantHash &value);
-    void setResponseHeader(const QRPCHttpHeaders &value);
+    void setResponseHeader(const HttpHeaders &value);
 
     //!
     //! \brief responseCallback

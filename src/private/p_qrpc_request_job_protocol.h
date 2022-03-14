@@ -6,23 +6,23 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestJobProtocol class
+//! \brief The RequestJobProtocol class
 //!
-class QRPCRequestJobProtocol : public QObject
+class RequestJobProtocol : public QObject
 {
     Q_OBJECT
 public:
-    QRPCRequest::Action action=QRPCRequest::acRequest;
+    Request::Action action=Request::acRequest;
     QString action_fileName;
     QSslConfiguration sslConfiguration;
 
-    Q_INVOKABLE explicit QRPCRequestJobProtocol(QObject*parent);
+    Q_INVOKABLE explicit RequestJobProtocol(QObject*parent);
 
-    ~QRPCRequestJobProtocol();
+    ~RequestJobProtocol();
 
-    virtual QRPCRequestJobProtocol&clear();
+    virtual RequestJobProtocol&clear();
 
-    virtual bool call(QRPCRequestJobResponse*response);
+    virtual bool call(RequestJobResponse*response);
 
 signals:
     void callback(const QVariant&vHash);

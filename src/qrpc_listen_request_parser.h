@@ -9,50 +9,50 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenRequestParser class
+//! \brief The ListenRequestParser class
 //!
-class Q_RPC_EXPORT QRPCListenRequestParser : public QObject
+class Q_RPC_EXPORT ListenRequestParser : public QObject
 {
     Q_OBJECT
-    QRPC_PARSER_DECLARE_BASE_PATH(QRPCListenRequestParser,"/")
-    friend class QRPCListenQRPCSlotPvt;
+    QRPC_PARSER_DECLARE_BASE_PATH(ListenRequestParser,"/")
+    friend class ListenQRPCSlotPvt;
 public:
 
     //!
-    //! \brief QRPCListenRequestParser
+    //! \brief ListenRequestParser
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenRequestParser(QObject *parent = nullptr);
+    Q_INVOKABLE explicit ListenRequestParser(QObject *parent = nullptr);
 
     //!
-    //! \brief ~QRPCListenRequestParser
+    //! \brief ~ListenRequestParser
     //!
-    ~QRPCListenRequestParser();
+    ~ListenRequestParser();
 
     //!
     //! \brief controller
     //! \return
     //!
-    virtual QRPCController &controller();
+    virtual Controller &controller();
 protected:
 
     //!
     //! \brief setController
     //! \param value
     //!
-    void setController(QRPCController *value);
+    void setController(Controller *value);
 public:
     //!
     //! \brief request
     //! \return
     //!
-    virtual QRPCListenRequest &request();
+    virtual ListenRequest &request();
 
     //!
     //! \brief rq
     //! \return
     //!
-    virtual QRPCListenRequest &rq();
+    virtual ListenRequest &rq();
 
     //!
     //! \brief canRoute

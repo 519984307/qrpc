@@ -8,22 +8,22 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestJobUDP class
+//! \brief The RequestJobUDP class
 //!
-class QRPCRequestJobUDP : public QRPCRequestJobProtocol
+class RequestJobUDP : public RequestJobProtocol
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE explicit QRPCRequestJobUDP(QObject*parent);
+    Q_INVOKABLE explicit RequestJobUDP(QObject*parent);
 
-    ~QRPCRequestJobUDP();
+    ~RequestJobUDP();
 
-    QRPCRequestJobResponse*response=nullptr;
+    RequestJobResponse*response=nullptr;
     QUdpSocket*m_socket=nullptr;
     QByteArray buffer;
 
 
-    virtual bool call(QRPCRequestJobResponse*response)override;
+    virtual bool call(RequestJobResponse*response)override;
 
 private slots:
 

@@ -12,41 +12,41 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenQRPCSlotPvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenQRPCSlotPvt*>(this->p)
 
-class QRPCListenQRPCSlotPvt:public QObject{
+class ListenQRPCSlotPvt:public QObject{
 public:
     bool locked=false;
     QMutex lockedMutex;
-    QRPCControllerRouter*controllerRouter=nullptr;
-    QRPCListenQRPC*listenQRPC=nullptr;
-    QList<const QMetaObject*> listenQRPCControllers;
+    ControllerRouter*controllerRouter=nullptr;
+    ListenQRPC*listenQRPC=nullptr;
+    QList<const QMetaObject*> listenControllers;
     QList<const QMetaObject*> listenQRPCParserRequest;
 
-    explicit QRPCListenQRPCSlotPvt(QRPCListenQRPCSlot*slot, QRPCListenQRPC*listenQRPC) : QObject(slot)
+    explicit ListenQRPCSlotPvt(ListenQRPCSlot*slot, ListenQRPC*listenQRPC) : QObject(slot)
     {
-        QObject::connect(slot, &QRPCListenQRPCSlot::requestInvoke, this, &QRPCListenQRPCSlotPvt::onRequestInvoke);
+        QObject::connect(slot, &ListenQRPCSlot::requestInvoke, this, &ListenQRPCSlotPvt::onRequestInvoke);
         this->listenQRPC = listenQRPC;
-        this->listenQRPCControllers=listenQRPC->server()->controllers();
+        this->listenControllers=listenQRPC->server()->controllers();
         this->listenQRPCParserRequest=listenQRPC->server()->parsers();
-        this->controllerRouter=QRPCControllerRouter::newRouter(this);
+        this->controllerRouter=ControllerRouter::newRouter(this);
     }
 
-    virtual ~QRPCListenQRPCSlotPvt()
+    virtual ~ListenQRPCSlotPvt()
     {
     }
 
-    void invokeController(QRPCListenRequest&request)
+    void invokeController(ListenRequest&request)
     {
         request.co().setMethodNotAllowed();
         QMetaMethod metaMethod;
         auto requestPath=request.requestPath().toLower();
 
-        for(auto&mObjController:this->listenQRPCControllers){
+        for(auto&mObjController:this->listenControllers){
             auto className=mObjController->className();
-            auto routeMethods = QRPCController::routeMethods(className);
+            auto routeMethods = Controller::routeMethods(className);
             if(!routeMethods.contains(requestPath)){//se nao contiver a rota
-                auto routeRedirect = QRPCController::routeRedirectCheckRoute(className, requestPath);
+                auto routeRedirect = Controller::routeRedirectCheckRoute(className, requestPath);
                 if(!routeRedirect){
     #if Q_RPC_LOG_SUPER_VERBOSE
                     sWarning()<<"Interface className ignored "<<className;
@@ -64,7 +64,7 @@ public:
             }
 
             QObject*objectController=sObj.data();
-            auto controller=dynamic_cast<QRPCController*>(objectController);
+            auto controller=dynamic_cast<Controller*>(objectController);
 
             if(controller==nullptr)
                 continue;
@@ -94,7 +94,7 @@ public:
                 return;
             }
 
-            if(!controller->canOperation()){
+            if(!controller->canOperation(metaMethod)){
                 if(controller->rq().co().isOK())
                     controller->rq().co().setBadRequest();
                 return;
@@ -134,7 +134,7 @@ public:
 
                 QMetaMethod methodParse;
 
-                if(!QRPCListenRequestParser::routeToMethod(*mObjParser, request.requestPath(), methodParse))
+                if(!ListenRequestParser::routeToMethod(*mObjParser, request.requestPath(), methodParse))
                     continue;
 
                 if(!methodParse.isValid())
@@ -149,7 +149,7 @@ public:
                 }
 
                 auto object=sObj.data();
-                auto parser=dynamic_cast<QRPCListenRequestParser*>(object);
+                auto parser=dynamic_cast<ListenRequestParser*>(object);
                 if(parser!=nullptr){
                     parser->setController(controller);
                     if(!parser->parse(methodParse)){
@@ -185,7 +185,7 @@ public:
                     vArgValue=request.toHash();
                     break;
                 default:
-                    vArgValue=QVariant::fromValue<QRPCListenRequest*>(&request);
+                    vArgValue=QVariant::fromValue<ListenRequest*>(&request);
                 }
             }
 
@@ -232,7 +232,7 @@ private slots:
 
         auto requestPath=vRequestHash.value(qsl("requestPath")).toString();
         const auto&controllerSetting=this->listenQRPC->server()->controllerOptions().setting(requestPath);
-        QRPCListenRequest request(vRequestHash, controllerSetting);
+        ListenRequest request(vRequestHash, controllerSetting);
         request.setUploadedFiles(uploadedFiles);
         if(!request.isValid())
             request.co().setBadRequest();
@@ -254,22 +254,22 @@ private slots:
     }
 };
 
-QRPCListenQRPCSlot::QRPCListenQRPCSlot(QRPCListenQRPC *listenQRPC):QThread(nullptr)
+ListenQRPCSlot::ListenQRPCSlot(ListenQRPC *listenQRPC):QThread(nullptr)
 {
-    this->p = new QRPCListenQRPCSlotPvt(this, listenQRPC);
+    this->p = new ListenQRPCSlotPvt(this, listenQRPC);
 }
 
-QRPCListenQRPCSlot::~QRPCListenQRPCSlot()
+ListenQRPCSlot::~ListenQRPCSlot()
 {
 
 }
 
-void QRPCListenQRPCSlot::run()
+void ListenQRPCSlot::run()
 {
     QThread::run();
 }
 
-bool QRPCListenQRPCSlot::canRequestInvoke(QVariantHash&v, const QVariant &uploadedFiles)
+bool ListenQRPCSlot::canRequestInvoke(QVariantHash&v, const QVariant &uploadedFiles)
 {
     dPvt();
     if(p.locked)
@@ -284,14 +284,14 @@ bool QRPCListenQRPCSlot::canRequestInvoke(QVariantHash&v, const QVariant &upload
     return true;
 }
 
-void QRPCListenQRPCSlot::start()
+void ListenQRPCSlot::start()
 {
     QThread::start();
     while(this->eventDispatcher()==nullptr)
         QThread::msleep(1);
 }
 
-bool QRPCListenQRPCSlot::lock()
+bool ListenQRPCSlot::lock()
 {
     dPvt();
     if(p.lockedMutex.tryLock(1))
@@ -299,7 +299,7 @@ bool QRPCListenQRPCSlot::lock()
     return false;
 }
 
-void QRPCListenQRPCSlot::unlock()
+void ListenQRPCSlot::unlock()
 {
     dPvt();
     p.lockedMutex.tryLock(1);

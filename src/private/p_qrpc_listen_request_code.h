@@ -6,9 +6,9 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenRequestCode class
+//! \brief The ListenRequestCode class
 //!
-class Q_RPC_EXPORT QRPCListenRequestCode : public QObject
+class Q_RPC_EXPORT ListenRequestCode : public QObject
 {
     Q_OBJECT
 public:
@@ -69,19 +69,19 @@ public:
     };
 
     //!
-    //! \brief QRPCListenRequestCode
+    //! \brief ListenRequestCode
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenRequestCode(QObject *parent = nullptr);
+    Q_INVOKABLE explicit ListenRequestCode(QObject *parent = nullptr);
 
-    ~QRPCListenRequestCode();
+    ~ListenRequestCode();
 
     //!
     //! \brief operator =
     //! \param v
     //! \return
     //!
-    QRPCListenRequestCode&operator=(const QVariant&v);
+    ListenRequestCode&operator=(const QVariant&v);
 
     //!
     //! \brief emptyData
@@ -101,7 +101,7 @@ public:
     //!
     int code();
     int code(const QVariant &code);
-    QRPCListenRequestCode&setCode();
+    ListenRequestCode&setCode();
 
     //!
     //! \brief reasonPhrase
@@ -129,50 +129,50 @@ public:
     //! \param phrase
     //! \return
     //!
-    QRPCListenRequestCode&setCode(QVariant code, const QString&phrase=QString());
+    ListenRequestCode&setCode(QVariant code, const QString&phrase=QString());
 
 
-    QRPCListenRequestCode&setContinue(const QString&phrase=QString());
-    QRPCListenRequestCode&setSwitchingProtocols(const QString&phrase=QString());
-    QRPCListenRequestCode&setOK(const QString&phrase=QString());
-    QRPCListenRequestCode&setCreated(const QString&phrase=QString());
-    QRPCListenRequestCode&setAccepted(const QString&phrase=QString());
-    QRPCListenRequestCode&setNonAuthoritativeInformation(const QString&phrase=QString());
-    QRPCListenRequestCode&setNoContent(const QString&phrase=QString());
-    QRPCListenRequestCode&setResetContent(const QString&phrase=QString());
-    QRPCListenRequestCode&setPartialContent(const QString&phrase=QString());
-    QRPCListenRequestCode&setMultipleChoices(const QString&phrase=QString());
-    QRPCListenRequestCode&setMovedPermanently(const QString&phrase=QString());
-    QRPCListenRequestCode&setFound(const QString&phrase=QString());
-    QRPCListenRequestCode&setSeeOther(const QString&phrase=QString());
-    QRPCListenRequestCode&setNotModified(const QString&phrase=QString());
-    QRPCListenRequestCode&setUseProxy(const QString&phrase=QString());
-    QRPCListenRequestCode&setTemporaryRedirect(const QString&phrase=QString());
-    QRPCListenRequestCode&setBadRequest(const QString&phrase=QString());
-    QRPCListenRequestCode&setUnauthorized(const QString&phrase=QString());
-    QRPCListenRequestCode&setPaymentRequired(const QString&phrase=QString());
-    QRPCListenRequestCode&setForbidden(const QString&phrase=QString());
-    QRPCListenRequestCode&setNotFound(const QString&phrase=QString());
-    QRPCListenRequestCode&setMethodNotAllowed(const QString&phrase=QString());
-    QRPCListenRequestCode&setNotAcceptable(const QString&phrase=QString());
-    QRPCListenRequestCode&setProxyAuthenticationRequired(const QString&phrase=QString());
-    QRPCListenRequestCode&setRequestTimeout(const QString&phrase=QString());
-    QRPCListenRequestCode&setConflict(const QString&phrase=QString());
-    QRPCListenRequestCode&setGone(const QString&phrase=QString());
-    QRPCListenRequestCode&setLengthRequired(const QString&phrase=QString());
-    QRPCListenRequestCode&setPreconditionFailed(const QString&phrase=QString());
-    QRPCListenRequestCode&setPayloadTooLarge(const QString&phrase=QString());
-    QRPCListenRequestCode&setURITooLong(const QString&phrase=QString());
-    QRPCListenRequestCode&setUnsupportedMediaType(const QString&phrase=QString());
-    QRPCListenRequestCode&setRangeNotSatisfiable(const QString&phrase=QString());
-    QRPCListenRequestCode&setExpectationFailed(const QString&phrase=QString());
-    QRPCListenRequestCode&setUpgradeRequired(const QString&phrase=QString());
-    QRPCListenRequestCode&setInternalServerError(const QString&phrase=QString());
-    QRPCListenRequestCode&setNotImplemented(const QString&phrase=QString());
-    QRPCListenRequestCode&setBadGateway(const QString&phrase=QString());
-    QRPCListenRequestCode&setServiceUnavailable(const QString&phrase=QString());
-    QRPCListenRequestCode&setGatewayTimeout(const QString&phrase=QString());
-    QRPCListenRequestCode &setHTTPVersionNotSupported(const QString&phrase=QString());
+    ListenRequestCode&setContinue(const QString&phrase=QString());
+    ListenRequestCode&setSwitchingProtocols(const QString&phrase=QString());
+    ListenRequestCode&setOK(const QString&phrase=QString());
+    ListenRequestCode&setCreated(const QString&phrase=QString());
+    ListenRequestCode&setAccepted(const QString&phrase=QString());
+    ListenRequestCode&setNonAuthoritativeInformation(const QString&phrase=QString());
+    ListenRequestCode&setNoContent(const QString&phrase=QString());
+    ListenRequestCode&setResetContent(const QString&phrase=QString());
+    ListenRequestCode&setPartialContent(const QString&phrase=QString());
+    ListenRequestCode&setMultipleChoices(const QString&phrase=QString());
+    ListenRequestCode&setMovedPermanently(const QString&phrase=QString());
+    ListenRequestCode&setFound(const QString&phrase=QString());
+    ListenRequestCode&setSeeOther(const QString&phrase=QString());
+    ListenRequestCode&setNotModified(const QString&phrase=QString());
+    ListenRequestCode&setUseProxy(const QString&phrase=QString());
+    ListenRequestCode&setTemporaryRedirect(const QString&phrase=QString());
+    ListenRequestCode&setBadRequest(const QString&phrase=QString());
+    ListenRequestCode&setUnauthorized(const QString&phrase=QString());
+    ListenRequestCode&setPaymentRequired(const QString&phrase=QString());
+    ListenRequestCode&setForbidden(const QString&phrase=QString());
+    ListenRequestCode&setNotFound(const QString&phrase=QString());
+    ListenRequestCode&setMethodNotAllowed(const QString&phrase=QString());
+    ListenRequestCode&setNotAcceptable(const QString&phrase=QString());
+    ListenRequestCode&setProxyAuthenticationRequired(const QString&phrase=QString());
+    ListenRequestCode&setRequestTimeout(const QString&phrase=QString());
+    ListenRequestCode&setConflict(const QString&phrase=QString());
+    ListenRequestCode&setGone(const QString&phrase=QString());
+    ListenRequestCode&setLengthRequired(const QString&phrase=QString());
+    ListenRequestCode&setPreconditionFailed(const QString&phrase=QString());
+    ListenRequestCode&setPayloadTooLarge(const QString&phrase=QString());
+    ListenRequestCode&setURITooLong(const QString&phrase=QString());
+    ListenRequestCode&setUnsupportedMediaType(const QString&phrase=QString());
+    ListenRequestCode&setRangeNotSatisfiable(const QString&phrase=QString());
+    ListenRequestCode&setExpectationFailed(const QString&phrase=QString());
+    ListenRequestCode&setUpgradeRequired(const QString&phrase=QString());
+    ListenRequestCode&setInternalServerError(const QString&phrase=QString());
+    ListenRequestCode&setNotImplemented(const QString&phrase=QString());
+    ListenRequestCode&setBadGateway(const QString&phrase=QString());
+    ListenRequestCode&setServiceUnavailable(const QString&phrase=QString());
+    ListenRequestCode&setGatewayTimeout(const QString&phrase=QString());
+    ListenRequestCode &setHTTPVersionNotSupported(const QString&phrase=QString());
 
 };
 

@@ -8,7 +8,7 @@ namespace QRpc {
 //!
 //! \brief The QRPCThread class
 //!
-class Q_RPC_EXPORT QRPCThread : public QThread{
+class Q_RPC_EXPORT Thread : public QThread{
     Q_OBJECT
 public:
 
@@ -16,12 +16,12 @@ public:
     //! \brief QRPCThread
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCThread(QObject *parent = nullptr);
+    Q_INVOKABLE explicit Thread(QObject *parent = nullptr);
 
     //!
     //! \brief ~QRPCThread
     //!
-    ~QRPCThread();
+    ~Thread();
 
     //!
     //! \brief run

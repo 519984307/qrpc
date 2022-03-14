@@ -5,27 +5,27 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCListenBrokerKAFKA class
+//! \brief The ListenBrokerKAFKA class
 //!
-class Q_RPC_EXPORT QRPCListenBrokerKAFKA:public QRPCListen
+class Q_RPC_EXPORT ListenBrokerKAFKA:public Listen
 {
     Q_OBJECT
 public:
 
     //!
-    //! \brief QRPCListenBrokerKAFKA
+    //! \brief ListenBrokerKAFKA
     //! \param parent
     //!
-    Q_INVOKABLE explicit QRPCListenBrokerKAFKA(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenBrokerKAFKA(QObject*parent=nullptr);
 
     //!
-    //! \brief ~QRPCListenBrokerKAFKA
+    //! \brief ~ListenBrokerKAFKA
     //!
-    ~QRPCListenBrokerKAFKA();
+    ~ListenBrokerKAFKA();
 private:
     void*p=nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(Kafka, QRPCListenBrokerKAFKA)
+QRPC_LISTTEN_AUTO_REGISTER(Kafka, ListenBrokerKAFKA)
 
 }

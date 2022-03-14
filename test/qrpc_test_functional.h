@@ -10,15 +10,15 @@
 
 namespace QRpc {
 
-class Server : public QRpc::QRPCServer
+class ServerTest : public QRpc::Server
 {
     Q_OBJECT
     Q_DECLARE_INSTANCE(Server)
 public:
-    Q_INVOKABLE explicit Server(QObject *parent = nullptr):QRpc::QRPCServer(parent)
+    Q_INVOKABLE explicit ServerTest(QObject *parent = nullptr):QRpc::Server(parent)
     {
     }
-    ~Server()
+    ~ServerTest()
     {
     }
 private:
@@ -93,9 +93,9 @@ public:
     PublicRecord&publicRecord=public_record;
     static QRpc::Server&service()
     {
-        auto&instance=QRpc::Server::instance();
+        auto&instance=QRpc::ServerTest::instance();
         if(!instance.isRunning()){
-            instance.setObjectName(QT_STRINGIFY(QRpcServer));
+            instance.setObjectName(QT_STRINGIFY(Server));
             {
                 auto&protocol=instance.colletions().protocol(QRpc::Http);
                 protocol.setEnabled(true);

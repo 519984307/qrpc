@@ -32,9 +32,9 @@ public:
         this->realMessageOnException=false;
     }
 
-    QRPCListenBrokerDataBase*listen()
+    ListenBrokerDataBase*listen()
     {
-        auto _listen=dynamic_cast<QRPCListenBrokerDataBase*>(this->parent());
+        auto _listen=dynamic_cast<ListenBrokerDataBase*>(this->parent());
         return _listen;
     }
 
@@ -287,19 +287,19 @@ public slots:
 
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCListenBrokerDataBasePvt*>(this->p)
+    auto&p =*reinterpret_cast<ListenBrokerDataBasePvt*>(this->p)
 
-class QRPCListenBrokerDataBasePvt:public QObject{
+class ListenBrokerDataBasePvt:public QObject{
 public:
     DataBaseListenerServer*_listenServer=nullptr;
-    QRPCListenBrokerDataBase*parent=nullptr;
+    ListenBrokerDataBase*parent=nullptr;
 
-    explicit QRPCListenBrokerDataBasePvt(QRPCListenBrokerDataBase*parent):QObject(parent)
+    explicit ListenBrokerDataBasePvt(ListenBrokerDataBase*parent):QObject(parent)
     {
         this->parent=parent;
     }
 
-    virtual ~QRPCListenBrokerDataBasePvt()
+    virtual ~ListenBrokerDataBasePvt()
     {
         this->stop();
     }
@@ -308,9 +308,9 @@ public:
     {
         auto&p=*this;
         p._listenServer = new DataBaseListenerServer(this->parent);
-        QObject::connect(this->parent, &QRPCListenBrokerDataBase::rpcResponse, p._listenServer, &DataBaseListenerServer::onRpcResponse);
-        QObject::connect(this->parent, &QRPCListenBrokerDataBase::rpcCheck, p._listenServer, &DataBaseListenerServer::queueCheck);
-        QObject::connect(this->parent, &QRPCListenBrokerDataBase::rpcResponseClient, p._listenServer, &DataBaseListenerServer::onRPCResponseClient);
+        QObject::connect(this->parent, &ListenBrokerDataBase::rpcResponse, p._listenServer, &DataBaseListenerServer::onRpcResponse);
+        QObject::connect(this->parent, &ListenBrokerDataBase::rpcCheck, p._listenServer, &DataBaseListenerServer::queueCheck);
+        QObject::connect(this->parent, &ListenBrokerDataBase::rpcResponseClient, p._listenServer, &DataBaseListenerServer::onRPCResponseClient);
 
         QObject::connect(p._listenServer, &DataBaseListenerServer::destroyed, [&p](){
             p._listenServer=nullptr;
@@ -324,9 +324,9 @@ public:
         auto&p=*this;
         if(p._listenServer!=nullptr){
             p._listenServer->queueStop();
-            QObject::disconnect(this->parent, &QRPCListenBrokerDataBase::rpcResponse, p._listenServer, &DataBaseListenerServer::onRpcResponse);
-            QObject::disconnect(this->parent, &QRPCListenBrokerDataBase::rpcCheck, p._listenServer, &DataBaseListenerServer::queueCheck);
-            QObject::disconnect(this->parent, &QRPCListenBrokerDataBase::rpcResponseClient, p._listenServer, &DataBaseListenerServer::onRPCResponseClient);
+            QObject::disconnect(this->parent, &ListenBrokerDataBase::rpcResponse, p._listenServer, &DataBaseListenerServer::onRpcResponse);
+            QObject::disconnect(this->parent, &ListenBrokerDataBase::rpcCheck, p._listenServer, &DataBaseListenerServer::queueCheck);
+            QObject::disconnect(this->parent, &ListenBrokerDataBase::rpcResponseClient, p._listenServer, &DataBaseListenerServer::onRPCResponseClient);
             delete p._listenServer;
         }
         p._listenServer=nullptr;
@@ -334,19 +334,19 @@ public:
     }
 };
 
-QRPCListenBrokerDataBase::QRPCListenBrokerDataBase(QObject *parent):QRPCListen(parent)
+ListenBrokerDataBase::ListenBrokerDataBase(QObject *parent):Listen(parent)
 {
-    this->p = new QRPCListenBrokerDataBasePvt(this);
+    this->p = new ListenBrokerDataBasePvt(this);
 }
 
-bool QRPCListenBrokerDataBase::start(){
+bool ListenBrokerDataBase::start(){
     dPvt();
-    QRPCListen::start();
+    Listen::start();
     return p.start();
 }
 
-bool QRPCListenBrokerDataBase::stop(){
-    QRPCListen::stop();
+bool ListenBrokerDataBase::stop(){
+    Listen::stop();
     dPvt();
     return p.stop();
 }

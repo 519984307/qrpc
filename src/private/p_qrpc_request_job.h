@@ -9,36 +9,36 @@
 namespace QRpc {
 
 //!
-//! \brief The QRPCRequestJob class
+//! \brief The RequestJob class
 //!
-class QRPCRequestJob : public QThread
+class RequestJob : public QThread
 {
     Q_OBJECT
 public:
 
 
-    explicit QRPCRequestJob();
+    explicit RequestJob();
 
-    ~QRPCRequestJob();
+    ~RequestJob();
 
     void run()override;
 
-    static QRPCRequestJob*newJob(QRPCRequest::Action action, const QString&action_fileName={});
-    static QRPCRequestJob*runJob(QRPCRequestJob *job);
+    static RequestJob*newJob(Request::Action action, const QString&action_fileName={});
+    static RequestJob*runJob(RequestJob *job);
 
-    QRPCRequestJob &start();
+    RequestJob &start();
 
-    QRPCRequestJob &release();
+    RequestJob &release();
 
-    QRPCRequestJobResponse&response();
+    RequestJobResponse&response();
 
-    void setResponse(QRPCRequestJobResponse &value);
+    void setResponse(RequestJobResponse &value);
 
 
 
 public slots:
 
-    void onRunJob(const QSslConfiguration*sslConfiguration, const QVariantHash&headers, const QVariant&vUrl, const QString&fileName, QRpc::QRPCRequest*request);
+    void onRunJob(const QSslConfiguration*sslConfiguration, const QVariantHash&headers, const QVariant&vUrl, const QString&fileName, QRpc::Request*request);
 
     void onRunCallback(const QVariant&v);
 

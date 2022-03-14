@@ -9,7 +9,7 @@
 namespace QRpc {
 
 #define dPvt()\
-auto&p =*reinterpret_cast<QRPCListenPvt*>(this->p)
+auto&p =*reinterpret_cast<ListenPvt*>(this->p)
 
 typedef QHash<int, QPair<int, const QMetaObject*>> MetaObjectVector;
 Q_GLOBAL_STATIC(MetaObjectVector, staticRegisterInterfaceMetaObject);
@@ -24,41 +24,41 @@ static void init()
 
 Q_COREAPP_STARTUP_FUNCTION(init)
 
-class QRPCListenPvt:public QObject{
+class ListenPvt:public QObject{
 public:
     QUuid uuid;
-    QRPCListen*listenPool=nullptr;
-    QRPCListenRequestCache cacheRequest;
-    QRPCListenColletions*collections=nullptr;
-    QRPCServer*server=nullptr;
-    explicit QRPCListenPvt(QRPCListen*parent):QObject(parent), cacheRequest(parent)
+    Listen*listenPool=nullptr;
+    ListenRequestCache cacheRequest;
+    ListenColletions*collections=nullptr;
+    Server*server=nullptr;
+    explicit ListenPvt(Listen*parent):QObject(parent), cacheRequest(parent)
     {
         this->uuid=QUuid::createUuidV5(QUuid::createUuid(), *baseUuid);
     }
 
-    virtual ~QRPCListenPvt()
+    virtual ~ListenPvt()
     {
     }
 
-    QRPCListen*listen()
+    Listen*listen()
     {
-        auto listen=dynamic_cast<QRPCListen*>(this->parent());
+        auto listen=dynamic_cast<Listen*>(this->parent());
         return listen;
     }
 };
 
-QRPCListen::QRPCListen(QObject *parent):QThread(nullptr)
+Listen::Listen(QObject *parent):QThread(nullptr)
 {
     Q_UNUSED(parent)
-    this->p = new QRPCListenPvt(this);
+    this->p = new ListenPvt(this);
 }
 
-QRPCListen::~QRPCListen()
+Listen::~Listen()
 {
     dPvt();delete&p;
 }
 
-int QRPCListen::interfaceRegister(const QVariant &type, const QMetaObject &metaObject)
+int Listen::interfaceRegister(const QVariant &type, const QMetaObject &metaObject)
 {
     const auto itype=type.toInt();
     if(!staticRegisterInterfaceMetaObject->contains(itype)){
@@ -73,7 +73,7 @@ int QRPCListen::interfaceRegister(const QVariant &type, const QMetaObject &metaO
     return staticRegisterInterfaceMetaObject->contains(itype);
 }
 
-QVector<QPair<int, const QMetaObject*> > QRPCListen::interfaceCollection()
+QVector<QPair<int, const QMetaObject*> > Listen::interfaceCollection()
 {
     QVector<QPair<int, const QMetaObject*> > __return;
     QHashIterator <int, QPair<int, const QMetaObject*>> i(*staticRegisterInterfaceMetaObject);
@@ -85,28 +85,28 @@ QVector<QPair<int, const QMetaObject*> > QRPCListen::interfaceCollection()
 }
 
 
-QUuid QRPCListen::uuid() const
+QUuid &Listen::uuid() const
 {
     dPvt();
     return p.uuid;
 }
 
-QObject *QRPCListen::parent()
+QObject *Listen::parent()
 {
     return QThread::parent();
 }
 
-void QRPCListen::setParent(QObject *parent)
+void Listen::setParent(QObject *parent)
 {
     QThread::setParent(parent);
 }
 
-void QRPCListen::run()
+void Listen::run()
 {
     this->exec();
 }
 
-bool QRPCListen::start()
+bool Listen::start()
 {
     QThread::start();
     while(this->eventDispatcher()==nullptr)
@@ -114,7 +114,7 @@ bool QRPCListen::start()
     return true;
 }
 
-bool QRPCListen::stop()
+bool Listen::stop()
 {
     if(!this->isRunning())
         return true;
@@ -126,43 +126,43 @@ bool QRPCListen::stop()
     return false;
 }
 
-QRPCServer *QRPCListen::server()
+Server *Listen::server()
 {
     dPvt();
     return p.server;
 }
 
-QRPCListenColletions *QRPCListen::colletions()
+ListenColletions *Listen::colletions()
 {
     dPvt();
     return p.collections;
 }
 
-QRPCListenRequestCache *QRPCListen::cacheRequest()
+ListenRequestCache *Listen::cacheRequest()
 {
     dPvt();
     return&p.cacheRequest;
 }
 
-void QRPCListen::registerListenPool(QRPCListen *listenPool)
+void Listen::registerListenPool(Listen *listenPool)
 {
     dPvt();
     p.listenPool=listenPool;
 }
 
-QRPCListen &QRPCListen::listenPool()
+Listen &Listen::listenPool()
 {
     dPvt();
     return*p.listenPool;
 }
 
-void QRPCListen::setServer(QRPCServer *server)
+void Listen::setServer(Server *server)
 {
     dPvt();
     p.server=server;
 }
 
-void QRPCListen::setColletions(QRPCListenColletions *colletions)
+void Listen::setColletions(ListenColletions *colletions)
 {
     dPvt();
     p.collections=colletions;

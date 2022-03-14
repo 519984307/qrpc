@@ -5,13 +5,13 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<QRPCRequestExchangeSettingPvt*>(this->p)
+    auto&p =*reinterpret_cast<RequestExchangeSettingPvt*>(this->p)
 
 const static auto defaultLimit=60000;
 
-class QRPCRequestExchangeSettingPvt{
+class RequestExchangeSettingPvt{
 public:
-    QRPCRequestMethod method=QRPCRequestMethod::Post;
+    RequestMethod method=RequestMethod::Post;
     QRPCProtocol protocol=QRPCProtocol::Http;
     QString vHost="/";
     QString hostName="localhost";
@@ -23,13 +23,13 @@ public:
     QVariantHash parameter;
     int port=8080;
     QVariant activityLimit=defaultLimit;
-    QRPCRequestExchangeSetting*parent=nullptr;
-    explicit QRPCRequestExchangeSettingPvt(QRPCRequestExchangeSetting*parent)
+    RequestExchangeSetting*parent=nullptr;
+    explicit RequestExchangeSettingPvt(RequestExchangeSetting*parent)
     {
         this->parent=parent;
     }
 
-    virtual ~QRPCRequestExchangeSettingPvt()
+    virtual ~RequestExchangeSettingPvt()
     {
     }
 
@@ -46,23 +46,23 @@ public:
     }
 };
 
-QRPCRequestExchangeSetting::QRPCRequestExchangeSetting(QObject *parent):QObject(parent)
+RequestExchangeSetting::RequestExchangeSetting(QObject *parent):QObject(parent)
 {
-    this->p = new QRPCRequestExchangeSettingPvt(this);
+    this->p = new RequestExchangeSettingPvt(this);
 }
 
-QRPCRequestExchangeSetting::QRPCRequestExchangeSetting(QRPCRequestExchangeSetting &e, QObject *parent):QObject(parent)
+RequestExchangeSetting::RequestExchangeSetting(RequestExchangeSetting &e, QObject *parent):QObject(parent)
 {
-    this->p = new QRPCRequestExchangeSettingPvt(this);
+    this->p = new RequestExchangeSettingPvt(this);
     *this=e;
 }
 
-QRPCRequestExchangeSetting::~QRPCRequestExchangeSetting()
+RequestExchangeSetting::~RequestExchangeSetting()
 {
     dPvt();delete&p;
 }
 
-QRPCRequestExchangeSetting&QRPCRequestExchangeSetting::operator=(const QRPCRequestExchangeSetting &e)
+RequestExchangeSetting&RequestExchangeSetting::operator=(const RequestExchangeSetting &e)
 {
     QStm::MetaObjectUtil util(*e.metaObject());
     auto values=util.toHash(&e);\
@@ -70,7 +70,7 @@ QRPCRequestExchangeSetting&QRPCRequestExchangeSetting::operator=(const QRPCReque
     return*this;
 }
 
-QRPCRequestExchangeSetting &QRPCRequestExchangeSetting::clear()
+RequestExchangeSetting &RequestExchangeSetting::clear()
 {
     auto&e=*this;
     for(int i = 0; i < e.metaObject()->propertyCount(); ++i) {
@@ -83,14 +83,14 @@ QRPCRequestExchangeSetting &QRPCRequestExchangeSetting::clear()
     return*this;
 }
 
-QRPCRequestExchangeSetting &QRPCRequestExchangeSetting::operator=(const QVariantHash &e)
+RequestExchangeSetting &RequestExchangeSetting::operator=(const QVariantHash &e)
 {
     QStm::MetaObjectUtil util;
     util.writeHash(this, e);
     return*this;
 }
 
-QVariantMap QRPCRequestExchangeSetting::toMap() const
+QVariantMap RequestExchangeSetting::toMap() const
 {
     QVariantMap map;
     auto&e=*this;
@@ -106,7 +106,7 @@ QVariantMap QRPCRequestExchangeSetting::toMap() const
     return map;
 }
 
-QVariantHash QRPCRequestExchangeSetting::toHash() const
+QVariantHash RequestExchangeSetting::toHash() const
 {
     QVariantHash map;
     auto&e=*this;
@@ -122,7 +122,7 @@ QVariantHash QRPCRequestExchangeSetting::toHash() const
     return map;
 }
 
-QString QRPCRequestExchangeSetting::url() const
+QString RequestExchangeSetting::url() const
 {
     auto __return = qsl("%1:||%2:%3/%4").arg(this->protocolName(),this->hostName(),QString::number(this->port()),this->route());
     while(__return.contains(qsl("//")))
@@ -132,7 +132,7 @@ QString QRPCRequestExchangeSetting::url() const
     return __return;
 }
 
-bool QRPCRequestExchangeSetting::isValid() const
+bool RequestExchangeSetting::isValid() const
 {
     if(this->protocol()==QRpc::Amqp && !this->topic().isEmpty())
         return true;
@@ -140,14 +140,14 @@ bool QRPCRequestExchangeSetting::isValid() const
 
 }
 
-QRPCRequestExchangeSetting &QRPCRequestExchangeSetting::print(const QString &output)
+RequestExchangeSetting &RequestExchangeSetting::print(const QString &output)
 {
     for(auto&v:this->printOut(output))
         sInfo()<<v;
     return*this;
 }
 
-QStringList QRPCRequestExchangeSetting::printOut(const QString &output)
+QStringList RequestExchangeSetting::printOut(const QString &output)
 {
     Q_DECLARE_VU;
 
@@ -169,66 +169,66 @@ QStringList QRPCRequestExchangeSetting::printOut(const QString &output)
 }
 
 
-QRPCRequestMethod QRPCRequestExchangeSetting::method()const
+RequestMethod RequestExchangeSetting::method()const
 {
     dPvt();
     return p.method;
 }
 
-void QRPCRequestExchangeSetting::setMethod(const int &value)
+void RequestExchangeSetting::setMethod(const int &value)
 {
     dPvt();
-    auto method=QRPCRequestMethod(value);
+    auto method=RequestMethod(value);
     method=(method<Head || method>MaxMethod)?Post:method;
     p.method=method;
 }
 
-void QRPCRequestExchangeSetting::setMethod(const QString &value)
+void RequestExchangeSetting::setMethod(const QString &value)
 {
     dPvt();
     const auto vv=value.trimmed().toLower();
-    for (const auto&v : QRPCRequestMethodNameList){
+    for (const auto&v : RequestMethodNameList){
         if(v.trimmed().toLower()!=vv)
             return;
-        const auto&i = QRPCRequestMethodName.key(v);
-        p.method=QRPCRequestMethod(i);
+        const auto&i = RequestMethodName.key(v);
+        p.method=RequestMethod(i);
         return;
     }
     p.method=QRpc::Post;
 }
 
-QString QRPCRequestExchangeSetting::methodName() const
+QString RequestExchangeSetting::methodName() const
 {
     dPvt();
-    auto name=QRPCRequestMethodName[p.method];
+    auto name=RequestMethodName[p.method];
     return name;
 }
 
-QRPCProtocol QRPCRequestExchangeSetting::protocol() const
+QRPCProtocol RequestExchangeSetting::protocol() const
 {
     dPvt();
     return p.protocol;
 }
 
-QString QRPCRequestExchangeSetting::protocolName() const
+QString RequestExchangeSetting::protocolName() const
 {
     dPvt();
     return p.protocolName();
 }
 
-QString QRPCRequestExchangeSetting::protocolUrlName() const
+QString RequestExchangeSetting::protocolUrlName() const
 {
     dPvt();
     return p.protocolUrlName();
 }
 
-void QRPCRequestExchangeSetting::setProtocol(const QRPCProtocol &value)
+void RequestExchangeSetting::setProtocol(const QRPCProtocol &value)
 {
     dPvt();
     p.protocol=value;
 }
 
-void QRPCRequestExchangeSetting::setProtocol(const QVariant &value)
+void RequestExchangeSetting::setProtocol(const QVariant &value)
 {
     dPvt();
     auto&v=p.protocol;
@@ -246,73 +246,73 @@ void QRPCRequestExchangeSetting::setProtocol(const QVariant &value)
 
 }
 
-QString QRPCRequestExchangeSetting::driver() const
+QString RequestExchangeSetting::driver() const
 {
     dPvt();
     return p.driver;
 }
 
-void QRPCRequestExchangeSetting::setDriver(const QString &value)
+void RequestExchangeSetting::setDriver(const QString &value)
 {
     dPvt();
     p.driver=value;
 }
 
-QString QRPCRequestExchangeSetting::hostName() const
+QString RequestExchangeSetting::hostName() const
 {
     dPvt();
     return p.hostName;
 }
 
-void QRPCRequestExchangeSetting::setHostName(const QString &value)
+void RequestExchangeSetting::setHostName(const QString &value)
 {
     dPvt();
     p.hostName=value;
 }
 
-QString QRPCRequestExchangeSetting::vHost() const
+QString RequestExchangeSetting::vHost() const
 {
     dPvt();
     return p.vHost;
 }
 
-void QRPCRequestExchangeSetting::setVHost(const QString &value)
+void RequestExchangeSetting::setVHost(const QString &value)
 {
     dPvt();
     p.vHost=value;
 }
 
-QString QRPCRequestExchangeSetting::userName() const
+QString RequestExchangeSetting::userName() const
 {
     dPvt();
     return p.userName;
 }
 
-void QRPCRequestExchangeSetting::setUserName(const QString &value)
+void RequestExchangeSetting::setUserName(const QString &value)
 {
     dPvt();
     p.userName=value;
 }
 
-QString QRPCRequestExchangeSetting::passWord() const
+QString RequestExchangeSetting::passWord() const
 {
     dPvt();
     return p.passWord;
 }
 
-void QRPCRequestExchangeSetting::setPassWord(const QString &value)
+void RequestExchangeSetting::setPassWord(const QString &value)
 {
     dPvt();
     p.passWord=value;
 }
 
-QString &QRPCRequestExchangeSetting::route() const
+QString &RequestExchangeSetting::route() const
 {
     dPvt();
     return p.route;
 }
 
-void QRPCRequestExchangeSetting::setRoute(const QVariant &value)
+void RequestExchangeSetting::setRoute(const QVariant &value)
 {
     dPvt();
     auto typeId=qTypeId(value);
@@ -329,31 +329,31 @@ void QRPCRequestExchangeSetting::setRoute(const QVariant &value)
         p.route=p.route.left(p.route.length()-1);
 }
 
-QString QRPCRequestExchangeSetting::topic() const
+QString RequestExchangeSetting::topic() const
 {
     dPvt();
     return p.topic;
 }
 
-void QRPCRequestExchangeSetting::setTopic(const QString &value)
+void RequestExchangeSetting::setTopic(const QString &value)
 {
     dPvt();
     p.topic=value;
 }
 
-int QRPCRequestExchangeSetting::port() const
+int RequestExchangeSetting::port() const
 {
     dPvt();
     return p.port;
 }
 
-void QRPCRequestExchangeSetting::setPort(int port)
+void RequestExchangeSetting::setPort(int port)
 {
     dPvt();
     p.port = port;
 }
 
-qlonglong QRPCRequestExchangeSetting::activityLimit() const
+qlonglong RequestExchangeSetting::activityLimit() const
 {
     dPvt();
     auto l=p.activityLimit.toLongLong();
@@ -361,19 +361,19 @@ qlonglong QRPCRequestExchangeSetting::activityLimit() const
     return l;
 }
 
-void QRPCRequestExchangeSetting::setActivityLimit(const QVariant &value)
+void RequestExchangeSetting::setActivityLimit(const QVariant &value)
 {
     dPvt();
     p.activityLimit=value;
 }
 
-QVariantHash QRPCRequestExchangeSetting::parameter() const
+QVariantHash RequestExchangeSetting::parameter() const
 {
     dPvt();
     return p.parameter;
 }
 
-void QRPCRequestExchangeSetting::setParameter(const QVariantHash &parameter)
+void RequestExchangeSetting::setParameter(const QVariantHash &parameter)
 {
     dPvt();
     p.parameter = parameter;
