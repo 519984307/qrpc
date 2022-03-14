@@ -59,9 +59,17 @@ public:
     Q_INVOKABLE virtual QVariant route()const;
 
     //!
-    //! \brief makeRoute
+    //! \brief apiInitialize
+    //! \return
     //!
-    Q_INVOKABLE virtual void makeRoute();
+    virtual QRPCController &apiInitialize();
+
+    //!
+    //! \brief apiInitialize
+    //! \param object
+    //! \param metaObject
+    //!
+    static void apiInitialize(QObject *object, const QMetaObject *metaObject);
 
     //!
     //! \brief module
@@ -257,13 +265,6 @@ protected:
     //! \param request
     //!
     virtual void setRequest(QRPCListenRequest&request);
-
-    //!
-    //! \brief makeRoute
-    //! \param object
-    //! \param metaObject
-    //!
-    static void makeRoute(QObject *object, const QMetaObject *metaObject);
 
     //!
     //! \brief routeFlags

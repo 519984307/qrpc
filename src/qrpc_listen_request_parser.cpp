@@ -101,7 +101,7 @@ bool QRPCListenRequestParser::routeToMethod(const QMetaObject &metaObject, const
     return false;
 }
 
-void QRPCListenRequestParser::makeRoute(const QMetaObject &metaObject)
+void QRPCListenRequestParser::apiInitialize(const QMetaObject &metaObject)
 {
     QScopedPointer<QObject> scopePointer(metaObject.newInstance(Q_ARG(QObject*, nullptr )));
     auto object=scopePointer.data();
@@ -112,7 +112,7 @@ void QRPCListenRequestParser::makeRoute(const QMetaObject &metaObject)
     if(parser==nullptr)
         return;
 
-    static const auto ignoreNames=QStringList()<<qsl("route")<<qsl("makeRoute");
+    static const auto ignoreNames=QStringList{qsl("route"), qsl("apiInitialize")};
     auto className=QByteArray(metaObject.className());
     if(staticMetaObjectRoute->contains(className))
         return;

@@ -263,11 +263,7 @@ Q_INVOKABLE QVariantList _rpc_notation_method_##methodName()\
 public:\
 Q_INVOKABLE virtual QByteArray basePath()const\
 {\
-        return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
-}\
-Q_INVOKABLE virtual void makeRoute()\
-{\
-    QRPCListenRequestParser::makeRoute(this->staticMetaObject);\
+    return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
 }
 
 #define QRPC_PARSER_DECLARE_ROUTE(Controller, v1)\

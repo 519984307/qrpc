@@ -32,7 +32,7 @@ Q_GLOBAL_STATIC(NotationColletion, staticControllerNotationClass);
 Q_GLOBAL_STATIC(NotationColletion, staticControllerNotationMethods);
 
 
-static void staticMakeNotations(QObject*makeObject, const QMetaObject*metaObject)
+static void staticApiMakeNotations(QObject*makeObject, const QMetaObject*metaObject)
 {
     auto className=QByteArray(metaObject->className()).toLower().trimmed();
 
@@ -93,7 +93,7 @@ static void staticMakeNotations(QObject*makeObject, const QMetaObject*metaObject
     }
 }
 
-static void staticMakeRoute(QObject*makeObject, const QMetaObject*metaObject)
+static void staticApiMakeBasePath(QObject*makeObject, const QMetaObject*metaObject)
 {
     auto className=QByteArray(metaObject->className()).toLower().trimmed();
 
@@ -182,16 +182,16 @@ static void staticMakeRoute(QObject*makeObject, const QMetaObject*metaObject)
 }
 
 
-static void staticMakeController(QObject*makeObject, const QMetaObject*metaObject)
+static void staticApiInitialize(QObject*makeObject, const QMetaObject*metaObject)
 {
-    staticMakeNotations(makeObject, metaObject);
-    staticMakeRoute(makeObject, metaObject);
+    staticApiMakeNotations(makeObject, metaObject);
+    staticApiMakeBasePath(makeObject, metaObject);
 }
 
 static void initQRPCParserRoutes()
 {
     for(auto&metaObject:*staticParserRequestMetaObjects){
-        QRPCListenRequestParser::makeRoute(*metaObject);
+        QRPCListenRequestParser::apiInitialize(*metaObject);
     }
 }
 
@@ -261,9 +261,15 @@ QVariant QRPCController::route() const
     return qsl("/");
 }
 
-void QRPCController::makeRoute()
+QRPCController &QRPCController::apiInitialize()
 {
-    return QRPCController::makeRoute(this, this->metaObject());
+    QRPCController::apiInitialize(this, this->metaObject());
+    return*this;
+}
+
+void QRPCController::apiInitialize(QObject*object, const QMetaObject*metaObject)
+{
+    staticApiInitialize(object, metaObject);
 }
 
 QString QRPCController::module() const
@@ -547,11 +553,6 @@ void QRPCController::setRequest(QRPCListenRequest &request)
 {
     dPvt();
     p.request=&request;
-}
-
-void QRPCController::makeRoute(QObject*object, const QMetaObject*metaObject)
-{
-    staticMakeController(object, metaObject);
 }
 
 QVariantHash QRPCController::routeFlags(const QString &route) const
