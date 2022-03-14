@@ -94,6 +94,12 @@ public:
                 return;
             }
 
+            if(controller->canOperation()){
+                if(controller->rq().co().isOK())
+                    controller->rq().co().setBadRequest();
+                return;
+            }
+
             if(!controller->requestBeforeInvoke()){
                 if(controller->rq().co().isOK())
                     controller->rq().co().setBadRequest();

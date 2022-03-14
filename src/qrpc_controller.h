@@ -166,6 +166,12 @@ public:
     virtual QRPCListenRequest&rq();
 
     //!
+    //! \brief canOperation
+    //! \return
+    //!
+    virtual bool canOperation();
+
+    //!
     //! \brief canAuthorization
     //! \return
     //!

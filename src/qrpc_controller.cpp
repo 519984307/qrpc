@@ -397,6 +397,11 @@ QRPCListenRequest &QRPCController::rq()
     return (p.request==nullptr)?(____request):(*p.request);
 }
 
+bool QRPCController::canOperation()
+{
+    return true;
+}
+
 bool QRPCController::canAuthorization()
 {
     auto&rq=this->rq();
