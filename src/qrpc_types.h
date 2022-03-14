@@ -156,7 +156,7 @@ namespace QRpc {
     const auto QRPCContentTypeExtensionToHeader=___QRPCContentTypeExtensionToHeader();
 
 
-    enum QRPCRequestMethod {Head=1, Get=2, Post=4, Put=8, Delete=16, Options=32, MaxMethod=Options};
+    enum QRPCRequestMethod {Head=1, Get=2, Post=4, Put=8, Delete=16, Options=32, Patch=64, Trace=128, MaxMethod=Trace};
 
     static auto ___QRPCRequestMethodName()
     {
@@ -167,6 +167,8 @@ namespace QRpc {
         r.insert(Put, QT_STRINGIFY2(Put));
         r.insert(Delete, QT_STRINGIFY2(Delete));
         r.insert(Options, QT_STRINGIFY2(Options));
+        r.insert(Patch, QT_STRINGIFY2(Patch));
+        r.insert(Trace, QT_STRINGIFY2(Trace));
         return r;
     }
     static const auto QRPCRequestMethodName = ___QRPCRequestMethodName();
@@ -181,6 +183,8 @@ namespace QRpc {
         r.insert(QT_STRINGIFY2(put), Put);
         r.insert(QT_STRINGIFY2(delete), Delete);
         r.insert(QT_STRINGIFY2(options), Options);
+        r.insert(QT_STRINGIFY2(patch), Patch);
+        r.insert(QT_STRINGIFY2(trace), Trace);
 
         r.insert(QT_STRINGIFY2(Head), Head);
         r.insert(QT_STRINGIFY2(Get), Get);
@@ -188,6 +192,8 @@ namespace QRpc {
         r.insert(QT_STRINGIFY2(Put), Put);
         r.insert(QT_STRINGIFY2(Delete), Delete);
         r.insert(QT_STRINGIFY2(Options), Options);
+        r.insert(QT_STRINGIFY2(Patch), Patch);
+        r.insert(QT_STRINGIFY2(Trace), Trace);
         return r;
     }
     static const auto QRPCRequestMethodType=___QRPCRequestMethodType();
