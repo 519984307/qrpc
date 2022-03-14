@@ -4,3 +4,8 @@
 QRpc::ServiceSetting::ServiceSetting(QObject *parent):QStm::SettingBase(parent)
 {
 }
+
+QRpc::ServiceSetting::~ServiceSetting()
+{
+
+}

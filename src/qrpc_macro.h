@@ -232,13 +232,22 @@ static auto Controller##MetaObject=QRpc::QRPCController::interfaceRegister(Contr
 static auto Listen##Type##_MetaObject=QRpc::QRPCListen::interfaceRegister(Type, Listen::staticMetaObject);\
 
 #define QRPC_PARSER_AUTO_REGISTER(ParserObject)\
-static auto ParserObject##MetaObject=QRpc::QRPCController::parserRequestRegister(ParserObject::staticMetaObject);\
+static auto ParserObject##MetaObject=QRpc::QRPCController::parserRequestRegister(ParserObject::staticMetaObject);
 
-#define QRPC_DECLARE_ROUTE(Controller, v1)\
+
+#define QRPC_DECLARE_BASE_PATH(Controller, v1)\
 public:\
-Q_INVOKABLE virtual QVariant basePath()const override\
-{\
+Q_INVOKABLE virtual QVariant basePath()const override {\
     return QVariant(v1);\
+}
+
+#define QRPC_DECLARE_ROUTE(Controller, v1) QRPC_DECLARE_BASE_PATH(Controller, v1)
+
+#define QRPC_NOTATION_PATH(methodName, notations)\
+public:\
+Q_INVOKABLE const QVariant __rpc_notation_method_##methodName(){\
+static auto __return=QVariantHash{ {QStringLiteral(#methodName), QVariantList(notations) } } ;\
+    return __return;\
 }
 
 #define QRPC_METHOD_PROPERTIES(method, properties)\
