@@ -226,13 +226,13 @@ public:\
     virtual bool redirectCheck()const override{return false;}
 
 #define QRPC_CONTROLLER_AUTO_REGISTER(Controller)\
-static auto Controller##MetaObject=QRpc::QRPCController::interfaceRegister(Controller::staticMetaObject);
+static auto Controller##MetaObject=QRpc::Controller::interfaceRegister(Controller::staticMetaObject);
 
 #define QRPC_LISTTEN_AUTO_REGISTER(Type, Listen)\
 static auto Listen##Type##_MetaObject=QRpc::Listen::interfaceRegister(Type, Listen::staticMetaObject);\
 
 #define QRPC_PARSER_AUTO_REGISTER(ParserObject)\
-static auto ParserObject##MetaObject=QRpc::QRPCController::parserRequestRegister(ParserObject::staticMetaObject);
+static auto ParserObject##MetaObject=QRpc::Controller::parserRequestRegister(ParserObject::staticMetaObject);
 
 
 #define QRPC_DECLARE_BASE_PATH(Controller, v1)\
