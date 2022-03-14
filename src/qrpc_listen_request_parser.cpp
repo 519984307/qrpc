@@ -101,7 +101,7 @@ bool ListenRequestParser::routeToMethod(const QMetaObject &metaObject, const QSt
     return false;
 }
 
-void ListenRequestParser::apiInitialize(const QMetaObject &metaObject)
+void ListenRequestParser::initializeInstalleds(const QMetaObject &metaObject)
 {
     QScopedPointer<QObject> scopePointer(metaObject.newInstance(Q_ARG(QObject*, nullptr )));
     auto object=scopePointer.data();
@@ -112,7 +112,7 @@ void ListenRequestParser::apiInitialize(const QMetaObject &metaObject)
     if(parser==nullptr)
         return;
 
-    static const auto ignoreNames=QStringList{qsl("route"), qsl("apiInitialize")};
+    static const auto ignoreNames=QStringList{qsl("route"), qsl("initializeInstalleds")};
     auto className=QByteArray(metaObject.className());
     if(staticMetaObjectRoute->contains(className))
         return;

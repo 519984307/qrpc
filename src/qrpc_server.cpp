@@ -46,11 +46,11 @@ bool Server::start()
     dPvt();
 
     this->controllers().clear();
-    for(auto&v:Controller::staticInterfaceList())
+    for(auto&v:Controller::staticApiList())
         this->controllers().append(v);
 
     this->parsers().clear();
-    for(auto&v:Controller::staticParserRequestList())
+    for(auto&v:Controller::staticApiParserList())
         this->parsers().append(v);
 
     return p.listenColletions->start();

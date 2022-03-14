@@ -161,7 +161,7 @@ void ListenQRPC::run()
                 continue;
             auto controller=dynamic_cast<Controller*>(object);
             if(controller!=nullptr){
-                controller->apiInitialize();
+                controller->initializeInstalleds();
                 p.controller.insert(name,mObj);
             }
             delete object;

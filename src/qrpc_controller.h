@@ -31,7 +31,7 @@ class Q_RPC_EXPORT Controller: public QObject, public NotationsExtended
     Q_PROPERTY(QVariant basePath READ basePath CONSTANT)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 
-    QRPC_NOTATION_CLASS({})
+    Q_NOTATION_CLASS({})
 
 public:
     //!
@@ -59,23 +59,23 @@ public:
     Q_INVOKABLE virtual QVariant route()const;
 
     //!
-    //! \brief apiInitialize
+    //! \brief initializeInstalleds
     //! \return
     //!
-    virtual Controller &apiInitialize();
+    virtual Controller &initializeInstalleds();
 
     //!
-    //! \brief apiInitialize
+    //! \brief initializeInstalleds
     //! \param object
     //! \param metaObject
     //!
-    static void apiInitialize(QObject *object, const QMetaObject *metaObject);
+    static void initializeInstalleds(QObject *object, const QMetaObject *metaObject);
 
     //!
     //! \brief module
     //! \return
     //!
-    QRPC_NOTATION_METHOD(module, {})
+    Q_NOTATION_METHOD(module, {})
     Q_INVOKABLE virtual QString module()const;
 
     //!
@@ -100,7 +100,7 @@ public:
     //! \brief controllerSetting
     //! \return
     //!
-    virtual ControllerSetting&controllerSetting();
+    virtual ControllerSetting&setting();
 
     //!
     //! \brief enabled
@@ -114,14 +114,20 @@ public:
     //!
     virtual void setEnabled(bool enabled);
 
-
     //!
-    //! \brief routeRedirectCheckClass
+    //! \brief redirectCheckClass
     //! \param className
     //! \return
     //!
-    static bool routeRedirectCheckClass(const QByteArray &className);
-    static bool routeRedirectCheckRoute(const QByteArray &className, const QByteArray &routePath);
+    static bool redirectCheckClass(const QByteArray &className);
+
+    //!
+    //! \brief redirectCheckBasePath
+    //! \param className
+    //! \param basePath
+    //! \return
+    //!
+    static bool redirectCheckBasePath(const QByteArray &className, const QByteArray &basePath);
 
     //!
     //! \brief routeRedirectMethod
@@ -235,56 +241,50 @@ public:
     virtual Server*server();
 
     //!
-    //! \brief interfaceRegister
+    //! \brief install
     //! \param metaObject
     //! \return
     //!
-    static int interfaceRegister(const QMetaObject &metaObject);
+    static int install(const QMetaObject &metaObject);
 
     //!
-    //! \brief parserRequestRegister
+    //! \brief installParser
     //! \param metaObject
     //! \return
     //!
-    static int parserRequestRegister(const QMetaObject &metaObject);
+    static int installParser(const QMetaObject &metaObject);
 
     //!
-    //! \brief staticInterfaceList
+    //! \brief staticApiList
     //! \return
     //!
-    static QVector<const QMetaObject *> &staticInterfaceList();
+    static QVector<const QMetaObject *> &staticApiList();
 
     //!
-    //! \brief staticParserRequestList
+    //! \brief staticApiParserList
     //! \return
     //!
-    static QVector<const QMetaObject *> &staticParserRequestList();
-
-    //!
-    //! \brief methodBlackList
-    //! \return
-    //!ignored method list
-    static const QVector<QByteArray> &methodBlackList();
-
+    static QVector<const QMetaObject *> &staticApiParserList();
 
 protected:
     //!
     //! \brief setServer
     //! \param server
     //!
-    virtual void setServer(Server*server);
+    virtual QRpc::Controller &setServer(Server*server);
 
     //!
     //! \brief setRequest
     //! \param request
     //!
-    virtual void setRequest(ListenRequest &request);
+    virtual Controller &setRequest(ListenRequest &request);
 
     //!
     //! \brief routeFlags
     //! \param route
     //! \return
     //!
+    //QT_DEPRECATED_X("use QRPC_NOTATION or Q_NOTATION")
     virtual QVariantHash routeFlags(const QString&route)const;
 
     //!
@@ -293,6 +293,7 @@ protected:
     //! \param flag
     //! \return
     //!
+    QT_DEPRECATED_X("use QRPC_NOTATION or Q_NOTATION")
     static const QVariantHash routeFlagsMaker(const QString&request_path, const QVariant &flag);
 
 signals:

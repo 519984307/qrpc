@@ -74,7 +74,7 @@ public:
 
     void makeListens()
     {
-        auto vList=Listen::interfaceCollection();
+        auto vList=Listen::listenList();
         for(auto&item:vList){
             this->makeOption(item.first, *item.second);
         }

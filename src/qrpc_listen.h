@@ -34,18 +34,18 @@ public:
     ~Listen();
 
     //!
-    //! \brief interfaceRegister
+    //! \brief install
     //! \param type
     //! \param metaObject
     //! \return
     //!
-    static int interfaceRegister(const QVariant &type, const QMetaObject &metaObject);
+    static int install(const QVariant &type, const QMetaObject &metaObject);
 
     //!
-    //! \brief interfaceCollection
+    //! \brief listenList
     //! \return
     //!
-    static QVector<QPair<int, const QMetaObject *> > interfaceCollection();
+    static QVector<QPair<int, const QMetaObject *> > listenList();
 
     //!
     //! \brief uuid

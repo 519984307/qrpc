@@ -72,10 +72,10 @@ public:
     static bool routeToMethod(const QMetaObject &metaObject, const QString&route, QMetaMethod&outMethod);
 
     //!
-    //! \brief apiInitialize
+    //! \brief initializeInstalleds
     //! \param metaObject
     //!
-    static void apiInitialize(const QMetaObject &metaObject);
+    static void initializeInstalleds(const QMetaObject &metaObject);
 
 protected:
     //!

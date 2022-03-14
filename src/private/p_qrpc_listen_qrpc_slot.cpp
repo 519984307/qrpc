@@ -46,7 +46,7 @@ public:
             auto className=mObjController->className();
             auto routeMethods = Controller::routeMethods(className);
             if(!routeMethods.contains(requestPath)){//se nao contiver a rota
-                auto routeRedirect = Controller::routeRedirectCheckRoute(className, requestPath);
+                auto routeRedirect = Controller::redirectCheckBasePath(className, requestPath);
                 if(!routeRedirect){
     #if Q_RPC_LOG_SUPER_VERBOSE
                     sWarning()<<"Interface className ignored "<<className;

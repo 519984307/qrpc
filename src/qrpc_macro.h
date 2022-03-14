@@ -225,15 +225,21 @@ public:\
 public:\
     virtual bool redirectCheck()const override{return false;}
 
-#define QRPC_CONTROLLER_AUTO_REGISTER(Controller)\
-static auto Controller##MetaObject=QRpc::Controller::interfaceRegister(Controller::staticMetaObject);
 
-#define QRPC_LISTTEN_AUTO_REGISTER(Type, Listen)\
-static auto Listen##Type##_MetaObject=QRpc::Listen::interfaceRegister(Type, Listen::staticMetaObject);\
+#define QRPC_CONTROLLER_AUTO_REGISTER(ClassName)\
+namespace Private{\
+static auto ClassName##ApiInstalled=QRpc::Controller::install(ClassName::staticMetaObject);\
+}
 
 #define QRPC_PARSER_AUTO_REGISTER(ParserObject)\
-static auto ParserObject##MetaObject=QRpc::Controller::parserRequestRegister(ParserObject::staticMetaObject);
+namespace Private{\
+    static auto ClassName##ApiParserInstalled=QRpc::Controller::installParser(ParserObject::staticMetaObject);\
+}
 
+#define QRPC_LISTTEN_AUTO_REGISTER(Type, Listen)\
+namespace Private{\
+static auto Listen##Type##_MetaObject=QRpc::Listen::install(Type, Listen::staticMetaObject);\
+}
 
 #define QRPC_DECLARE_BASE_PATH(Controller, v1)\
 public:\
@@ -242,22 +248,6 @@ Q_INVOKABLE virtual QVariant basePath()const override {\
 }
 
 #define QRPC_DECLARE_ROUTE(Controller, v1) QRPC_DECLARE_BASE_PATH(Controller, v1)
-
-#define QRPC_NOTATION_CLASS(notations)\
-public:\
-Q_INVOKABLE QVariantList _rpc_notation_class()\
-{\
-    static auto __return=QVariantList(notations);\
-    return __return;\
-}
-
-#define QRPC_NOTATION_METHOD(methodName, notations)\
-public:\
-Q_INVOKABLE QVariantList _rpc_notation_method_##methodName()\
-{\
-    static auto __return=QVariantList(notations);\
-    return __return;\
-}
 
 #define QRPC_PARSER_DECLARE_BASE_PATH(Controller, v1)\
 public:\
@@ -271,7 +261,7 @@ QRPC_PARSER_DECLARE_BASE_PATH(Controller, v1)\
 QT_DEPRECATED_X("Use basePath;")\
 Q_INVOKABLE virtual QByteArray route()const\
 {\
-        return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
+    return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
 }\
 
 #define QRPC_DECLARE_MODULE(vmodule)\

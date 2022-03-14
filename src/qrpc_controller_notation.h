@@ -6,6 +6,9 @@
 #include <QString>
 #include "./qrpc_types.h"
 
+namespace QRpc
+{
+
 namespace Private {
 const QVariantHash &___opHead();
 
@@ -27,9 +30,6 @@ const QVariantList &___opCrud();
 
 const QVariantList &___opPostPut();
 }
-
-namespace QRpc
-{
 
 class NotationsExtended
 {

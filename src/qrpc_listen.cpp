@@ -12,7 +12,7 @@ namespace QRpc {
 auto&p =*reinterpret_cast<ListenPvt*>(this->p)
 
 typedef QHash<int, QPair<int, const QMetaObject*>> MetaObjectVector;
-Q_GLOBAL_STATIC(MetaObjectVector, staticRegisterInterfaceMetaObject);
+Q_GLOBAL_STATIC(MetaObjectVector, staticListenInstalled);
 Q_GLOBAL_STATIC(QByteArray, baseUuid)
 
 static void init()
@@ -58,25 +58,25 @@ Listen::~Listen()
     dPvt();delete&p;
 }
 
-int Listen::interfaceRegister(const QVariant &type, const QMetaObject &metaObject)
+int Listen::install(const QVariant &type, const QMetaObject &metaObject)
 {
     const auto itype=type.toInt();
-    if(!staticRegisterInterfaceMetaObject->contains(itype)){
+    if(!staticListenInstalled->contains(itype)){
 #if Q_RPC_LOG_VERBOSE
-        if(staticRegisterInterfaceMetaObject->isEmpty())
+        if(staticListenInstalled->isEmpty())
             sInfo()<<qsl("interface registered: ")<<metaObject.className();
         qInfo()<<qbl("interface: ")+metaObject.className();
 #endif
         QPair<int, const QMetaObject*> pair(itype, &metaObject);
-        staticRegisterInterfaceMetaObject->insert(itype, pair);
+        staticListenInstalled->insert(itype, pair);
     }
-    return staticRegisterInterfaceMetaObject->contains(itype);
+    return staticListenInstalled->contains(itype);
 }
 
-QVector<QPair<int, const QMetaObject*> > Listen::interfaceCollection()
+QVector<QPair<int, const QMetaObject*> > Listen::listenList()
 {
     QVector<QPair<int, const QMetaObject*> > __return;
-    QHashIterator <int, QPair<int, const QMetaObject*>> i(*staticRegisterInterfaceMetaObject);
+    QHashIterator <int, QPair<int, const QMetaObject*>> i(*staticListenInstalled);
     while(i.hasNext()){
         i.next();
         __return<<i.value();
