@@ -7,6 +7,8 @@
 #include "./qrpc_global.h"
 #include "./qrpc_listen_request.h"
 #include "./qrpc_controller_setting.h"
+#include "./qrpc_controller_notation.h"
+
 namespace QRpc {
 
 typedef QMultiHash<QByteArray, QMetaMethod> QRPCControllerMethods;
@@ -18,7 +20,7 @@ class QRPCServer;
 //!
 //! \brief The QRPCController class
 //!
-class Q_RPC_EXPORT QRPCController: public QObject
+class Q_RPC_EXPORT QRPCController: public QObject, public NotationsExtended
 {
     Q_OBJECT
     friend class QRPCServer;
@@ -28,6 +30,8 @@ class Q_RPC_EXPORT QRPCController: public QObject
 
     Q_PROPERTY(QVariant basePath READ basePath CONSTANT)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+
+    QRPC_NOTATION_CLASS({})
 
 public:
     //!
@@ -63,6 +67,7 @@ public:
     //! \brief module
     //! \return
     //!
+    QRPC_NOTATION_METHOD(module, {})
     Q_INVOKABLE virtual QString module()const;
 
     //!
@@ -157,6 +162,13 @@ public:
     //! \return
     //!
     virtual bool canAuthorization();
+
+    //!
+    //! \brief canAuthorization
+    //! \param method
+    //! \return
+    //!
+    virtual bool canAuthorization(const QMetaMethod&method);
 
     //!
     //! \brief beforeAuthorization
@@ -273,6 +285,11 @@ signals:
     //! \brief enabledChanged
     //!
     void enabledChanged();
+
+    //!
+    //! \brief notMethodCanAuthorizationChanged
+    //!
+    void notMethodCanAuthorizationChanged();
 private:
     void*p = nullptr;
     QRPCProtocol acceptedProtocols;

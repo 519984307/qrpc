@@ -243,28 +243,40 @@ Q_INVOKABLE virtual QVariant basePath()const override {\
 
 #define QRPC_DECLARE_ROUTE(Controller, v1) QRPC_DECLARE_BASE_PATH(Controller, v1)
 
-#define QRPC_NOTATION_PATH(methodName, notations)\
+#define QRPC_NOTATION_CLASS(notations)\
 public:\
-Q_INVOKABLE const QVariant __rpc_notation_method_##methodName(){\
-static auto __return=QVariantHash{ {QStringLiteral(#methodName), QVariantList(notations) } } ;\
+Q_INVOKABLE QVariantList _rpc_notation_class()\
+{\
+    static auto __return=QVariantList(notations);\
     return __return;\
 }
 
-#define QRPC_METHOD_PROPERTIES(method, properties)\
+#define QRPC_NOTATION_METHOD(methodName, notations)\
 public:\
-Q_INVOKABLE virtual QVariant __rpc_properties_##method()const{\
-    static QVariantHash ___return({{qsl("method"), #method}, {qsl("properties"), QVariantHash(properties)}});\
-    return ___return;\
+Q_INVOKABLE QVariantList _rpc_notation_method_##methodName()\
+{\
+    static auto __return=QVariantList(notations);\
+    return __return;\
+}
+
+#define QRPC_PARSER_DECLARE_BASE_PATH(Controller, v1)\
+public:\
+Q_INVOKABLE virtual QByteArray basePath()const\
+{\
+        return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
+}\
+Q_INVOKABLE virtual void makeRoute()\
+{\
+    QRPCListenRequestParser::makeRoute(this->staticMetaObject);\
 }
 
 #define QRPC_PARSER_DECLARE_ROUTE(Controller, v1)\
-public:\
-Q_INVOKABLE virtual QByteArray route()const{\
-    return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
+QRPC_PARSER_DECLARE_BASE_PATH(Controller, v1)\
+QT_DEPRECATED_X("Use basePath;")\
+Q_INVOKABLE virtual QByteArray route()const\
+{\
+        return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
 }\
-Q_INVOKABLE virtual void makeRoute(){\
-    QRPCListenRequestParser::makeRoute(this->staticMetaObject);\
-}
 
 #define QRPC_DECLARE_MODULE(vmodule)\
 public:\

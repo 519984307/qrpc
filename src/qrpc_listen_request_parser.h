@@ -14,7 +14,7 @@ namespace QRpc {
 class Q_RPC_EXPORT QRPCListenRequestParser : public QObject
 {
     Q_OBJECT
-    QRPC_PARSER_DECLARE_ROUTE(QRPCListenRequestParser,"/")
+    QRPC_PARSER_DECLARE_BASE_PATH(QRPCListenRequestParser,"/")
     friend class QRPCListenQRPCSlotPvt;
 public:
 

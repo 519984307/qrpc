@@ -14,9 +14,7 @@ class Q_RPC_EXPORT ControllerSetting:public QStm::SettingBase
 {
     Q_OBJECT
     SETTING_OBJECT(ControllerSetting)
-public:
-    Q_PROPERTY(QVariantHash headers READ headers WRITE setHeaders )
-    Q_PROPERTY(QString path READ path WRITE setPath )
+    Q_PROPERTY(QStringList notMethodCanAuthorization MEMBER notMethodCanAuthorization NOTIFY notMethodCanAuthorizationChanged)
 public:
     //!
     //! \brief ControllerSetting
@@ -28,6 +26,10 @@ public:
     ~ControllerSetting()
     {
     }
+signals:
+    void notMethodCanAuthorizationChanged();
+public:
+    QStringList notMethodCanAuthorization;
 };
 
 

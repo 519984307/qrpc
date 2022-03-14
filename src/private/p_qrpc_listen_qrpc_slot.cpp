@@ -100,7 +100,7 @@ public:
                 return;
             }
 
-            if(controller->canAuthorization()){
+            if(controller->canAuthorization() && controller->canAuthorization(metaMethod)){
                 if(!controller->beforeAuthorization()){
                     sWarning()<<qsl("authorization in Controller::beforeAuthorization()");
                     if(controller->rq().co().isOK())

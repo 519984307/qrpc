@@ -17,6 +17,7 @@ typedef QVector<QByteArray> ByteArrayVector;
 typedef QVector<const QMetaObject*> MetaObjectVector;
 typedef QMultiHash<QByteArray, QStringList> MultStringList ;
 typedef QMultiHash<QByteArray, QRpc::QRPCControllerMethods> MultStringMethod;
+typedef QHash<QByteArray, QVariantList> NotationColletion;
 
 #define dPvt()\
     auto&p =*reinterpret_cast<QRPCControllerPvt*>(this->p)
@@ -27,10 +28,12 @@ Q_GLOBAL_STATIC(MultStringMethod, staticControllerMethods);
 Q_GLOBAL_STATIC(MetaObjectVector, staticRegisterInterfaceMetaObject);
 Q_GLOBAL_STATIC(MetaObjectVector, staticParserRequestMetaObjects);
 Q_GLOBAL_STATIC(ByteArrayVector, staticControllerMethodBlackList);
+Q_GLOBAL_STATIC(NotationColletion, staticControllerNotationClass);
+Q_GLOBAL_STATIC(NotationColletion, staticControllerNotationMethods);
 
-static void staticMakeRoute(QObject*makeObject, const QMetaObject*metaObject)
+
+static void staticMakeNotations(QObject*makeObject, const QMetaObject*metaObject)
 {
-
     auto className=QByteArray(metaObject->className()).toLower().trimmed();
 
     if(staticControllerMethods->contains(className))
@@ -54,9 +57,12 @@ static void staticMakeRoute(QObject*makeObject, const QMetaObject*metaObject)
 #if Q_RPC_LOG_SUPER_VERBOSE
     sWarning()<<"registered class : "<<makeObject->metaObject()->className();
 #endif
+
+    static const auto _rpc_notation_method=QByteArray("_rpc_notation_method");
+    static const auto _rpc_notation_class=QByteArray("_rpc_notation_class");
+
     for (auto i = 0; i < metaObject->methodCount(); ++i) {
         auto method = metaObject->method(i);
-        auto methodName = method.name().toLower();
 
         if(method.methodType()!=method.Method && method.methodType()!=method.Slot)
             continue;
@@ -67,6 +73,84 @@ static void staticMakeRoute(QObject*makeObject, const QMetaObject*metaObject)
 #endif
             continue;
         }
+
+        auto methodName = method.name().toLower();
+
+        if(!methodName.startsWith(qbl("_")))//ignore methods with [_] in start name
+            continue;
+
+        if(method.name().startsWith(_rpc_notation_class)){
+            QVariantList returnVariant;
+            if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
+                staticControllerNotationClass->insert(method.name(), returnVariant);
+        }
+
+        if(method.name().startsWith(_rpc_notation_method)){
+            QVariantList returnVariant;
+            if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
+                staticControllerNotationMethods->insert(method.name(), returnVariant);
+        }
+    }
+}
+
+static void staticMakeRoute(QObject*makeObject, const QMetaObject*metaObject)
+{
+    auto className=QByteArray(metaObject->className()).toLower().trimmed();
+
+    if(staticControllerMethods->contains(className))
+        return;
+
+    auto ctrMethods=staticControllerMethods->value(className);
+    if(!ctrMethods.isEmpty())
+        return;
+
+    auto controller=dynamic_cast<QRPCController*>(makeObject);
+    if(controller==nullptr)
+        return;
+
+    if(controller->redirectCheck()){
+        static QMutex controllerMethodsMutex;
+        auto vList=controller->basePath().toStringList();
+        QMutexLOCKER locker(&controllerMethodsMutex);
+        staticControllerRedirect->insert(className, vList);
+    }
+
+#if Q_RPC_LOG_SUPER_VERBOSE
+    sWarning()<<"registered class : "<<makeObject->metaObject()->className();
+#endif
+
+    static const auto _rpc_notation_method=QByteArray("_rpc_notation_method");
+    static const auto _rpc_notation_class=QByteArray("_rpc_notation_class");
+
+    for (auto i = 0; i < metaObject->methodCount(); ++i) {
+        auto method = metaObject->method(i);
+
+        if(method.methodType()!=method.Method && method.methodType()!=method.Slot)
+            continue;
+
+        auto methodName = method.name().toLower();
+
+        if(method.parameterCount()>0){
+#if Q_RPC_LOG_SUPER_VERBOSE
+            sWarning()<<qsl("Method(%1) ignored").arg(mMth.name().constData());
+#endif
+            continue;
+        }
+
+        {
+            if(method.name().startsWith(_rpc_notation_class)){
+                QVariantList returnVariant;
+                if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
+                    staticControllerNotationClass->insert(method.name(), returnVariant);
+            }
+
+            if(method.name().startsWith(_rpc_notation_method)){
+                QVariantList returnVariant;
+                if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
+                    staticControllerNotationMethods->insert(method.name(), returnVariant);
+            }
+        }
+
 
         if(methodName.startsWith(qbl("_")))//ignore methods with [_] in start name
             continue;
@@ -98,10 +182,17 @@ static void staticMakeRoute(QObject*makeObject, const QMetaObject*metaObject)
 }
 
 
+static void staticMakeController(QObject*makeObject, const QMetaObject*metaObject)
+{
+    staticMakeNotations(makeObject, metaObject);
+    staticMakeRoute(makeObject, metaObject);
+}
+
 static void initQRPCParserRoutes()
 {
-    for(auto&metaObject:*staticParserRequestMetaObjects)
+    for(auto&metaObject:*staticParserRequestMetaObjects){
         QRPCListenRequestParser::makeRoute(*metaObject);
+    }
 }
 
 static void initQRPCController()
@@ -150,7 +241,7 @@ public:
 
 };
 
-QRPCController::QRPCController(QObject *parent):QObject(parent)
+QRPCController::QRPCController(QObject *parent):QObject(parent), NotationsExtended(this)
 {
     this->p = new QRPCControllerPvt();
 }
@@ -300,6 +391,12 @@ bool QRPCController::canAuthorization()
     auto&rq=this->rq();
     if(rq.isMethodOptions())
         return false;
+    return true;
+}
+
+bool QRPCController::canAuthorization(const QMetaMethod &method)
+{
+    Q_UNUSED(method)
     return true;
 }
 
@@ -454,9 +551,7 @@ void QRPCController::setRequest(QRPCListenRequest &request)
 
 void QRPCController::makeRoute(QObject*object, const QMetaObject*metaObject)
 {
-    Q_UNUSED(object)
-    Q_UNUSED(metaObject)
-    staticMakeRoute(object, metaObject);
+    staticMakeController(object, metaObject);
 }
 
 QVariantHash QRPCController::routeFlags(const QString &route) const
