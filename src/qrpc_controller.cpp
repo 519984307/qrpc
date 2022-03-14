@@ -17,7 +17,7 @@ typedef QVector<QByteArray> ByteArrayVector;
 typedef QVector<const QMetaObject*> MetaObjectVector;
 typedef QMultiHash<QByteArray, QStringList> MultStringList ;
 typedef QMultiHash<QByteArray, QRpc::QRPCControllerMethods> MultStringMethod;
-typedef QHash<QByteArray, QVariantList> NotationColletion;
+typedef QHash<QByteArray, QVariantHash> NotationMaked;
 
 #define dPvt()\
     auto&p =*reinterpret_cast<QRPCControllerPvt*>(this->p)
@@ -28,8 +28,28 @@ Q_GLOBAL_STATIC(MultStringMethod, staticControllerMethods);
 Q_GLOBAL_STATIC(MetaObjectVector, staticRegisterInterfaceMetaObject);
 Q_GLOBAL_STATIC(MetaObjectVector, staticParserRequestMetaObjects);
 Q_GLOBAL_STATIC(ByteArrayVector, staticControllerMethodBlackList);
-Q_GLOBAL_STATIC(NotationColletion, staticControllerNotationClass);
-Q_GLOBAL_STATIC(NotationColletion, staticControllerNotationMethods);
+Q_GLOBAL_STATIC(NotationMaked, staticControllerNotationClassMaked);
+Q_GLOBAL_STATIC(NotationMaked, staticControllerNotationMethodsMaked);
+
+
+static QVariantHash reMakeNotation(const QVariant &notations)
+{
+    QVariantHash __return;
+    auto vList=notations.toList();
+    for(auto&v:vList){
+        auto vHash=v.toHash();
+
+        if(vHash.isEmpty())
+            continue;
+
+        QHashIterator<QString, QVariant> i(vHash);
+        while(i.hasNext()){
+            i.next();
+            __return.insert(i.key(), i.value());
+        }
+    }
+    return __return;
+}
 
 
 static void staticApiMakeNotations(QObject*makeObject, const QMetaObject*metaObject)
@@ -82,13 +102,13 @@ static void staticApiMakeNotations(QObject*makeObject, const QMetaObject*metaObj
         if(method.name().startsWith(_rpc_notation_class)){
             QVariantList returnVariant;
             if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
-                staticControllerNotationClass->insert(method.name(), returnVariant);
+                staticControllerNotationClassMaked->insert(method.name(), reMakeNotation(returnVariant));
         }
 
         if(method.name().startsWith(_rpc_notation_method)){
             QVariantList returnVariant;
             if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
-                staticControllerNotationMethods->insert(method.name(), returnVariant);
+                staticControllerNotationMethodsMaked->insert(method.name(), reMakeNotation(returnVariant));
         }
     }
 }
@@ -136,21 +156,6 @@ static void staticApiMakeBasePath(QObject*makeObject, const QMetaObject*metaObje
 #endif
             continue;
         }
-
-        {
-            if(method.name().startsWith(_rpc_notation_class)){
-                QVariantList returnVariant;
-                if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
-                    staticControllerNotationClass->insert(method.name(), returnVariant);
-            }
-
-            if(method.name().startsWith(_rpc_notation_method)){
-                QVariantList returnVariant;
-                if(method.invoke(makeObject, Qt::DirectConnection, Q_ARG(QVariantList, returnVariant)))
-                    staticControllerNotationMethods->insert(method.name(), returnVariant);
-            }
-        }
-
 
         if(methodName.startsWith(qbl("_")))//ignore methods with [_] in start name
             continue;
@@ -402,6 +407,14 @@ bool QRPCController::canAuthorization()
 
 bool QRPCController::canAuthorization(const QMetaMethod &method)
 {
+    if(!staticControllerNotationMethodsMaked->contains(method.name()))
+        return true;
+
+    auto vNotations=staticControllerNotationMethodsMaked->value(method.name());
+
+    if(vNotations.isEmpty())
+        return true;
+
     Q_UNUSED(method)
     return true;
 }
