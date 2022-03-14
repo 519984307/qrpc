@@ -30,7 +30,7 @@ class Q_RPC_Interface : public QRpc::QRPCController
 {
     Q_OBJECT
     Q_DECLARE_OBJECT()
-    QRPC_DECLARE_ROUTE(InterfaceAgent, default_route_rpc)
+    QRPC_DECLARE_BASE_PATH(InterfaceAgent, default_route_rpc)
     Q_RPC_DECLARE_INTERFACE_METHOD_CHECK()
 public:
     Q_INVOKABLE explicit Q_RPC_Interface(QObject *parent=nullptr):QRpc::QRPCController(parent)
