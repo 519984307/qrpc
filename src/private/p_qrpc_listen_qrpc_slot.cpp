@@ -94,7 +94,7 @@ public:
                 return;
             }
 
-            if(controller->canOperation()){
+            if(!controller->canOperation()){
                 if(controller->rq().co().isOK())
                     controller->rq().co().setBadRequest();
                 return;
