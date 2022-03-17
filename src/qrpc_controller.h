@@ -4,6 +4,7 @@
 #include <QList>
 #include <QMetaObject>
 #include <QMetaMethod>
+#include "../../qnotation/src/qnotation.h"
 #include "./qrpc_global.h"
 #include "./qrpc_listen_request.h"
 #include "./qrpc_controller_setting.h"
@@ -20,7 +21,7 @@ class Server;
 //!
 //! \brief The Controller class
 //!
-class Q_RPC_EXPORT Controller: public QObject, public NotationsExtended
+class Q_RPC_EXPORT Controller: public QObject, public QRpcPrivate::NotationsExtended
 {
     Q_OBJECT
     friend class Server;
@@ -31,7 +32,7 @@ class Q_RPC_EXPORT Controller: public QObject, public NotationsExtended
     Q_PROPERTY(QVariant basePath READ basePath CONSTANT)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 
-    Q_NOTATION_CLASS({})
+    Q_NOTATION(Controller, {})
 
 public:
     //!
@@ -49,14 +50,14 @@ public:
     //! \brief basePath
     //! \return
     //!
-    Q_INVOKABLE virtual QVariant basePath()const;
+    virtual QVariant basePath()const;
 
     //!
     //! \brief route
     //! \return
     //!
-    QT_DEPRECATED_X("Use basePath;")
-    Q_INVOKABLE virtual QVariant route()const;
+    QT_DEPRECATED_X("Use basePath()")
+    virtual QVariant route()const;
 
     //!
     //! \brief initializeInstalleds
@@ -75,44 +76,20 @@ public:
     //! \brief module
     //! \return
     //!
-    Q_NOTATION_METHOD(module, {})
-    Q_INVOKABLE virtual QString module()const;
+    virtual QString module()const;
 
     //!
     //! \brief moduleUuid
     //! \return
     //!
-    Q_INVOKABLE virtual QUuid moduleUuid() const;
+    virtual QUuid moduleUuid() const;
 
     //!
     //! \brief redirectCheck
     //! \return
     //!
-    Q_INVOKABLE virtual bool redirectCheck()const;
 
-    //!
-    //! \brief description
-    //! \return
-    //!
-    Q_INVOKABLE virtual QString description()const;
-
-    //!
-    //! \brief controllerSetting
-    //! \return
-    //!
-    virtual ControllerSetting&setting();
-
-    //!
-    //! \brief enabled
-    //! \return
-    //!
-    virtual bool enabled()const;
-
-    //!
-    //! \brief setEnabled
-    //! \param enabled
-    //!
-    virtual void setEnabled(bool enabled);
+    virtual bool redirectCheck()const;
 
     //!
     //! \brief redirectCheckClass
@@ -130,27 +107,51 @@ public:
     static bool redirectCheckBasePath(const QByteArray &className, const QByteArray &basePath);
 
     //!
-    //! \brief routeRedirectMethod
+    //! \brief redirectMethod
     //! \param className
     //! \param routePath
     //! \param method
     //! \return
     //!
-    virtual bool routeRedirectMethod(const QByteArray &className, const QByteArray &routePath, QMetaMethod &method);
+    virtual bool redirectMethod(const QByteArray &className, const QByteArray &path, QMetaMethod &method);
 
     //!
-    //! \brief methodExists
-    //! \param methodName
+    //! \brief description
     //! \return
     //!
-    virtual bool methodExists(const QByteArray &methodName) const;
+    virtual QString description()const;
 
     //!
-    //! \brief routeExists
-    //! \param routePath
+    //! \brief controllerSetting
     //! \return
     //!
-    static bool routeExists(const QByteArray &routePath);
+    virtual ControllerSetting &setting();
+
+    //!
+    //! \brief enabled
+    //! \return
+    //!
+    virtual bool enabled()const;
+
+    //!
+    //! \brief setEnabled
+    //! \param enabled
+    //!
+    virtual void setEnabled(bool enabled);
+
+//    //!
+//    //! \brief methodExists
+//    //! \param methodName
+//    //! \return
+//    //!
+//    virtual bool methodExists(const QByteArray &methodName) const;
+
+//    //!
+//    //! \brief routeExists
+//    //! \param routePath
+//    //! \return
+//    //!
+//    static bool routeExists(const QByteArray &routePath);
 
     //!
     //! \brief routeMethods
@@ -284,7 +285,7 @@ protected:
     //! \param route
     //! \return
     //!
-    //QT_DEPRECATED_X("use QRPC_NOTATION or Q_NOTATION")
+    QT_DEPRECATED_X("use QRPC_NOTATION or Q_NOTATION")
     virtual QVariantHash routeFlags(const QString&route)const;
 
     //!

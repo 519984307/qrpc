@@ -227,19 +227,13 @@ public:\
 
 
 #define QRPC_CONTROLLER_AUTO_REGISTER(ClassName)\
-namespace Private{\
 static auto ClassName##ApiInstalled=QRpc::Controller::install(ClassName::staticMetaObject);\
-}
 
 #define QRPC_PARSER_AUTO_REGISTER(ParserObject)\
-namespace Private{\
-    static auto ClassName##ApiParserInstalled=QRpc::Controller::installParser(ParserObject::staticMetaObject);\
-}
+static auto ClassName##ApiParserInstalled=QRpc::Controller::installParser(ParserObject::staticMetaObject);\
 
 #define QRPC_LISTTEN_AUTO_REGISTER(Type, Listen)\
-namespace Private{\
 static auto Listen##Type##_MetaObject=QRpc::Listen::install(Type, Listen::staticMetaObject);\
-}
 
 #define QRPC_DECLARE_BASE_PATH(Controller, v1)\
 public:\

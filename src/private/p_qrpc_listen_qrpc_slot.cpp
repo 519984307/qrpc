@@ -82,7 +82,7 @@ public:
 
 
             metaMethod = routeMethods.value(requestPath);
-            if(!controller->routeRedirectMethod(className, requestPath, metaMethod)){
+            if(!controller->redirectMethod(className, requestPath, metaMethod)){
                 if(request.co().isOK())
                     request.co().setNotFound();
                 return;
@@ -95,8 +95,7 @@ public:
             }
 
             if(!controller->canOperation(metaMethod)){
-                if(controller->rq().co().isOK())
-                    controller->rq().co().setBadRequest();
+                controller->rq().co().setNotAcceptable();
                 return;
             }
 

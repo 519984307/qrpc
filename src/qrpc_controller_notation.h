@@ -4,49 +4,120 @@
 #include <QVariantHash>
 #include <QVariantList>
 #include <QString>
-#include "./qrpc_types.h"
+#include <QNotation>
+#include "./qrpc_global.h"
 
-namespace QRpc
+namespace QRpcPrivate
 {
 
-namespace Private {
-const QVariantHash &___opHead();
-
-const QVariantHash &___opGet();
-
-const QVariantHash &___opPost();
-
-const QVariantHash &___opPut();
-
-const QVariantHash &___opDelete();
-
-const QVariantHash &___opOptions();
-
-const QVariantHash &___opPatch();
-
-const QVariantHash &___opTrace();
-
-const QVariantList &___opCrud();
-
-const QVariantList &___opPostPut();
-}
-
-class NotationsExtended
+//!
+//! \brief The NotationsExtended class
+//!
+class Q_RPC_EXPORT NotationsExtended:public QNotation::Extended
 {
 public:
+
+    enum Classification{
+        ApiOperation
+    };
+
+
+    //!
+    //! \brief NotationsExtended
+    //! \param parent
+    //!
     explicit NotationsExtended(QObject*parent=nullptr);
     virtual ~NotationsExtended();
-public:
-    const QVariantList &opPostPut=Private::___opPostPut();
-    const QVariantList &opCrud=Private::___opCrud();
-    const QVariantHash &opTrace=Private::___opTrace();
-    const QVariantHash &opPatch=Private::___opPatch();
-    const QVariantHash &opOptions=Private::___opOptions();
-    const QVariantHash &opDelete=Private::___opDelete();
-    const QVariantHash &opPut=Private::___opPut();
-    const QVariantHash &opPost=Private::___opPost();
-    const QVariantHash &opGet=Private::___opGet();
-    const QVariantHash &opHead=Private::___opHead();
+
+    //!
+    //! \brief apiDoc
+    //!
+    Q_NOTATION_DECLARE(apiDoc, Documentation)
+
+    //!
+    //! \brief apiName
+    //!
+    Q_NOTATION_DECLARE_FUNC(apiName, Information)
+
+    //!
+    //! \brief apiDescription
+    //!
+    Q_NOTATION_DECLARE_FUNC(apiDescription, Information)
+
+    //!
+    //! \brief apiBasePath
+    //!
+    Q_NOTATION_DECLARE_FUNC(apiBasePath, Information)
+
+    //!
+    //! \brief opDescription
+    //!
+    Q_NOTATION_DECLARE(opDescription, Information)
+
+    //!
+    //! \brief opPath
+    //! \param path
+    //! \return
+    //!
+    Q_NOTATION_DECLARE_FUNC(opPath, Information)
+
+
+    //!
+    //! \brief opCrud
+    //!
+    Q_NOTATION_DECLARE(opCrud, ApiOperation)
+
+    //!
+    //! \brief opTrace
+    //!
+    Q_NOTATION_DECLARE(opTrace, ApiOperation)
+
+    //!
+    //! \brief opPatch
+    //!
+    Q_NOTATION_DECLARE(opPatch, ApiOperation)
+
+    //!
+    //! \brief opHead
+    //!
+    Q_NOTATION_DECLARE(opHead, ApiOperation)
+
+    //!
+    //! \brief opOptions
+    //!
+    Q_NOTATION_DECLARE(opOptions, ApiOperation)
+
+    //!
+    //! \brief opGet
+    //!
+    Q_NOTATION_DECLARE(opGet, ApiOperation)
+
+    //!
+    //! \brief opPost
+    //!
+    Q_NOTATION_DECLARE(opPost, ApiOperation)
+
+    //!
+    //! \brief opPut
+    //!
+    Q_NOTATION_DECLARE(opPut, ApiOperation)
+
+    //!
+    //! \brief opDelete
+    //!
+    Q_NOTATION_DECLARE(opDelete, ApiOperation)
+
+    //!
+    //! \brief rqExcludePath
+    //!
+    Q_NOTATION_DECLARE(rqExcludePath, Information)
+
+    //!
+    //! \brief rqSecurityIgnore
+    //!
+    Q_NOTATION_DECLARE(rqSecurityIgnore, Security)
+
+
 private:
 
 };
