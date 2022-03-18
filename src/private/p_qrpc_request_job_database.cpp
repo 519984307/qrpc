@@ -252,7 +252,7 @@ void RequestJobDataBase::onFinish()
     auto __connection=QSqlDatabase::database(this->sqlConnectionName);
     if(__connection.isValid()){
         __connection.close();
-        __connection=QSqlDatabase();
+        __connection={};
         QSqlDatabase::removeDatabase(this->sqlConnectionName);
     }
     this->sqlDriver=nullptr;

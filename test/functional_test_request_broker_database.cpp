@@ -49,11 +49,11 @@ TEST_F(Q_RPC_RequestFunctionalBrokerDatabase, serviceStart)
 /*
 
 
-TEST_F(Q_RPC_RequestFunctionalBrokerDatabase, check_header)
+TEST_F(Q_RPC_RequestFunctionalBrokerDatabase, check_head)
 {
     Q_RPC_RequestFunctionalBrokerDatabaseV1(request);
 
-    auto&response=request.call(QRpc::Options,"check_header",QVariant());
+    auto&response=request.call(QRpc::Options,"check_head",QVariant());
     EXPECT_EQ(response.isOk(),true)<<"fail";
     EXPECT_EQ(this->checkResponseHeader(response),true)<<"invalid response header";
     EXPECT_EQ(response.body().isEmpty(),true)<<"fail";

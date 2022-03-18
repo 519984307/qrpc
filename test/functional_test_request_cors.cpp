@@ -42,11 +42,11 @@ TEST_F(Q_RPC_RequestFunctionalCORS, serviceStart)
     EXPECT_TRUE(this->serviceStart())<<"fail: service start";
 }
 
-TEST_F(Q_RPC_RequestFunctionalCORS, check_header)
+TEST_F(Q_RPC_RequestFunctionalCORS, check_head)
 {
     Q_RPC_RequestFunctionalCORSV1(request);
 
-    auto&response=request.call(QRpc::Options,"check_header",QVariant());
+    auto&response=request.call(QRpc::Options,"check_head",QVariant());
     EXPECT_EQ(response.isOk(),true)<<"fail";
     EXPECT_EQ(this->checkResponseHeader(response),true)<<"invalid response header";
     EXPECT_EQ(response.body().isEmpty(),true)<<"fail";

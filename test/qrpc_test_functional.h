@@ -29,7 +29,7 @@ class Q_RPC_Interface : public QRpc::QRPCController
 {
     Q_OBJECT
     Q_DECLARE_OBJECT()
-    QRPC_DECLARE_BASE_PATH(InterfaceAgent, qsl("/"))
+    Q_NOTATION(Q_RPC_Interface, nl{apiBasePath("/")})
     Q_RPC_DECLARE_INTERFACE_METHOD_CHECK()
 public:
     Q_INVOKABLE explicit Q_RPC_Interface(QObject *parent=nullptr):QRpc::QRPCController(parent)
@@ -40,33 +40,51 @@ public:
     {
     }
 
-    Q_INVOKABLE QVariant check_header()
+    Q_NOTATION(check_head, {opHead})
+    Q_INVOKABLE QVariant check_head()
     {
-        QRPC_METHOD_CHECK_HEADER();
         return QDate::currentDate();
     }
 
+    Q_NOTATION(check_options, {opOptions})
+    Q_INVOKABLE QVariant check_options()
+    {
+        return QDate::currentDate();
+    }
+
+    Q_NOTATION(check_get, {opGet})
     Q_INVOKABLE QVariant check_get()
     {
-        QRPC_METHOD_CHECK_GET();
         return QDate::currentDate();
     }
 
+    Q_NOTATION(check_post, {opPost})
     Q_INVOKABLE QVariant check_post()
     {
-        QRPC_METHOD_CHECK_POST();
         return QDate::currentDate();
     }
 
+    Q_NOTATION(check_put, {opPut})
     Q_INVOKABLE QVariant check_put()
     {
-        QRPC_METHOD_CHECK_PUT();
         return QDate::currentDate();
     }
 
+    Q_NOTATION(check_delete, {opDelete})
     Q_INVOKABLE QVariant check_delete()
     {
-        QRPC_METHOD_CHECK_DELETE();
+        return QDate::currentDate();
+    }
+
+    Q_NOTATION(check_patch, {opPatch})
+    Q_INVOKABLE QVariant check_patch()
+    {
+        return QDate::currentDate();
+    }
+
+    Q_NOTATION(check_trace, {opTrace})
+    Q_INVOKABLE QVariant check_trace()
+    {
         return QDate::currentDate();
     }
 };

@@ -147,8 +147,6 @@ public:
     virtual ~ControllerPvt()
     {
     }
-
-
 };
 
 Controller::Controller(QObject *parent):QObject(parent), QRpcPrivate::NotationsExtended(this)
@@ -163,11 +161,13 @@ Controller::~Controller()
 
 QVariant Controller::basePath() const
 {
-    return qsl("/");
-}
+    auto&notations=this->notation();
 
-QVariant Controller::route() const
-{
+    const auto&notation=notations.find(apiBasePath());
+
+    if(notation.isValid())
+        return notation.value();
+
     return qsl("/");
 }
 
@@ -216,10 +216,13 @@ bool Controller::redirectCheckBasePath(const QByteArray &className, const QByteA
         i.next();
         const auto classNameB=i.key().toLower();
         const auto&vList=i.value();
+
         if(!className.isEmpty() && (classNameB!=classNameA))
             continue;
+
         if(!Request::startsWith(basePath, vList))
             continue;
+
         return true;
     }
     return false;
@@ -256,34 +259,6 @@ void Controller::setEnabled(bool enabled)
     p.enabled=enabled;
 }
 
-//bool Controller::methodExists(const QByteArray &methodName)const
-//{
-//    auto _methodName=QRpc::Util::routeParser(methodName);
-//    auto __route=QRpc::Util::routeExtract(methodName);
-//    _methodName=QRpc::Util::routeExtractMethod(methodName);
-//    auto route=QRpc::Util::routeParser(this->basePath());
-//    if(!(__route.isEmpty() || route==__route))
-//        return false;
-
-//    auto metaObject=this->metaObject();
-//    for (int i = 0; i < metaObject->methodCount(); ++i) {
-//        auto method = metaObject->method(i);
-
-//        if(method.methodType()!=method.Method && method.methodType()!=method.Slot)
-//            continue;
-
-//        if(method.name().toLower()==_methodName)
-//            return true;
-//    }
-//    return false;
-//}
-
-//bool Controller::routeExists(const QByteArray &routePath)
-//{
-//    auto __return=staticControllerRoutes->contains(routePath);
-//    return __return;
-//}
-
 ControllerMethods Controller::routeMethods(const QByteArray&className)
 {
     return staticControllerMethods->value(className.toLower().trimmed());
@@ -302,82 +277,7 @@ ListenRequest &Controller::rq()
     return (p.request==nullptr)?(____request):(*p.request);
 }
 
-bool Controller::canOperation(const QMetaMethod &method)
-{
-    dPvt();
-
-    if(p.request==nullptr)
-        return {};
-
-    auto&rq=*p.request;
-    auto operation=qsl("op%1").arg(QString::fromUtf8(rq.requestMethod())).toLower();
-
-    Q_NOTATION_UTIL;
-    const auto &notations=nUtil.notation(method);
-    if(notations.containsClassification(ApiOperation)){
-        if(!notations.contains(operation))
-            return {};
-    }
-
-    return true;
-}
-
-bool Controller::canAuthorization()
-{
-    Q_NOTATION_UTIL;
-    const auto &notations=nUtil.notation();
-
-    if(notations.containsClassification(Security)){
-        if(!notations.contains(this->rqSecurityIgnore))
-            return {};
-    }
-
-    auto&rq=this->rq();
-    if(rq.isMethodOptions())
-        return false;
-    return true;
-}
-
-bool Controller::canAuthorization(const QMetaMethod &method)
-{
-    Q_NOTATION_UTIL;
-    const auto &notations=nUtil.notation(method);
-
-    if(notations.containsClassification(Security)){
-        if(!notations.contains(this->rqSecurityIgnore))
-            return {};
-    }
-
-    return true;
-}
-
-bool Controller::beforeAuthorization()
-{
-    return true;
-}
-
-bool Controller::authorization()
-{
-    return true;
-}
-
-bool Controller::authorization(const QMetaMethod &method)
-{
-    Q_NOTATION_UTIL;
-    const auto &notations=nUtil.notation(method);
-    if(notations.containsClassification(Security)){
-        if(!notations.contains(this->rqSecurityIgnore))
-            return {};
-    }
-    return true;
-}
-
-bool Controller::afterAuthorization()
-{
-    return true;
-}
-
-bool Controller::requestBeforeInvoke()
+bool Controller::requestSettings()
 {
     auto&rq=this->rq();
     auto vHearder = rq.requestHeader();
@@ -443,7 +343,93 @@ bool Controller::requestBeforeInvoke()
     rq.setResponseHeader(vHearderResponse);
     rq.co().setOK();
     return rq.co().isOK();
+}
 
+
+bool Controller::canOperation(const QMetaMethod &method)
+{
+    dPvt();
+    if(p.request==nullptr)
+        return {};
+
+    if(this->rq().isMethodOptions())
+        return true;
+
+    auto&rq=*p.request;
+
+    const auto &notations=this->notation(method);
+    if(!notations.containsClassification(ApiOperation))
+        return true;
+
+    auto operation=qsl("op%1").arg(QString::fromUtf8(rq.requestMethod())).toLower();
+    if(notations.contains(operation))
+        return true;
+
+    return {};
+}
+
+bool Controller::canAuthorization()
+{
+    if(this->rq().isMethodOptions())
+        return true;
+
+    const auto &notations=this->notation();
+
+    if(!notations.containsClassification(Security))
+        return true;
+
+    if(notations.contains(this->rqSecurityIgnore))
+        return true;
+
+    return false;
+}
+
+bool Controller::canAuthorization(const QMetaMethod &method)
+{
+    if(this->rq().isMethodOptions())
+        return true;
+
+    const auto &notations=this->notation(method);
+
+    if(!notations.containsClassification(Security))
+        return true;
+
+    if(notations.contains(this->rqSecurityIgnore))
+        return true;
+
+    return false;
+}
+
+bool Controller::beforeAuthorization()
+{
+    return true;
+}
+
+bool Controller::authorization()
+{
+    return true;
+}
+
+bool Controller::authorization(const QMetaMethod &method)
+{
+    const auto &notations=this->notation(method);
+    if(!notations.containsClassification(Security))
+        return true;
+
+    if(notations.contains(this->rqSecurityIgnore))
+        return true;
+
+    return false;
+}
+
+bool Controller::afterAuthorization()
+{
+    return true;
+}
+
+bool Controller::requestBeforeInvoke()
+{
+    return true;
 }
 
 bool Controller::requestRedirect()
@@ -511,49 +497,6 @@ Controller &Controller::setRequest(ListenRequest &request)
     dPvt();
     p.request=&request;
     return*this;
-}
-
-QVariantHash Controller::routeFlags(const QString &route) const
-{
-    QString __method=QRpc::Util::routeParser(route);
-    if((__method.contains(qsl("/")))){
-        auto lst=__method.split(qsl("/"));
-        __method=lst.takeLast();
-    }
-    auto n1=qsl("flags_%1").arg(__method).toUtf8().toLower();
-
-    auto&metaObject=*this->metaObject();
-    for (int row = 0; row < metaObject.propertyCount(); ++row) {
-        auto property = metaObject.property(row);
-        auto n2=QByteArray(property.name()).toLower();
-        if(n1!=n2)
-            continue;
-        auto flags=property.read(this);
-        return flags.toHash();
-    }
-    return {};
-}
-
-const QVariantHash Controller::routeFlagsMaker(const QString &request_path, const QVariant &flag)
-{
-    QString __route;
-    auto __method=request_path.trimmed().toLower();
-    if((__method.contains(qsl("/")))){
-        __method=qsl("/")+__method+qsl("/");
-        while(__method.contains(qsl("//")))
-            __method=__method.replace(qsl("//"), qsl("/"));
-
-        auto lst=__method.split(qsl("/"));
-        __method=lst.takeLast();
-        __route=lst.join(qsl("/"));
-    }
-    auto typeId=qTypeId(flag);
-    if(QMetaTypeUtilVariantDictionary.contains(typeId))
-        return flag.toHash();
-
-    if(QMetaTypeUtilVariantList.contains(typeId))
-        return {};
-    return QJsonDocument::fromJson(flag.toString().toUtf8()).toVariant().toHash();
 }
 
 }

@@ -68,7 +68,7 @@ public:
             QObject::disconnect(__connection.driver(), QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &DataBaseListenerServer::service);
             auto name=__connection.connectionName();
             __connection.close();
-            __connection=QSqlDatabase();
+            __connection={};
             listenersQSqlDrivers.remove(connectionName);
             listenersQSqlDatabase.insert(connectionName,__connection);
             QSqlDatabase::removeDatabase(name);

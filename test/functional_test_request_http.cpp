@@ -20,10 +20,10 @@ TEST_F(Q_RPC_RequestHTTPFunctional, serviceStart)
     EXPECT_TRUE(this->serviceStart())<<"fail: service start";
 }
 
-TEST_F(Q_RPC_RequestHTTPFunctional, check_header)
+TEST_F(Q_RPC_RequestHTTPFunctional, check_head)
 {
     d_Q_RPC_RequestHTTPFunctionalV1(request);
-    auto&response=request.call(QRpc::Head,"check_header",QVariant());
+    auto&response=request.call(QRpc::Head,"check_head",QVariant());
     EXPECT_EQ(response.isOk(),true)<<"fail";
     //auto dt=QDate::fromString(response.body(),Qt::ISODate);
     //EXPECT_EQ(dt,QDate::currentDate())<<"fail";

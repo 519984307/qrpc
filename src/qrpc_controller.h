@@ -29,11 +29,8 @@ class Q_RPC_EXPORT Controller: public QObject, public QRpcPrivate::NotationsExte
     friend class ListenQRPC;
     friend class ListenQRPCSlotPvt;
 
-    Q_PROPERTY(QVariant basePath READ basePath CONSTANT)
+    Q_PROPERTY(QVariant basePath READ basePath NOTIFY basePathChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
-
-    Q_NOTATION(Controller, {})
-
 public:
     //!
     //! \brief Controller
@@ -57,7 +54,7 @@ public:
     //! \return
     //!
     QT_DEPRECATED_X("Use basePath()")
-    virtual QVariant route()const;
+    virtual QVariant route()const { return this->basePath(); };
 
     //!
     //! \brief initializeInstalleds
@@ -139,20 +136,6 @@ public:
     //!
     virtual void setEnabled(bool enabled);
 
-//    //!
-//    //! \brief methodExists
-//    //! \param methodName
-//    //! \return
-//    //!
-//    virtual bool methodExists(const QByteArray &methodName) const;
-
-//    //!
-//    //! \brief routeExists
-//    //! \param routePath
-//    //! \return
-//    //!
-//    static bool routeExists(const QByteArray &routePath);
-
     //!
     //! \brief routeMethods
     //! \param className
@@ -171,6 +154,12 @@ public:
     //! \return
     //!
     virtual ListenRequest &rq();
+
+    //!
+    //! \brief requestSettings
+    //! \return
+    //!
+    bool requestSettings();
 
     //!
     //! \brief canOperation
@@ -268,6 +257,7 @@ public:
     static QVector<const QMetaObject *> &staticApiParserList();
 
 protected:
+
     //!
     //! \brief setServer
     //! \param server
@@ -280,33 +270,17 @@ protected:
     //!
     virtual Controller &setRequest(ListenRequest &request);
 
-    //!
-    //! \brief routeFlags
-    //! \param route
-    //! \return
-    //!
-    QT_DEPRECATED_X("use QRPC_NOTATION or Q_NOTATION")
-    virtual QVariantHash routeFlags(const QString&route)const;
-
-    //!
-    //! \brief routeFlagsMaker
-    //! \param request_path
-    //! \param flag
-    //! \return
-    //!
-    QT_DEPRECATED_X("use QRPC_NOTATION or Q_NOTATION")
-    static const QVariantHash routeFlagsMaker(const QString&request_path, const QVariant &flag);
-
 signals:
+
+    //!
+    //! \brief basePathChanged
+    //!
+    void basePathChanged();
+
     //!
     //! \brief enabledChanged
     //!
     void enabledChanged();
-
-    //!
-    //! \brief notMethodCanAuthorizationChanged
-    //!
-    void notMethodCanAuthorizationChanged();
 private:
     void*p = nullptr;
     QRPCProtocol acceptedProtocols;

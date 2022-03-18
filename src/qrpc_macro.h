@@ -4,12 +4,6 @@
 #include <QDebug>
 #include <QStm>
 
-#define Q_RPC_ROUTE_FLAGS(route, r_flags)\
-private:\
-    QVariantHash _flags_##route()const { return routeFlagsMaker(QStringLiteral(#route), r_flags);};\
-    Q_PROPERTY(QVariantHash flags_##route READ _flags_##route)\
-public:\
-
 #define QRPC_METHOD_CHECK_GET()\
 if(this->rq().isMethodOptions()){\
     this->rq().co().setOK();\
