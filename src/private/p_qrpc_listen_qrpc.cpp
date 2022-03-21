@@ -167,7 +167,6 @@ public:
                 auto path = basePathParser(v, methodName);
                 if (methodList.contains(path))
                     continue;
-
                 methodList.insert(path, method);
             }
         }
@@ -185,13 +184,19 @@ public:
 
         this->controller.clear();
         for (auto &mObj : server->controllers()) {
-            auto name = QString::fromUtf8(mObj->className()).split(qsl("::")).last().toUtf8();
+            auto name = QString::fromUtf8(mObj->className()).toLower().toUtf8().toLower();
+
             auto object = mObj->newInstance();
-            if (object == nullptr)
+
+            if (object == nullptr){
                 continue;
+            }
+
             auto controller = dynamic_cast<Controller *>(object);
-            if (controller == nullptr)
+            if (controller == nullptr){
                 delete object;
+                continue;
+            }
 
             //controller->initializeInstalleds();
             apiMakeBasePath(controller, mObj);
@@ -210,8 +215,8 @@ public:
         }
         this->controllerParsers.clear();
         for (auto &mObj : server->controllerParsers()) {
-            auto name = QString::fromUtf8(mObj->className()).split(qsl("::")).last().toUtf8();
-            auto object = mObj->newInstance(Q_ARG(QObject *, nullptr));
+            auto name = QString::fromUtf8(mObj->className()).toLower().toUtf8().toLower();
+            auto object = mObj->newInstance(Q_ARG(QObject*, nullptr));
             if (object == nullptr)
                 continue;
 

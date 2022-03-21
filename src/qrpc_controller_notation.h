@@ -45,6 +45,11 @@ public:
     Q_NOTATION_DECLARE_FUNC(apiDescription, Information)
 
     //!
+    //! \brief apiModule
+    //!
+    Q_NOTATION_DECLARE_FUNC(apiModule, Information)
+
+    //!
     //! \brief apiBasePath
     //!
     Q_NOTATION_DECLARE_FUNC(apiBasePath, Information)

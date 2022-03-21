@@ -140,7 +140,7 @@ public:
         return true;
     }
 
-    QList<const QMetaObject *> invkeControllers(const QByteArray &requestPath)
+    QList<const QMetaObject *> invokeControllers(const QByteArray &requestPath)
     {
         QList<const QMetaObject *> __return;
         for (auto &mObjController : this->listenControllers) {
@@ -181,7 +181,7 @@ public:
 
         const auto requestPath = request.requestPath().toLower();
 
-        auto listenControllers=invkeControllers(requestPath);
+        auto listenControllers=invokeControllers(requestPath);
         for (auto &mObjController : listenControllers) {
             auto className = QByteArray(mObjController->className()).toLower();
             auto routeMethods = this->controllerMethods.value(className);

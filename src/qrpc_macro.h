@@ -231,28 +231,6 @@ public: \
         return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral("")); \
     }
 
-#define QRPC_DECLARE_MODULE(vmodule) \
-public: \
-    virtual QString module() const override \
-    { \
-        static QString __return(vmodule); \
-        return __return; \
-    } \
-    virtual QUuid moduleUuid() const override \
-    { \
-        QStm::VariantUtil vu; \
-        static auto __return = vu.toMd5Uuid(vmodule); \
-        return __return; \
-    }
-
-#define QRPC_DECLARE_DESCRIPTION(vdesc) \
-public: \
-    virtual QString description() const override \
-    { \
-        static QString __return(vdesc); \
-        return __return; \
-    }
-
 #define Q_RPC_DECLARE_INTERFACE_METHOD_CHECK() \
 public: \
     Q_INVOKABLE virtual QVariant check() \

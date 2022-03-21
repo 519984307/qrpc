@@ -99,6 +99,10 @@ QStringList &Controller::basePath() const
 
 QString Controller::module() const
 {
+    auto&notations=this->notation();
+    const auto&notation=notations.find(apiModule());
+    if(notation.isValid())
+        return notation.value().toString();
     return {};
 }
 
