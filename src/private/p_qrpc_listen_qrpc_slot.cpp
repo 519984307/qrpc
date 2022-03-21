@@ -295,15 +295,6 @@ public:
             }
         }
 
-        if (!controller->requestBeforeInvoke()) {
-#if Q_RPC_LOG_VERBOSE
-            sWarning() << qsl("requestBeforeInvoke:: fail");
-#endif
-            if (controller->rq().co().isOK())
-                controller->rq().co().setInternalServerError();
-            return {};
-        }
-
         static const auto sQVariant = qbl("QVariant");
         auto invokeArg0 = QGenericArgument(sQVariant, &vArgValue);
         bool invokeResult = false;
@@ -326,7 +317,7 @@ public:
                                                  invokeArg0);
         }
 
-        controller->requestAfterInvoke();
+
 
         if (!invokeResult) {
             if (request.co().isOK())
@@ -352,29 +343,62 @@ public:
         QMetaMethod metaMethod;
         Controller *controller = nullptr;
 
-        if (!invokeQMetaObject(sObj.data(), request, controller, metaMethod))
+        auto preInvoke=[this, &sObj, &request, &controller, &metaMethod](){
+            if (!invokeQMetaObject(sObj.data(), request, controller, metaMethod))
+                return false;
+
+            if (!invokeControllerSettings(controller))
+                return false;
+
+            if (controller->rq().isMethodOptions())
+                return false;
+
+            if (!invokeControllerRoutines(controller, metaMethod))
+                return false;
+
+            return true;
+        };
+
+        auto invokeMethods=[this, &request, &controller, &metaMethod]()
+        {
+            if (!this->invokeSecurity(controller, metaMethod))
+                return false;
+
+            if (!this->invokeParsers(controller, request))
+                return false;
+
+            if (!this->invokeRouters(request, metaMethod))
+                return false;
+
+            if (!this->invokeMethod(controller, request, metaMethod))
+                return false;
+
+            return true;
+        };
+
+        if(!preInvoke())
             return;
 
-        if (!invokeControllerSettings(controller))
+        if(controller==nullptr){
+#if Q_RPC_LOG_VERBOSE
+            sWarning() << qsl("Invalid controller");
+#endif
+            return;
+        }
+
+        if (!controller->requestBeforeInvoke()) {
+#if Q_RPC_LOG_VERBOSE
+            sWarning() << qsl("requestBeforeInvoke:: fail");
+#endif
+            if (controller->rq().co().isOK())
+                controller->rq().co().setInternalServerError();
+            return;
+        }
+
+        if(!invokeMethods())
             return;
 
-        if (controller->rq().isMethodOptions())
-            return;
-
-        if (!invokeControllerRoutines(controller, metaMethod))
-            return;
-
-        if (!this->invokeSecurity(controller, metaMethod))
-            return;
-
-        if (!this->invokeParsers(controller, request))
-            return;
-
-        if (!this->invokeRouters(request, metaMethod))
-            return;
-
-        if (!this->invokeMethod(controller, request, metaMethod))
-            return;
+        controller->requestAfterInvoke();
     }
 
 private slots:
