@@ -39,9 +39,9 @@ public:
 };
 
 
-HttpResponse::HttpResponse(QObject *parent):QObject(parent)
+HttpResponse::HttpResponse(QObject *parent):QObject{parent}
 {
-    this->p = new HttpResponsePvt(this);
+    this->p = new HttpResponsePvt{this};
 }
 
 HttpResponse::~HttpResponse()

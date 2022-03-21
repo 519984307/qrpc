@@ -61,7 +61,6 @@ public:
     //!
     Q_NOTATION_DECLARE_FUNC(opPath, Information)
 
-
     //!
     //! \brief opCrud
     //!

@@ -4,25 +4,25 @@
 
 namespace QRpc {
 
-#include <QVariant>
 #include <QByteArray>
-#include <QVariantHash>
 #include <QEventLoop>
+#include <QVariant>
+#include <QVariantHash>
 
 //!
 //! \brief The ListenQRPCSlot class
 //!
-class Q_RPC_EXPORT ListenQRPCSlot:public QThread
+class Q_RPC_EXPORT ListenQRPCSlot : public QThread
 {
     Q_OBJECT
 public:
-    explicit ListenQRPCSlot(ListenQRPC *listenQRPC=nullptr);
+    explicit ListenQRPCSlot(ListenQRPC *listenQRPC = nullptr);
     ~ListenQRPCSlot();
 
     //!
     //! \brief run
     //!
-    void run()override;
+    void run() override;
 
     //!
     //! \brief canRequestInvoke
@@ -30,7 +30,7 @@ public:
     //! \param uploadedFiles
     //! \return
     //!
-    bool canRequestInvoke(QVariantHash &v, const QVariant&uploadedFiles);
+    bool canRequestInvoke(QVariantHash &v, const QVariant &uploadedFiles);
 
     //!
     //! \brief start
@@ -55,9 +55,10 @@ signals:
     //! \param v
     //! \param uploadedFiles
     //!
-    void requestInvoke(QVariantHash v, const QVariant&uploadedFiles);
+    void requestInvoke(QVariantHash v, const QVariant &uploadedFiles);
+
 private:
-    QObject*p=nullptr;
+    QObject *p = nullptr;
 };
 
-}
+} // namespace QRpc

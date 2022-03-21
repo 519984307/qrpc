@@ -19,7 +19,7 @@ public:
     ServiceThread*service=nullptr;
     ServiceThread::Stats stats;
 
-    explicit ServiceThreadPvt(ServiceThread*parent) : QObject(parent), manager(parent), service(parent){
+    explicit ServiceThreadPvt(ServiceThread*parent) : QObject{parent}, manager(parent), service(parent){
         parent->moveToThread(parent);
     }
 
@@ -91,36 +91,36 @@ QVariantHash ServiceThread::Stats::toHash() const
 
 }
 
-ServiceThread::ServiceThread(QObject *parent) : QThread(nullptr)
+ServiceThread::ServiceThread(QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
-    this->p = new ServiceThreadPvt(this);
+    this->p = new ServiceThreadPvt{this};
     dPvt();
     p.service=this;
 }
 
-ServiceThread::ServiceThread(const QString &serviceName, QObject *parent) : QThread(nullptr)
+ServiceThread::ServiceThread(const QString &serviceName, QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
-    this->p = new ServiceThreadPvt(this);
+    this->p = new ServiceThreadPvt{this};
     dPvt();
     p.service=this;
     this->setServiceName(serviceName);
 }
 
-ServiceThread::ServiceThread(const ServiceManager &manager, QObject *parent) : QThread(nullptr)
+ServiceThread::ServiceThread(const ServiceManager &manager, QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
-    this->p = new ServiceThreadPvt(this);
+    this->p = new ServiceThreadPvt{this};
     dPvt();
     p.service=this;
     p.setManager(manager);
 }
 
-ServiceThread::ServiceThread(const ServiceManager &manager, const QString &serviceName, QObject *parent) : QThread(nullptr)
+ServiceThread::ServiceThread(const ServiceManager &manager, const QString &serviceName, QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
-    this->p = new ServiceThreadPvt(this);
+    this->p = new ServiceThreadPvt{this};
     dPvt();
     p.service=this;
     p.setManager(manager);

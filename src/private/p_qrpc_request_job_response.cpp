@@ -2,11 +2,11 @@
 
 namespace QRpc {
 
-RequestJobResponse::RequestJobResponse(QObject *parent):QObject(parent)
+RequestJobResponse::RequestJobResponse(QObject *parent):QObject{parent}
 {
 }
 
-RequestJobResponse::RequestJobResponse(const QVariantHash &request_header, const QVariant &vUrl, Request &request, QObject *parent):QObject(parent)
+RequestJobResponse::RequestJobResponse(const QVariantHash &request_header, const QVariant &vUrl, Request &request, QObject *parent):QObject{parent}
 {
     this->request_url = vUrl;
     this->request_header = request_header;

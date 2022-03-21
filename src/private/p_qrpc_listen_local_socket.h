@@ -7,36 +7,33 @@ namespace QRpc {
 //!
 //! \brief The ListenLocalSocket class
 //!
-class Q_RPC_EXPORT ListenLocalSocket:public Listen{
+class Q_RPC_EXPORT ListenLocalSocket : public Listen
+{
     Q_OBJECT
 public:
-
     //!
     //! \brief ListenLocalSocket
     //! \param parent
     //!
-    explicit ListenLocalSocket(QObject*parent=nullptr);
-
-    //!
-    //! \brief ~ListenLocalSocket
-    //!
+    explicit ListenLocalSocket(QObject *parent = nullptr);
     ~ListenLocalSocket();
 
-    /**
-     * @brief start
-     * @return
-     */
-    bool start()override;
+    //!
+    //! \brief start
+    //! \return
+    //!
+    bool start() override;
 
-    /**
-     * @brief stop
-     * @return
-     */
-    bool stop()override;
+    //!
+    //! \brief stop
+    //! \return
+    //!
+    bool stop() override;
+
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
 
-QRPC_LISTTEN_AUTO_REGISTER(LocalSocket,ListenLocalSocket)
+QRPC_LISTTEN_AUTO_REGISTER(LocalSocket, ListenLocalSocket)
 
-}
+} // namespace QRpc

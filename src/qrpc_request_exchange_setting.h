@@ -110,10 +110,10 @@ public:
     //! \brief protocol
     //! \return
     //!
-    virtual QRPCProtocol protocol() const;
+    virtual Protocol protocol() const;
     virtual QString protocolName() const;
     virtual QString protocolUrlName() const;
-    virtual void setProtocol(const QRPCProtocol &value);
+    virtual void setProtocol(const Protocol &value);
     virtual void setProtocol(const QVariant&value);
 
     //!

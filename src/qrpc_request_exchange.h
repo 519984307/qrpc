@@ -77,7 +77,7 @@ public:
     //! \param value
     //!
     virtual void setProtocol(const QVariant &value);
-    virtual void setProtocol(const QRPCProtocol &value);
+    virtual void setProtocol(const Protocol &value);
 
     //!
     //! \brief setMethod

@@ -4,32 +4,30 @@
 
 namespace QRpc {
 
-#define dPvt()\
-    auto&p =*reinterpret_cast<TokenPoolPvt*>(this->p)
+#define dPvt() auto &p = *reinterpret_cast<TokenPoolPvt *>(this->p)
 
-class TokenPoolPvt:public QObject{
+class TokenPoolPvt : public QObject
+{
 public:
     QMutex mutex;
     QHash<QByteArray, QVariantHash> tokenMap;
-    TokenPool*tokenPool=nullptr;
-    explicit TokenPoolPvt(TokenPool*parent):QObject(parent){
-        this->tokenPool=parent;
-    }
+    TokenPool *tokenPool = nullptr;
+    explicit TokenPoolPvt(TokenPool *parent) : QObject{parent} { this->tokenPool = parent; }
 
-    virtual ~TokenPoolPvt(){
-    }
+    virtual ~TokenPoolPvt() {}
+
 public:
     bool tokenCheck(const QByteArray &md5)
     {
-        auto&p=*this;
-        auto vToken=p.tokenMap.value(md5);
+        auto &p = *this;
+        auto vToken = p.tokenMap.value(md5);
         return !vToken.isEmpty();
     }
 };
 
-TokenPool::TokenPool(QObject *parent) : QThread(nullptr)
+TokenPool::TokenPool(QObject *parent) : QThread{nullptr}
 {
-    this->p = new TokenPoolPvt(this);
+    this->p = new TokenPoolPvt{this};
     Q_UNUSED(parent)
     this->moveToThread(this);
 }
@@ -37,7 +35,7 @@ TokenPool::TokenPool(QObject *parent) : QThread(nullptr)
 QRpc::TokenPool::~TokenPool()
 {
     dPvt();
-    delete&p;
+    delete &p;
 }
 
 QVariantHash TokenPool::token(const QByteArray &md5) const
@@ -63,17 +61,17 @@ void TokenPool::tokenCheck(const QByteArray &md5, TokenPoolCallBack callback)
 {
     dPvt();
     p.mutex.lock();
-    auto isValid=p.tokenCheck(md5);
-    auto vToken=p.tokenMap.value(md5);
+    auto isValid = p.tokenCheck(md5);
+    auto vToken = p.tokenMap.value(md5);
     p.mutex.unlock();
-    QTimer::singleShot(1, this, [&isValid, &vToken, &callback](){ callback(isValid, vToken); });
+    QTimer::singleShot(1, this, [&isValid, &vToken, &callback]() { callback(isValid, vToken); });
 }
 
 void TokenPool::tokenInsert(const QByteArray &md5, QVariantHash &tokenPayload)
 {
     dPvt();
     QMutexLOCKER locker(&p.mutex);
-    p.tokenMap.insert(md5,tokenPayload);
+    p.tokenMap.insert(md5, tokenPayload);
 }
 
 void TokenPool::tokenRemove(const QByteArray &md5)
@@ -90,4 +88,4 @@ void TokenPool::tokenClear()
     p.tokenMap.clear();
 }
 
-}
+} // namespace QRpc

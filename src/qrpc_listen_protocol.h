@@ -18,34 +18,39 @@ class Q_RPC_EXPORT ListenProtocol : public QObject
     Q_OBJECT
     friend class ListenColletions;
     friend class ListenColletionsPvt;
-public:
 
-    Q_PROPERTY(int          protocol                READ protocol               WRITE setProtocol               NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   protocolName            READ protocolName                                           NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   optionName              READ optionName             WRITE setOptionName             NOTIFY changeProperty   )
-    Q_PROPERTY(int          cleanupInterval         READ cleanupInterval        WRITE setCleanupInterval        NOTIFY changeProperty   )
-    Q_PROPERTY(int          minThreads              READ minThreads             WRITE setMinThreads             NOTIFY changeProperty   )
-    Q_PROPERTY(int          maxThreads              READ maxThreads             WRITE setMaxThreads             NOTIFY changeProperty   )
-    Q_PROPERTY(int          maxRequestSize          READ maxRequestSize         WRITE setMaxRequestSize         NOTIFY changeProperty   )
-    Q_PROPERTY(int          maxMultiPartSize        READ maxMultiPartSize       WRITE setMaxMultiPartSize       NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   driver                  READ driver                 WRITE setDriver                 NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   hostName                READ hostName               WRITE setHostName               NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   userName                READ userName               WRITE setUserName               NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   password                READ password               WRITE setPassword               NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   database                READ database               WRITE setDatabase               NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   options                 READ options                WRITE setOptions                NOTIFY changeProperty   )
-    Q_PROPERTY(QVariantList port                    READ port                   WRITE setPort                   NOTIFY changeProperty   )
-    Q_PROPERTY(QVariantList queue                   READ queue                  WRITE setQueue                  NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   sslKeyFile              READ sslKeyFile             WRITE setSslKeyFile             NOTIFY changeProperty   )
-    Q_PROPERTY(QByteArray   sslCertFile             READ sslCertFile            WRITE setSslCertFile            NOTIFY changeProperty   )
-    Q_PROPERTY(bool         enabled                 READ enabled                WRITE setEnabled                NOTIFY changeProperty   )
-    Q_PROPERTY(bool         realMessageOnException  READ realMessageOnException WRITE setRealMessageOnException NOTIFY changeProperty   )
+public:
+    Q_PROPERTY(int protocol READ protocol WRITE setProtocol NOTIFY protocolChanged)
+    Q_PROPERTY(QByteArray protocolName READ protocolName NOTIFY protocolNameChanged)
+    Q_PROPERTY(QByteArray optionName READ optionName WRITE setOptionName NOTIFY optionNameChanged)
+    Q_PROPERTY(int cleanupInterval READ cleanupInterval WRITE setCleanupInterval NOTIFY
+                   cleanupIntervalChanged)
+    Q_PROPERTY(int minThreads READ minThreads WRITE setMinThreads NOTIFY minThreadsChanged)
+    Q_PROPERTY(int maxThreads READ maxThreads WRITE setMaxThreads NOTIFY maxThreadsChanged)
+    Q_PROPERTY(
+        int maxRequestSize READ maxRequestSize WRITE setMaxRequestSize NOTIFY maxRequestSizeChanged)
+    Q_PROPERTY(int maxMultiPartSize READ maxMultiPartSize WRITE setMaxMultiPartSize NOTIFY
+                   maxMultiPartSizeChanged)
+    Q_PROPERTY(QByteArray driver READ driver WRITE setDriver NOTIFY driverChanged)
+    Q_PROPERTY(QByteArray hostName READ hostName WRITE setHostName NOTIFY hostNameChanged)
+    Q_PROPERTY(QByteArray userName READ userName WRITE setUserName NOTIFY userNameChanged)
+    Q_PROPERTY(QByteArray password READ password WRITE setPassword NOTIFY passwordChanged)
+    Q_PROPERTY(QByteArray database READ database WRITE setDatabase NOTIFY databaseChanged)
+    Q_PROPERTY(QByteArray options READ options WRITE setOptions NOTIFY optionsChanged)
+    Q_PROPERTY(QVariantList port READ port WRITE setPort NOTIFY portChanged)
+    Q_PROPERTY(QVariantList queue READ queue WRITE setQueue NOTIFY queueChanged)
+    Q_PROPERTY(QByteArray sslKeyFile READ sslKeyFile WRITE setSslKeyFile NOTIFY sslKeyFileChanged)
+    Q_PROPERTY(QByteArray sslCertFile READ sslCertFile WRITE setSslCertFile NOTIFY sslCertFileChanged)
+    Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
+    Q_PROPERTY(bool realMessageOnException READ realMessageOnException WRITE
+                   setRealMessageOnException NOTIFY realMessageOnExceptionChanged)
 
     //!
     //! \brief ListenProtocol
     //! \param parent
     //!
     Q_INVOKABLE explicit ListenProtocol(QObject *parent = nullptr);
+
 private:
     //!
     //! \brief ListenProtocol
@@ -53,9 +58,11 @@ private:
     //! \param metaObject
     //! \param parent
     //!
-    Q_INVOKABLE explicit ListenProtocol(int protocol, const QMetaObject&metaObject, QObject *parent);
-public:
+    Q_INVOKABLE explicit ListenProtocol(int protocol,
+                                        const QMetaObject &metaObject,
+                                        QObject *parent);
 
+public:
     //!
     //! \brief isValid
     //! \return
@@ -73,15 +80,15 @@ public:
     //! \return
     //!
     virtual int protocol();
-private:
 
+private:
     //!
     //! \brief setProtocol
     //! \param value
     //!
     virtual void setProtocol(const int &value);
-public:
 
+public:
     //!
     //! \brief protocolName
     //! \return
@@ -95,14 +102,13 @@ public:
     virtual QByteArray optionName();
 
 private:
-
     //!
     //! \brief setOptionName
     //! \param value
     //!
     virtual void setOptionName(const QByteArray &value);
-public:
 
+public:
     //!
     //! \brief minThreads
     //! \return
@@ -275,27 +281,27 @@ public:
     //! \brief toHash
     //! \return
     //!
-    virtual QVariantHash&toHash() const;
+    virtual QVariantHash &toHash() const;
 
     //!
     //! \brief settings
     //! \return
     //!
-    virtual QSettings&settings() const;
+    virtual QSettings &settings() const;
 
     //!
     //! \brief setSettings
     //! \param settings
     //! \param defaultSettings
     //!
-    virtual void setSettings(const QVariantHash&settings, const QVariantHash&defaultSettings);
+    virtual void setSettings(const QVariantHash &settings, const QVariantHash &defaultSettings);
 
     //!
     //! \brief makeSettings
     //! \param parent
     //! \return
     //!
-    virtual QSettings*makeSettings(QObject *parent=nullptr);
+    virtual QSettings *makeSettings(QObject *parent = nullptr);
 
     //!
     //! \brief makeSettingsHash
@@ -347,12 +353,28 @@ public:
     virtual void setRealMessageOnException(bool value);
 
 private:
-    QObject*p=nullptr;
+    QObject *p = nullptr;
 signals:
-    //!
-    //! \brief changeProperty
-    //!
-    void changeProperty();
+    void protocolChanged();
+    void protocolNameChanged();
+    void optionNameChanged();
+    void cleanupIntervalChanged();
+    void minThreadsChanged();
+    void maxThreadsChanged();
+    void maxRequestSizeChanged();
+    void maxMultiPartSizeChanged();
+    void driverChanged();
+    void hostNameChanged();
+    void userNameChanged();
+    void passwordChanged();
+    void databaseChanged();
+    void optionsChanged();
+    void portChanged();
+    void queueChanged();
+    void sslKeyFileChanged();
+    void sslCertFileChanged();
+    void enabledChanged();
+    void realMessageOnExceptionChanged();
 };
 
-}
+} // namespace QRpc

@@ -74,7 +74,7 @@ public:
     int _requestTimeout=0;
     void*_data=nullptr;
     ListenRequest*parent=nullptr;
-    explicit ListenRequestPvt(ListenRequest*parent):QObject(parent), listenCode(parent)
+    explicit ListenRequestPvt(ListenRequest*parent):QObject{parent}, listenCode(parent)
     {
         this->parent=parent;
         QObject::connect(parent, &ListenRequest::finish, this, &ListenRequestPvt::onRequestFinish);
@@ -236,21 +236,21 @@ public slots:
     }
 };
 
-ListenRequest::ListenRequest(QObject *parent):QObject(parent)
+ListenRequest::ListenRequest(QObject *parent):QObject{parent}
 {
-    this->p = new ListenRequestPvt(this);
+    this->p = new ListenRequestPvt{this};
 }
 
-ListenRequest::ListenRequest(const QVariant &requestBody, QObject *parent):QObject(parent)
+ListenRequest::ListenRequest(const QVariant &requestBody, QObject *parent):QObject{parent}
 {
-    this->p = new ListenRequestPvt(this);
+    this->p = new ListenRequestPvt{this};
     dPvt();
     p.mergeMap(requestBody);
 }
 
-ListenRequest::ListenRequest(const QVariant &requestBody, const ControllerSetting &setting, QObject *parent):QObject(parent)
+ListenRequest::ListenRequest(const QVariant &requestBody, const ControllerSetting &setting, QObject *parent):QObject{parent}
 {
-    this->p = new ListenRequestPvt(this);
+    this->p = new ListenRequestPvt{this};
     if(setting.isValid())
         this->setControllerSetting(setting);
     dPvt();
@@ -892,7 +892,7 @@ void ListenRequest::setRequestProtocol(const QVariant &value)
     dPvt();
     auto ivalue=value.toLongLong();
     if(ivalue>0){
-        auto name=QRPCProtocolUrlName.value(QRPCProtocol(ivalue)).toUtf8();
+        auto name=ProtocolUrlName.value(Protocol(ivalue)).toUtf8();
         if(name.isEmpty())
             p._requestProtocol = value.toString().toUtf8();
         else
@@ -1460,7 +1460,7 @@ void ListenRequest::setRequestContentType(const QVariant &value)
 {
     dPvt();
     auto content_type=ContentType(value.toInt());
-    if(!QRPCContentTypeHeaderTypeToHeader.contains(content_type))
+    if(!ContentTypeHeaderTypeToHeader.contains(content_type))
         p._requestContentType = QRpc::AppNone;
     else
         p._requestContentType = content_type;

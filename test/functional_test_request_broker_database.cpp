@@ -24,7 +24,7 @@ public:
 };
 
 
-QRPC_DECLARE_REQUEST_CLASS(Q_RPC_RequestFunctionalBrokerDatabaseV1,QRpc::AppJson,/)
+QRPC_DECLARE_REQUEST_CLASS(Q_RPC_RequestFunctionalBrokerDatabaseV1,QRpc::AppJson, "/")
 
 #define Q_RPC_RequestFunctionalBrokerDatabaseV1(request)\
         Q_RPC_RequestFunctionalBrokerDatabaseV1 request;\

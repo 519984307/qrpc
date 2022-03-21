@@ -179,7 +179,7 @@ public:
     //! \brief protocol
     //! \return
     //!
-    virtual QRPCProtocol protocol() const;
+    virtual Protocol protocol() const;
     virtual QString protocolName() const;
     virtual Request&setProtocol(const QVariant &value);
 

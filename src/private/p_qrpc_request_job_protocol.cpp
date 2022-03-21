@@ -2,7 +2,7 @@
 
 namespace QRpc {
 
-RequestJobProtocol::RequestJobProtocol(QObject *parent):QObject(parent), sslConfiguration(QSslConfiguration::defaultConfiguration())
+RequestJobProtocol::RequestJobProtocol(QObject *parent):QObject{parent}, sslConfiguration(QSslConfiguration::defaultConfiguration())
 {
     QObject::connect(this, &RequestJobProtocol::____verify, this, &RequestJobProtocol::____onVerify);
 }

@@ -60,16 +60,16 @@ public:
     }
 };
 
-HttpHeaders::HttpHeaders(QObject *parent):QObject(parent)
+HttpHeaders::HttpHeaders(QObject *parent):QObject{parent}
 {
-    this->p = new HttpHeadersPvt(this);
+    this->p = new HttpHeadersPvt{this};
     dPvt();
     p.parent=parent;
 }
 
-HttpHeaders::HttpHeaders(const QVariant &v, QObject *parent):QObject(parent)
+HttpHeaders::HttpHeaders(const QVariant &v, QObject *parent):QObject{parent}
 {
-    this->p = new HttpHeadersPvt(this);
+    this->p = new HttpHeadersPvt{this};
     dPvt();
     p.parent=parent;
     Q_DECLARE_VU;
@@ -231,10 +231,10 @@ HttpHeaders &HttpHeaders::setContentType(const int contentType)
     QString header;
     auto content_type=ContentType(contentType);
 
-    if(QRPCContentTypeHeaderTypeToHeader.contains(content_type))
-        return this->setContentType(QRPCContentTypeHeaderTypeToHeader.value(content_type));
+    if(ContentTypeHeaderTypeToHeader.contains(content_type))
+        return this->setContentType(ContentTypeHeaderTypeToHeader.value(content_type));
 
-    return this->setContentType(QRPCContentTypeHeaderTypeToHeader.value(QRpc::AppOctetStream));
+    return this->setContentType(ContentTypeHeaderTypeToHeader.value(QRpc::AppOctetStream));
 }
 
 HttpHeaders &HttpHeaders::setContentType(const QVariant &v)
@@ -248,10 +248,10 @@ HttpHeaders &HttpHeaders::setContentType(const QVariant &v)
         auto url=v.toUrl();
         if(url.isLocalFile()){
             auto ext=url.toLocalFile().split(qsl(".")).last().trimmed();
-            if(!QRPCContentTypeExtensionToHeader.contains(ext.toLower()))
+            if(!ContentTypeExtensionToHeader.contains(ext.toLower()))
                 ext.clear();
-            auto type=QRPCContentTypeExtensionToHeader.value(ext.toLower());
-            value=QRPCContentTypeHeaderTypeToHeader.value(type);
+            auto type=ContentTypeExtensionToHeader.value(ext.toLower());
+            value=ContentTypeHeaderTypeToHeader.value(type);
         }
     }
     if(value.isValid())

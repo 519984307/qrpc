@@ -4,25 +4,20 @@
 
 namespace QRpc {
 
-#define dPvt()\
-    auto&p =*reinterpret_cast<ThreadPvt*>(this->p)
+#define dPvt() auto &p = *reinterpret_cast<ThreadPvt *>(this->p)
 
-class ThreadPvt{
+class ThreadPvt
+{
 public:
     QMutex lockRunWait;
     QMutex mutexRunning;
 
-    explicit ThreadPvt()
-    {
-    }
+    explicit ThreadPvt() {}
 
-    virtual ~ThreadPvt()
-    {
-    }
-
+    virtual ~ThreadPvt() {}
 };
 
-Thread::Thread(QObject *parent):QThread(nullptr)
+Thread::Thread(QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
     this->p = new ThreadPvt();
@@ -30,13 +25,14 @@ Thread::Thread(QObject *parent):QThread(nullptr)
 
 Thread::~Thread()
 {
-    dPvt();delete&p;
+    dPvt();
+    delete &p;
 }
 
 void Thread::run()
 {
     dPvt();
-    if(p.mutexRunning.tryLock(1000)){
+    if (p.mutexRunning.tryLock(1000)) {
         QTimer::singleShot(10, this, &Thread::eventRun);
         this->exec();
         p.mutexRunning.unlock();
@@ -52,17 +48,16 @@ void Thread::eventRun()
 bool Thread::start()
 {
     dPvt();
-    if(p.mutexRunning.tryLock(1000)){
-        p.lockRunWait.lock();
-        QThread::start();
-        while(this->eventDispatcher()==nullptr){
-            QThread::msleep(1);
-        }
-        p.lockRunWait.lock();
-        p.lockRunWait.unlock();
-        return this->isRunning();
+    if (!p.mutexRunning.tryLock(1000))
+        return false;
+    p.lockRunWait.lock();
+    QThread::start();
+    while (this->eventDispatcher() == nullptr) {
+        QThread::msleep(1);
     }
-    return false;
+    p.lockRunWait.lock();
+    p.lockRunWait.unlock();
+    return this->isRunning();
 }
 
 bool Thread::stop()
@@ -76,4 +71,4 @@ bool Thread::quit()
     return true;
 }
 
-}
+} // namespace QRpc

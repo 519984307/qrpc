@@ -8,10 +8,10 @@ namespace QRpc {
 //!
 //! \brief The QRPCThread class
 //!
-class Q_RPC_EXPORT Thread : public QThread{
+class Q_RPC_EXPORT Thread : public QThread
+{
     Q_OBJECT
 public:
-
     //!
     //! \brief QRPCThread
     //! \param parent
@@ -51,7 +51,8 @@ public slots:
     //! \return
     //!
     virtual bool quit();
+
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
-}
+} // namespace QRpc

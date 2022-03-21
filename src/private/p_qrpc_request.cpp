@@ -143,11 +143,11 @@ HttpResponse &RequestPvt::upload(const QString &route, const QString &fileName)
         auto content=this->qrpcHeader.contentType();
         if(!content.isValid() || content.isNull()){
             auto ext=qsl(".")+fileName.split(qsl(".")).last().toLower();
-            if(!QRPCContentTypeExtensionToHeader.contains(ext)){
+            if(!ContentTypeExtensionToHeader.contains(ext)){
                 this->qrpcHeader.setContentType(QRpc::AppOctetStream);
             }
             else{
-                auto contentType=QRPCContentTypeExtensionToHeader.value(ext);
+                auto contentType=ContentTypeExtensionToHeader.value(ext);
                 this->qrpcHeader.setContentType(contentType);
             }
         }

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "./qrpc_global.h"
+#include <QTemporaryFile>
 #include <QThread>
 #include <QUuid>
 #include <QVariantHash>
-#include <QTemporaryFile>
 
 namespace QRpc {
 class Server;
@@ -15,18 +15,18 @@ class ListenRequestCache;
 //!
 //! \brief The Listen class
 //!
-class Q_RPC_EXPORT Listen: public QThread
+class Q_RPC_EXPORT Listen : public QThread
 {
     Q_OBJECT
     friend class ListenColletions;
     friend class ListenColletionsPvt;
-public:
 
+public:
     //!
     //! \brief Listen
     //! \param parent
     //!
-    Q_INVOKABLE explicit Listen(QObject *parent=nullptr);
+    Q_INVOKABLE explicit Listen(QObject *parent = nullptr);
 
     //!
     //! \brief ~Listen
@@ -45,7 +45,7 @@ public:
     //! \brief listenList
     //! \return
     //!
-    static QVector<QPair<int, const QMetaObject *> > listenList();
+    static ListenMetaObjectList &listenList();
 
     //!
     //! \brief uuid
@@ -85,25 +85,25 @@ public:
     //! \brief server
     //! \return
     //!
-    virtual Server*server();
+    virtual Server *server();
 
     //!
     //! \brief colletions
     //! \return
     //!
-    virtual ListenColletions*colletions();
+    virtual ListenColletions *colletions();
 
     //!
     //! \brief cacheRequest
     //! \return
     //!
-    virtual ListenRequestCache*cacheRequest();
+    virtual ListenRequestCache *cacheRequest();
 
     //!
     //! \brief registerListenPool
     //! \param listenPool
     //!
-    virtual void registerListenPool(Listen*listenPool);
+    virtual void registerListenPool(Listen *listenPool);
 
     //!
     //! \brief listenPool
@@ -117,33 +117,35 @@ signals:
     //! \param request
     //! \param uploadedFiles
     //!
-    void rpcRequest(QVariantHash request, const QVariant&uploadedFiles);
+    void rpcRequest(QVariantHash request, const QVariant &uploadedFiles);
 
     //!
     //! \brief rpcResponse
     //! \param uuid
     //! \param request
     //!
-    void rpcResponse(QUuid uuid, const QVariantHash&request);
+    void rpcResponse(QUuid uuid, const QVariantHash &request);
 
     //!
     //! \brief rpcCheck
     //!
     void rpcCheck();
+
 protected:
     //!
     //! \brief setServer
     //! \param server
     //!
-    void setServer(Server*server);
+    void setServer(Server *server);
 
     //!
     //! \brief setColletions
     //! \param colletions
     //!
-    void setColletions(ListenColletions*colletions);
+    void setColletions(ListenColletions *colletions);
+
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
 
-}
+} // namespace QRpc

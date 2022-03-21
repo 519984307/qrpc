@@ -1,18 +1,15 @@
 #pragma once
 
-#include <QMetaMethod>
-#include <QList>
-#include <QMetaObject>
-#include <QMetaMethod>
 #include "../../qnotation/src/qnotation.h"
+#include "./qrpc_controller_notation.h"
+#include "./qrpc_controller_setting.h"
 #include "./qrpc_global.h"
 #include "./qrpc_listen_request.h"
-#include "./qrpc_controller_setting.h"
-#include "./qrpc_controller_notation.h"
+#include <QList>
+#include <QMetaMethod>
+#include <QMetaObject>
 
 namespace QRpc {
-
-typedef QMultiHash<QByteArray, QMetaMethod> ControllerMethods;
 
 class ListenRequest;
 class ListenRequestParser;
@@ -21,7 +18,7 @@ class Server;
 //!
 //! \brief The Controller class
 //!
-class Q_RPC_EXPORT Controller: public QObject, public QRpcPrivate::NotationsExtended
+class Q_RPC_EXPORT Controller : public QObject, public QRpcPrivate::NotationsExtended
 {
     Q_OBJECT
     friend class Server;
@@ -29,14 +26,14 @@ class Q_RPC_EXPORT Controller: public QObject, public QRpcPrivate::NotationsExte
     friend class ListenQRPC;
     friend class ListenQRPCSlotPvt;
 
-    Q_PROPERTY(QVariant basePath READ basePath NOTIFY basePathChanged)
+    Q_PROPERTY(QStringList basePath READ basePath NOTIFY basePathChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 public:
     //!
     //! \brief Controller
     //! \param parent
     //!
-    Q_INVOKABLE explicit Controller(QObject *parent=nullptr);
+    Q_INVOKABLE explicit Controller(QObject *parent = nullptr);
 
     //!
     //! \brief ~Controller
@@ -47,33 +44,12 @@ public:
     //! \brief basePath
     //! \return
     //!
-    virtual QVariant basePath()const;
-
-    //!
-    //! \brief route
-    //! \return
-    //!
-    QT_DEPRECATED_X("Use basePath()")
-    virtual QVariant route()const { return this->basePath(); };
-
-    //!
-    //! \brief initializeInstalleds
-    //! \return
-    //!
-    virtual Controller &initializeInstalleds();
-
-    //!
-    //! \brief initializeInstalleds
-    //! \param object
-    //! \param metaObject
-    //!
-    static void initializeInstalleds(QObject *object, const QMetaObject *metaObject);
-
+    virtual QStringList &basePath() const;
     //!
     //! \brief module
     //! \return
     //!
-    virtual QString module()const;
+    virtual QString module() const;
 
     //!
     //! \brief moduleUuid
@@ -86,7 +62,7 @@ public:
     //! \return
     //!
 
-    virtual bool redirectCheck()const;
+    virtual bool redirectCheck() const;
 
     //!
     //! \brief redirectCheckClass
@@ -110,13 +86,15 @@ public:
     //! \param method
     //! \return
     //!
-    virtual bool redirectMethod(const QByteArray &className, const QByteArray &path, QMetaMethod &method);
+    virtual bool redirectMethod(const QByteArray &className,
+                                const QByteArray &path,
+                                QMetaMethod &method);
 
     //!
     //! \brief description
     //! \return
     //!
-    virtual QString description()const;
+    virtual QString description() const;
 
     //!
     //! \brief controllerSetting
@@ -128,20 +106,13 @@ public:
     //! \brief enabled
     //! \return
     //!
-    virtual bool enabled()const;
+    virtual bool enabled() const;
 
     //!
     //! \brief setEnabled
     //! \param enabled
     //!
     virtual void setEnabled(bool enabled);
-
-    //!
-    //! \brief routeMethods
-    //! \param className
-    //! \return
-    //!
-    static ControllerMethods routeMethods(const QByteArray &className);
 
     //!
     //! \brief request
@@ -179,7 +150,7 @@ public:
     //! \param method
     //! \return
     //!
-    virtual bool canAuthorization(const QMetaMethod&method);
+    virtual bool canAuthorization(const QMetaMethod &method);
 
     //!
     //! \brief beforeAuthorization
@@ -228,21 +199,21 @@ public:
     //! \brief server
     //! \return
     //!
-    virtual Server*server();
+    virtual Server *server();
 
     //!
     //! \brief install
     //! \param metaObject
     //! \return
     //!
-    static int install(const QMetaObject &metaObject);
+    static const QMetaObject &install(const QMetaObject &metaObject);
 
     //!
     //! \brief installParser
     //! \param metaObject
     //! \return
     //!
-    static int installParser(const QMetaObject &metaObject);
+    static const QMetaObject &installParser(const QMetaObject &metaObject);
 
     //!
     //! \brief staticApiList
@@ -257,12 +228,11 @@ public:
     static QVector<const QMetaObject *> &staticApiParserList();
 
 protected:
-
     //!
     //! \brief setServer
     //! \param server
     //!
-    virtual QRpc::Controller &setServer(Server*server);
+    virtual QRpc::Controller &setServer(Server *server);
 
     //!
     //! \brief setRequest
@@ -281,11 +251,12 @@ signals:
     //! \brief enabledChanged
     //!
     void enabledChanged();
+
 private:
-    void*p = nullptr;
-    QRPCProtocol acceptedProtocols;
+    void *p = nullptr;
+    Protocol acceptedProtocols;
 };
 
 typedef Controller QRPCController;
 
-}
+} // namespace QRpc

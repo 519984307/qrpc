@@ -6,7 +6,7 @@ namespace QRpc {
 static const char * __nativeErrorCode="nativeErrorCode";
 static const char * __nativeErrorText="nativeErrorText";
 
-LastError::LastError(QObject *parent) : QObject(parent)
+LastError::LastError(QObject *parent) : QObject{parent}
 {
 
 }

@@ -55,7 +55,7 @@ public:
     QHash<int,RequestJobProtocol*> _requestJobProtocolHash;
     RequestJobResponse _response;
 
-    explicit RequestJobPvt(RequestJob*parent):QObject(parent),
+    explicit RequestJobPvt(RequestJob*parent):QObject{parent},
 #ifdef Q_RPC_HTTP
         _requestJobHttp(this),
 #endif
@@ -130,9 +130,9 @@ public:
     }
 };
 
-RequestJob::RequestJob():QThread(nullptr)
+RequestJob::RequestJob():QThread{nullptr}
 {
-    this->p=new RequestJobPvt(this);
+    this->p=new RequestJobPvt{this};
     this->moveToThread(this);
     static qlonglong taskCount=0;
     this->setObjectName(qsl("ReqJob%1").arg(++taskCount));

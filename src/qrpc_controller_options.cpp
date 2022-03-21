@@ -3,7 +3,7 @@
 
 namespace QRpc {
 
-ControllerOptions::ControllerOptions(QObject *parent) : QObject(nullptr)
+ControllerOptions::ControllerOptions(QObject *parent) : QObject{nullptr}
 {
     this->p = new ControllerOptionsPrv(this);
     if(parent && parent->thread()==this->thread())
@@ -24,7 +24,7 @@ ControllerOptions::ControllerOptions(const QStringList &settingFileName, QObject
     p.load(settingFileName);
 }
 
-ControllerOptions::ControllerOptions(const QString &settingFileName, QObject *parent):QObject(parent)
+ControllerOptions::ControllerOptions(const QString &settingFileName, QObject *parent):QObject{parent}
 {
     this->p = new ControllerOptionsPrv(this);
     if(parent!=nullptr){

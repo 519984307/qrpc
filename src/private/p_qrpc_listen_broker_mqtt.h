@@ -7,7 +7,7 @@ namespace QRpc {
 //!
 //! \brief The ListenBrokerMQTT class
 //!
-class Q_RPC_EXPORT ListenBrokerMQTT:public Listen
+class Q_RPC_EXPORT ListenBrokerMQTT : public Listen
 {
     Q_OBJECT
 public:
@@ -15,16 +15,17 @@ public:
     //! \brief ListenBrokerMQTT
     //! \param parent
     //!
-    Q_INVOKABLE explicit ListenBrokerMQTT(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenBrokerMQTT(QObject *parent = nullptr);
 
     //!
     //! \brief ~ListenBrokerMQTT
     //!
     ~ListenBrokerMQTT();
+
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
 
 QRPC_LISTTEN_AUTO_REGISTER(Mqtt, ListenBrokerMQTT)
 
-}
+} // namespace QRpc

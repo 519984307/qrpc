@@ -21,14 +21,14 @@ public:
     }
 };
 
-RequestExchange::RequestExchange(QObject *parent):QObject(parent)
+RequestExchange::RequestExchange(QObject *parent):QObject{parent}
 {
-    this->p = new RequestExchangePvt(this);
+    this->p = new RequestExchangePvt{this};
 }
 
-RequestExchange::RequestExchange(RequestExchange &exchange, QObject *parent):QObject(parent)
+RequestExchange::RequestExchange(RequestExchange &exchange, QObject *parent):QObject{parent}
 {
-    this->p = new RequestExchangePvt(this);
+    this->p = new RequestExchangePvt{this};
     dPvt();
     p.call=exchange.call();
     p.back=exchange.back();
@@ -111,7 +111,7 @@ void RequestExchange::setProtocol(const QVariant &value)
     this->call().setProtocol(value);
 }
 
-void RequestExchange::setProtocol(const QRPCProtocol &value)
+void RequestExchange::setProtocol(const Protocol &value)
 {
     this->call().setProtocol(value);
 }

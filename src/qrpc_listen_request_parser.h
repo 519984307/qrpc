@@ -1,10 +1,10 @@
 #pragma once
 
+#include "./qrpc_controller.h"
 #include "./qrpc_global.h"
 #include "./qrpc_listen_request.h"
-#include "./qrpc_controller.h"
-#include <QMetaObject>
 #include <QMetaMethod>
+#include <QMetaObject>
 
 namespace QRpc {
 
@@ -14,10 +14,10 @@ namespace QRpc {
 class Q_RPC_EXPORT ListenRequestParser : public QObject
 {
     Q_OBJECT
-    QRPC_PARSER_DECLARE_BASE_PATH(ListenRequestParser,"/")
+    QRPC_PARSER_DECLARE_BASE_PATH(ListenRequestParser, "/")
     friend class ListenQRPCSlotPvt;
-public:
 
+public:
     //!
     //! \brief ListenRequestParser
     //! \param parent
@@ -34,13 +34,14 @@ public:
     //! \return
     //!
     virtual Controller &controller();
-protected:
 
+protected:
     //!
     //! \brief setController
     //! \param value
     //!
     void setController(Controller *value);
+
 public:
     //!
     //! \brief request
@@ -60,7 +61,7 @@ public:
     //! \param route
     //! \return
     //!test route is valid
-    static bool canRoute(const QMetaObject &metaObject, const QString&route);
+    static bool canRoute(const QMetaObject &metaObject, const QString &route);
 
     //!
     //! \brief routeToMethod
@@ -69,7 +70,9 @@ public:
     //! \param outMethod
     //! \return
     //!return method to invoke
-    static bool routeToMethod(const QMetaObject &metaObject, const QString&route, QMetaMethod&outMethod);
+    static bool routeToMethod(const QMetaObject &metaObject,
+                              const QString &route,
+                              QMetaMethod &outMethod);
 
     //!
     //! \brief initializeInstalleds
@@ -83,10 +86,10 @@ protected:
     //! \param metaMethod
     //! \return
     //!default method to parser request
-    virtual bool parse(const QMetaMethod&metaMethod);
+    virtual bool parse(const QMetaMethod &metaMethod);
 
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
 
 } // namespace QRpc

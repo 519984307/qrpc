@@ -12,7 +12,7 @@ const static auto defaultLimit=60000;
 class RequestExchangeSettingPvt{
 public:
     RequestMethod method=RequestMethod::Post;
-    QRPCProtocol protocol=QRPCProtocol::Http;
+    Protocol protocol=Protocol::Http;
     QString vHost="/";
     QString hostName="localhost";
     QString driver;
@@ -35,25 +35,25 @@ public:
 
     QString protocolName()const
     {
-        const auto&v=QRPCProtocolName.value(this->protocol);
+        const auto&v=ProtocolName.value(this->protocol);
         return v;
     }
 
     QString protocolUrlName()const
     {
-        const auto&v=QRPCProtocolUrlName.value(this->protocol);
+        const auto&v=ProtocolUrlName.value(this->protocol);
         return v;
     }
 };
 
-RequestExchangeSetting::RequestExchangeSetting(QObject *parent):QObject(parent)
+RequestExchangeSetting::RequestExchangeSetting(QObject *parent):QObject{parent}
 {
-    this->p = new RequestExchangeSettingPvt(this);
+    this->p = new RequestExchangeSettingPvt{this};
 }
 
-RequestExchangeSetting::RequestExchangeSetting(RequestExchangeSetting &e, QObject *parent):QObject(parent)
+RequestExchangeSetting::RequestExchangeSetting(RequestExchangeSetting &e, QObject *parent):QObject{parent}
 {
-    this->p = new RequestExchangeSettingPvt(this);
+    this->p = new RequestExchangeSettingPvt{this};
     *this=e;
 }
 
@@ -204,7 +204,7 @@ QString RequestExchangeSetting::methodName() const
     return name;
 }
 
-QRPCProtocol RequestExchangeSetting::protocol() const
+Protocol RequestExchangeSetting::protocol() const
 {
     dPvt();
     return p.protocol;
@@ -222,7 +222,7 @@ QString RequestExchangeSetting::protocolUrlName() const
     return p.protocolUrlName();
 }
 
-void RequestExchangeSetting::setProtocol(const QRPCProtocol &value)
+void RequestExchangeSetting::setProtocol(const Protocol &value)
 {
     dPvt();
     p.protocol=value;
@@ -233,13 +233,13 @@ void RequestExchangeSetting::setProtocol(const QVariant &value)
     dPvt();
     auto&v=p.protocol;
     if(value.isNull() || !value.isValid())
-        v=QRPCProtocol::Http;
+        v=Protocol::Http;
     else if(QString::number(value.toInt())==value)
-        v=QRPCProtocol(value.toInt());
+        v=Protocol(value.toInt());
     else if(value.toString().trimmed().isEmpty())
-        v=QRPCProtocol::Http;
+        v=Protocol::Http;
     else
-        v=QRPCProtocol(QRPCProtocolType.value(value.toString().trimmed()));
+        v=Protocol(ProtocolType.value(value.toString().trimmed()));
 
     v=(v>rpcProtocolMax)?rpcProtocolMax:v;
     v=(v<rpcProtocolMin)?rpcProtocolMin:v;

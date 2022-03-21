@@ -4,9 +4,9 @@
 
 namespace QRpc {
 
-Request::Request(QObject *parent):QObject(parent)
+Request::Request(QObject *parent):QObject{parent}
 {
-    this->p = new RequestPvt(this);
+    this->p = new RequestPvt{this};
 }
 
 Request::~Request()
@@ -118,7 +118,7 @@ QString Request::url(const QString &path) const
     return qsl("%1://%2:%3%4").arg(rq.protocolName(),rq.hostName(),rq.port().toString(),spath);
 }
 
-QRPCProtocol Request::protocol() const
+Protocol Request::protocol() const
 {
     dPvt();
     return p.exchange.call().protocol();
@@ -616,7 +616,7 @@ QStringList Request::printOut()
     return out;
 }
 
-Request::Body::Body(QObject *parent):QObject(parent)
+Request::Body::Body(QObject *parent):QObject{parent}
 {
 }
 

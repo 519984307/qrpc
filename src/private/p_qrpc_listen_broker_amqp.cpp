@@ -3,28 +3,24 @@
 
 namespace QRpc {
 
-#define dPvt()\
-    auto&p =*reinterpret_cast<ListenBrokerAMQPPvt*>(this->p)
+#define dPvt() auto &p = *reinterpret_cast<ListenBrokerAMQPPvt *>(this->p)
 
-class ListenBrokerAMQPPvt{
+class ListenBrokerAMQPPvt
+{
 public:
-    explicit ListenBrokerAMQPPvt(ListenBrokerAMQP*object)
-    {
-        Q_UNUSED(object)
-    }
-    virtual ~ListenBrokerAMQPPvt()
-    {
-    }
+    explicit ListenBrokerAMQPPvt(ListenBrokerAMQP *object) { Q_UNUSED(object) }
+    virtual ~ListenBrokerAMQPPvt() {}
 };
 
-ListenBrokerAMQP::ListenBrokerAMQP(QObject *parent):Listen(parent)
+ListenBrokerAMQP::ListenBrokerAMQP(QObject *parent) : Listen{parent}
 {
-    this->p = new ListenBrokerAMQPPvt(this);
+    this->p = new ListenBrokerAMQPPvt{this};
 }
 
 ListenBrokerAMQP::~ListenBrokerAMQP()
 {
-    dPvt();delete&p;
+    dPvt();
+    delete &p;
 }
 
-}
+} // namespace QRpc

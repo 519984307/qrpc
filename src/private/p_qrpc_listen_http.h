@@ -7,30 +7,30 @@ namespace QRpc {
 //!
 //! \brief The ListenHTTP class
 //!
-class Q_RPC_EXPORT ListenHTTP:public Listen{
+class Q_RPC_EXPORT ListenHTTP : public Listen
+{
     Q_OBJECT
 public:
-
-    Q_INVOKABLE explicit ListenHTTP(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenHTTP(QObject *parent = nullptr);
     ~ListenHTTP();
 
     //!
     //! \brief start
     //! \return
     //!
-    bool start()override;
+    bool start() override;
 
     //!
     //! \brief stop
     //! \return
     //!
-    bool stop()override;
+    bool stop() override;
+
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
 
 QRPC_LISTTEN_AUTO_REGISTER(Http, ListenHTTP)
 //QRPC_LISTTEN_AUTO_REGISTER(Https, ListenHTTP)
 
-
-}
+} // namespace QRpc

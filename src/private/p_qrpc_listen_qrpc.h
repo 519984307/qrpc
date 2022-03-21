@@ -7,18 +7,18 @@ namespace QRpc {
 //!
 //! \brief The ListenQRPC class
 //!
-class Q_RPC_EXPORT ListenQRPC:public Listen
+class Q_RPC_EXPORT ListenQRPC : public Listen
 {
     Q_OBJECT
     friend class ListenColletionsPvt;
     friend class ListenQRPCSlotPvt;
-public:
 
+public:
     //!
     //! \brief ListenQRPC
     //! \param parent
     //!
-    Q_INVOKABLE explicit ListenQRPC(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenQRPC(QObject *parent = nullptr);
 
     //!
     //! \brief ~ListenQRPC
@@ -28,8 +28,31 @@ public:
     //!
     //! \brief run
     //!
-    void run()override;
+    void run() override;
 
+    //!
+    //! \brief start
+    //! \return
+    //!
+    virtual bool start()override;
+
+    //!
+    //! \brief controllers
+    //! \return
+    //!
+    QHash<QByteArray, const QMetaObject *> &controllers();
+
+    //!
+    //! \brief controllerParsers
+    //! \return
+    //!
+    QHash<QByteArray, const QMetaObject *> &controllerParsers();
+
+    //!
+    //! \brief controllerMethods
+    //! \return
+    //!
+    ControllerMethodCollection &controllerMethods();
 protected:
     //!
     //! \brief registerListen
@@ -42,12 +65,12 @@ protected:
     //! \param uuid
     //! \return
     //!
-    virtual Listen*childrenListen(QUuid uuid);
+    virtual Listen *childrenListen(QUuid uuid);
 
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
 
 QRPC_LISTTEN_AUTO_REGISTER(0, ListenQRPC)
 
-}
+} // namespace QRpc

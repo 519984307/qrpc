@@ -202,7 +202,7 @@ static QMap<QNetworkReply::NetworkError, QString>&makeStaticError(){
 
 const static auto&staticErrors=makeStaticError();
 
-ListenRequestCode::ListenRequestCode(QObject *parent) : QObject(parent)
+ListenRequestCode::ListenRequestCode(QObject *parent) : QObject{parent}
 {
     if(parent==nullptr){
         qFatal("invalid object");

@@ -8,30 +8,30 @@ namespace QRpc {
 //!
 //! \brief The ListenBrokerDataBase class
 //!
-class Q_RPC_EXPORT ListenBrokerDataBase:public Listen{
+class Q_RPC_EXPORT ListenBrokerDataBase : public Listen
+{
     Q_OBJECT
 public:
-
     //!
     //! \brief ListenBrokerDataBase
     //! \param parent
     //!
-    Q_INVOKABLE explicit ListenBrokerDataBase(QObject*parent=nullptr);
+    Q_INVOKABLE explicit ListenBrokerDataBase(QObject *parent = nullptr);
 
     //!
     //! \brief start
     //! \return
     //!
-    bool start()override;
+    bool start() override;
 
     //!
     //! \brief stop
     //! \return
     //!
-    bool stop()override;
+    bool stop() override;
 
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 signals:
     //!
     //! \brief rpcResponseClient
@@ -39,9 +39,11 @@ signals:
     //! \param requestPath
     //! \param responseBody
     //!
-    void rpcResponseClient(QSqlDriver*sqlDriver, const QString&requestPath, const QVariantHash&responseBody);
+    void rpcResponseClient(QSqlDriver *sqlDriver,
+                           const QString &requestPath,
+                           const QVariantHash &responseBody);
 };
 
 QRPC_LISTTEN_AUTO_REGISTER(Database, ListenBrokerDataBase)
 
-}
+} // namespace QRpc

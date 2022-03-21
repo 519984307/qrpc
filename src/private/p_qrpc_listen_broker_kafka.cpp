@@ -3,28 +3,24 @@
 
 namespace QRpc {
 
-#define dPvt()\
-    auto&p =*reinterpret_cast<ListenBrokerKAFKAPvt*>(this->p)
+#define dPvt() auto &p = *reinterpret_cast<ListenBrokerKAFKAPvt *>(this->p)
 
-class ListenBrokerKAFKAPvt{
+class ListenBrokerKAFKAPvt
+{
 public:
-    explicit ListenBrokerKAFKAPvt(ListenBrokerKAFKA*object)
-    {
-        Q_UNUSED(object)
-    }
-    virtual ~ListenBrokerKAFKAPvt()
-    {
-    }
+    explicit ListenBrokerKAFKAPvt(ListenBrokerKAFKA *object) { Q_UNUSED(object) }
+    virtual ~ListenBrokerKAFKAPvt() {}
 };
 
-ListenBrokerKAFKA::ListenBrokerKAFKA(QObject *parent):Listen(parent)
+ListenBrokerKAFKA::ListenBrokerKAFKA(QObject *parent) : Listen{parent}
 {
-    this->p = new ListenBrokerKAFKAPvt(this);
+    this->p = new ListenBrokerKAFKAPvt{this};
 }
 
 ListenBrokerKAFKA::~ListenBrokerKAFKA()
 {
-    dPvt();delete&p;
+    dPvt();
+    delete &p;
 }
 
-}
+} // namespace QRpc

@@ -7,14 +7,15 @@ namespace QRpc {
 //!
 //! \brief The ListenWebSocket class
 //!
-class Q_RPC_EXPORT ListenWebSocket:public Listen{
+class Q_RPC_EXPORT ListenWebSocket : public Listen
+{
     Q_OBJECT
 public:
     //!
     //! \brief ListenWebSocket
     //! \param parent
     //!
-    Q_INVOKABLE explicit ListenWebSocket(QObject *parent=nullptr);
+    Q_INVOKABLE explicit ListenWebSocket(QObject *parent = nullptr);
 
     //!
     //! \brief ~ListenWebSocket
@@ -25,17 +26,18 @@ public:
     //! \brief start
     //! \return
     //!
-    bool start()override;
+    bool start() override;
 
     //!
     //! \brief stop
     //! \return
     //!
-    bool stop()override;
+    bool stop() override;
+
 private:
-    void*p=nullptr;
+    void *p = nullptr;
 };
 
 QRPC_LISTTEN_AUTO_REGISTER(WebSocket, ListenWebSocket)
 
-}
+} // namespace QRpc

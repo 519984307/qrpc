@@ -1,18 +1,17 @@
-#include "./p_qrpc_listen_qrpc.h"
 #include "./p_qrpc_listen_qrpc_slot.h"
-#include "../qrpc_listen_request.h"
-#include "../qrpc_listen_request_parser.h"
 #include "../qrpc_controller.h"
 #include "../qrpc_controller_router.h"
+#include "../qrpc_listen_request.h"
+#include "../qrpc_listen_request_parser.h"
 #include "../qrpc_server.h"
-#include <QMutex>
-#include <QMetaMethod>
+#include "./p_qrpc_listen_qrpc.h"
 #include <QDebug>
+#include <QMetaMethod>
+#include <QMutex>
 
 namespace QRpc {
 
-#define dPvt()\
-    auto&p =*reinterpret_cast<ListenQRPCSlotPvt*>(this->p)
+#define dPvt() auto &p = *reinterpret_cast<ListenQRPCSlotPvt *>(this->p)
 
 class ListenQRPCSlotPvt : public QObject
 {
@@ -23,6 +22,7 @@ public:
     ListenQRPC *listenQRPC = nullptr;
     QList<const QMetaObject *> listenControllers;
     QList<const QMetaObject *> listenQRPCParserRequest;
+    ControllerMethodCollection controllerMethods;
 
     explicit ListenQRPCSlotPvt(ListenQRPCSlot *slot, ListenQRPC *listenQRPC) : QObject(slot)
     {
@@ -31,12 +31,14 @@ public:
                          this,
                          &ListenQRPCSlotPvt::onRequestInvoke);
         this->listenQRPC = listenQRPC;
-        this->listenControllers = listenQRPC->server()->controllers();
-        this->listenQRPCParserRequest = listenQRPC->server()->parsers();
+        this->listenControllers = listenQRPC->controllers().values();
+        this->listenQRPCParserRequest = listenQRPC->controllerParsers().values();
+        this->controllerMethods=listenQRPC->controllerMethods();
         this->controllerRouter = ControllerRouter::newRouter(this);
     }
 
     virtual ~ListenQRPCSlotPvt() {}
+
 
     bool invokeSecurity(Controller *controller, QMetaMethod &metaMethod)
     {
@@ -101,7 +103,7 @@ public:
             }
 
             auto parser = dynamic_cast<ListenRequestParser *>(object);
-            if (parser == nullptr){
+            if (parser == nullptr) {
 #if Q_RPC_LOG
                 sWarning() << qsl("Parser not valid ") << mObjParser->className();
 #endif
@@ -114,8 +116,7 @@ public:
                 continue;
 
 #if Q_RPC_LOG
-            sWarning() << qsl("Listen request parser fail: parser ")
-                       << mObjParser->className();
+            sWarning() << qsl("Listen request parser fail: parser ") << mObjParser->className();
 #endif
             if (request.co().isOK())
                 request.co().setNotAcceptable(qsl_null);
@@ -139,6 +140,27 @@ public:
         return true;
     }
 
+    QList<const QMetaObject *> invkeControllers(const QByteArray &requestPath)
+    {
+        QList<const QMetaObject *> __return;
+        for (auto &mObjController : this->listenControllers) {
+            auto className = QByteArray(mObjController->className()).toLower();
+            auto routeMethods = this->controllerMethods.value(className);
+            if (routeMethods.contains(requestPath)){
+                __return<<mObjController;
+                continue;
+            }
+
+            auto routeRedirect = Controller::redirectCheckBasePath(className, requestPath);
+            if (routeRedirect){
+                __return<<mObjController;
+                continue;
+            }
+        }
+        return __return;
+    }
+
+
     bool invokeQMetaObject(QObject *parentController,
                            ListenRequest &request,
                            Controller *&outController,
@@ -159,24 +181,21 @@ public:
 
         const auto requestPath = request.requestPath().toLower();
 
-        for (auto &mObjController : this->listenControllers) {
-            auto className = mObjController->className();
-            auto routeMethods = Controller::routeMethods(className);
-            if (!routeMethods.contains(requestPath)) { //se nao contiver a rota
+        auto listenControllers=invkeControllers(requestPath);
+        for (auto &mObjController : listenControllers) {
+            auto className = QByteArray(mObjController->className()).toLower();
+            auto routeMethods = this->controllerMethods.value(className);
+            if (!routeMethods.contains(requestPath)) {
                 auto routeRedirect = Controller::redirectCheckBasePath(className, requestPath);
-                if (!routeRedirect) {
-#if Q_RPC_LOG_SUPER_VERBOSE
-                    sWarning() << "Interface className ignored " << className;
-#endif
+                if (!routeRedirect)
                     continue;
-                }
             }
             auto object = mObjController->newInstance(Q_ARG(QObject*, parentController));
 
             if (object == nullptr)
                 continue;
 
-            outController = dynamic_cast<Controller*>(object);
+            outController = dynamic_cast<Controller *>(object);
             if (outController == nullptr) {
                 delete object;
                 continue;
@@ -212,8 +231,7 @@ public:
         return {};
     }
 
-
-    bool invokeControllerSettings(Controller*controller)
+    bool invokeControllerSettings(Controller *controller)
     {
         if (controller == nullptr)
             return {};
@@ -230,9 +248,9 @@ public:
         return true;
     }
 
-    bool invokeControllerRoutines(Controller*controller, QMetaMethod &metaMethod)
+    bool invokeControllerRoutines(Controller *controller, QMetaMethod &metaMethod)
     {
-        if (controller == nullptr){
+        if (controller == nullptr) {
             return {};
         }
 
@@ -240,7 +258,7 @@ public:
 #if Q_RPC_LOG_VERBOSE
             sWarning() << qsl("requestRedirect:: fail");
 #endif
-            if(controller->rq().co().isOK())
+            if (controller->rq().co().isOK())
                 controller->rq().co().setInternalServerError();
             return {};
         }
@@ -249,7 +267,7 @@ public:
 #if Q_RPC_LOG_VERBOSE
             sWarning() << qsl("canOperation:: fail");
 #endif
-            if(controller->rq().co().isOK())
+            if (controller->rq().co().isOK())
                 controller->rq().co().setNotAcceptable();
             return {};
         }
@@ -326,7 +344,6 @@ public:
         return true;
     }
 
-
     void invokeController(ListenRequest &request)
     {
         request.co().setMethodNotAllowed();
@@ -338,13 +355,13 @@ public:
         if (!invokeQMetaObject(sObj.data(), request, controller, metaMethod))
             return;
 
-        if(!invokeControllerSettings(controller))
+        if (!invokeControllerSettings(controller))
             return;
 
-        if(controller->rq().isMethodOptions())
+        if (controller->rq().isMethodOptions())
             return;
 
-        if(!invokeControllerRoutines(controller, metaMethod))
+        if (!invokeControllerRoutines(controller, metaMethod))
             return;
 
         if (!this->invokeSecurity(controller, metaMethod))
@@ -390,31 +407,28 @@ private slots:
     }
 };
 
-ListenQRPCSlot::ListenQRPCSlot(ListenQRPC *listenQRPC):QThread(nullptr)
+ListenQRPCSlot::ListenQRPCSlot(ListenQRPC *listenQRPC) : QThread{nullptr}
 {
     this->p = new ListenQRPCSlotPvt(this, listenQRPC);
 }
 
-ListenQRPCSlot::~ListenQRPCSlot()
-{
-
-}
+ListenQRPCSlot::~ListenQRPCSlot() {}
 
 void ListenQRPCSlot::run()
 {
     QThread::run();
 }
 
-bool ListenQRPCSlot::canRequestInvoke(QVariantHash&v, const QVariant &uploadedFiles)
+bool ListenQRPCSlot::canRequestInvoke(QVariantHash &v, const QVariant &uploadedFiles)
 {
     dPvt();
-    if(p.locked)
+    if (p.locked)
         return false;
 
-    if(!p.lockedMutex.tryLock(1))
+    if (!p.lockedMutex.tryLock(1))
         return false;
 
-    p.locked=true;
+    p.locked = true;
     this->start();
     emit requestInvoke(v, uploadedFiles);
     return true;
@@ -423,14 +437,14 @@ bool ListenQRPCSlot::canRequestInvoke(QVariantHash&v, const QVariant &uploadedFi
 void ListenQRPCSlot::start()
 {
     QThread::start();
-    while(this->eventDispatcher()==nullptr)
+    while (this->eventDispatcher() == nullptr)
         QThread::msleep(1);
 }
 
 bool ListenQRPCSlot::lock()
 {
     dPvt();
-    if(p.lockedMutex.tryLock(1))
+    if (p.lockedMutex.tryLock(1))
         return true;
     return false;
 }
@@ -442,4 +456,4 @@ void ListenQRPCSlot::unlock()
     p.lockedMutex.unlock();
 }
 
-}
+} // namespace QRpc

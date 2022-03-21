@@ -112,14 +112,12 @@ public:
     static QRpc::Server&service()
     {
         auto&instance=QRpc::ServerTest::instance();
-        if(!instance.isRunning()){
-            instance.setObjectName(QT_STRINGIFY(Server));
-            {
-                auto&protocol=instance.colletions().protocol(QRpc::Http);
-                protocol.setEnabled(true);
-                protocol.setPort(public_record.server_port_http);
-            }
-        }
+        if(instance.isRunning())
+            return instance;
+        instance.setObjectName(QT_STRINGIFY(Server));
+        auto&protocol=instance.colletions().protocol(QRpc::Http);
+        protocol.setEnabled(true);
+        protocol.setPort(public_record.server_port_http);
         return instance;
     }
 

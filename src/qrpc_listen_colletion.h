@@ -1,7 +1,7 @@
 #pragma once
 
-#include "./qrpc_types.h"
 #include "./qrpc_listen.h"
+#include "./qrpc_types.h"
 #include <QThread>
 #include <QVariant>
 #include <QVariantHash>
@@ -17,12 +17,13 @@ class Listen;
 //!
 //! \brief ListenProtocols
 //!
-typedef QHash<int, ListenProtocol*> ListenProtocols;
+typedef QHash<int, ListenProtocol *> ListenProtocols;
 
 //!
 //! \brief The ListenColletions class
 //!
-class Q_RPC_EXPORT ListenColletions : public QThread{
+class Q_RPC_EXPORT ListenColletions : public QThread
+{
     Q_OBJECT
 public:
     //!
@@ -54,18 +55,18 @@ public:
     //! \param protocol
     //! \return
     //!
-    virtual ListenProtocol &protocol(const QRpc::QRPCProtocol&protocol);
+    virtual ListenProtocol &protocol(const QRpc::Protocol &protocol);
 
     //!
     //! \brief protocols
     //! \return
     //!
-    virtual ListenProtocols&protocols();
+    virtual ListenProtocols &protocols();
 
     //!
     //! \brief run
     //!
-    void run();
+    void run()override;
 
     //!
     //! \brief requestEnabled
@@ -87,13 +88,13 @@ public:
     //! \brief setSettings
     //! \param settings
     //!
-    virtual void setSettings(const QVariantHash&settings) const;
+    virtual void setSettings(const QVariantHash &settings) const;
 
     //!
     //! \brief listenPool
     //! \return
     //!
-    virtual ListenQRPC*listenPool();
+    virtual ListenQRPC *listenPool();
 
 public slots:
 
@@ -114,8 +115,9 @@ public slots:
     //! \return
     //!
     virtual bool quit();
+
 private:
-    QObject*p=nullptr;
+    QObject *p = nullptr;
 signals:
 };
-}
+} // namespace QRpc

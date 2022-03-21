@@ -1,332 +1,124 @@
 #pragma once
 
-#include <QObject>
 #include <QHash>
 #include <QMap>
-#include <QVariant>
+#include <QObject>
+#include <QSslCertificate>
+#include <QSslConfiguration>
 #include <QString>
 #include <QTemporaryFile>
-#include <QSslConfiguration>
-#include <QSslCertificate>
+#include <QVariant>
 
 namespace QRpc {
 
-    static const auto ContentTypeName="Content-Type";
-    static const auto ContentDispositionName="Content-Disposition";
+class Listen;
+class ListenProtocol;
+class ListenQRPCSlot;
 
-    enum ContentType {
-          AppNone=1
-        , AppXML=AppNone*2
-        , AppJson=AppXML*2
-        , AppCBOR=AppJson*2
-        , AppOctetStream=AppCBOR*2
-        , AppXwwwForm=AppOctetStream*2
-        , AppPNG=AppXwwwForm*2
-        , AppJPGE=AppPNG*2
-        , AppGIF=AppJPGE*2
-        , AppPDF=AppGIF*2
-        , AppTXT=AppPDF*2
-        , AppHTML=AppTXT*2
-        , AppCSS=AppHTML*2
-        , AppJS=AppCSS*2
-        , AppSVG=AppJS*2
-        , AppWOFF=AppSVG*2
-        , AppWOFF2=AppWOFF*2
-        , AppTTF=AppWOFF2*2
-        , AppEOT=AppTTF*2
-        , AppOTF=AppEOT*2
-    };
+enum ContentType {
+    AppNone = 1,
+    AppXML = AppNone * 2,
+    AppJson = AppXML * 2,
+    AppCBOR = AppJson * 2,
+    AppOctetStream = AppCBOR * 2,
+    AppXwwwForm = AppOctetStream * 2,
+    AppPNG = AppXwwwForm * 2,
+    AppJPGE = AppPNG * 2,
+    AppGIF = AppJPGE * 2,
+    AppPDF = AppGIF * 2,
+    AppTXT = AppPDF * 2,
+    AppHTML = AppTXT * 2,
+    AppCSS = AppHTML * 2,
+    AppJS = AppCSS * 2,
+    AppSVG = AppJS * 2,
+    AppWOFF = AppSVG * 2,
+    AppWOFF2 = AppWOFF * 2,
+    AppTTF = AppWOFF2 * 2,
+    AppEOT = AppTTF * 2,
+    AppOTF = AppEOT * 2
+};
 
-    enum AuthorizationType{//https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#Authentication_schemes
-        Basic// (see RFC 7617, base64-encoded credentials. See below for more information.),
-        ,Bearer// (see RFC 6750, bearer tokens to access OAuth 2.0-protected resources),
-        ,Digest// (see RFC 7616, only md5 hashing is supported in Firefox, see bug 472823 for SHA encryption support),
-        ,HOBA// (see RFC 7486, Section 3, HTTP Origin-Bound Authentication, digital-signature-based),
-        ,Mutual// (see RFC 8120),
-        ,AWS4_HMAC_SHA256// (see AWS docs).
-        ,Service
-    };
+//https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#Authentication_schemes
+enum AuthorizationType { Basic, Bearer, Digest, HOBA, Mutual, AWS4_HMAC_SHA256, Service };
 
-    static auto ___QRPCContentTypeHeaderTypeToHeader()
-    {
-        QHash<ContentType,QString> __return;
-        __return.insert(AppNone, "application/x-www-form-urlencoded");
-        __return.insert(AppXML, "application/xml");
-        __return.insert(AppJson, "application/json");
-        __return.insert(AppCBOR, "application/cbor");
-        __return.insert(AppOctetStream, "application/octet-stream");
-        __return.insert(AppXwwwForm, "application/x-www-form-urlencoded");
-        __return.insert(AppPNG, "image/png");
-        __return.insert(AppJPGE, "image/jpg");
-        __return.insert(AppGIF, "image/gif");
-        __return.insert(AppPDF, "application/pdf");
-        __return.insert(AppTXT, "text/plain; charset=utf-8");
-        __return.insert(AppHTML, "text/html; charset=utf-8");
-        __return.insert(AppCSS, "text/css");
-        __return.insert(AppJS, "text/javascript");
-        __return.insert(AppSVG, "image/svg+xml");
-        __return.insert(AppWOFF, "font/woff");
-        __return.insert(AppWOFF2, "font/woff2");
-        __return.insert(AppTTF, "application/x-font-ttf");
-        __return.insert(AppEOT, "application/vnd.ms-fontobject");
-        __return.insert(AppOTF, "application/font-otf");
-        return __return;
-    }
+enum RequestMethod {
+    Head = 1,
+    Get = 2,
+    Post = 4,
+    Put = 8,
+    Delete = 16,
+    Options = 32,
+    Patch = 64,
+    Trace = 128,
+    MinMethod = Head,
+    MaxMethod = Trace
+};
 
-    const auto QRPCContentTypeHeaderTypeToHeader=___QRPCContentTypeHeaderTypeToHeader();
+//!
+//! \brief The Protocol enum
+//!
+enum Protocol {
+    TcpSocket = 1,
+    UdpSocket = 2,
+    WebSocket = 4,
+    Mqtt = 8,
+    Amqp = 16,
+    Http = 32,
+    Https = 64,
+    DataBase = 128,
+    Kafka = 256,
+    LocalSocket = 612,
+    rpcProtocolMin = TcpSocket,
+    rpcProtocolMax = LocalSocket
+};
 
-    static auto ___ContentTypeHeaderToHeaderType()
-    {
-        QHash<QString, ContentType> __return;
-        __return.insert("application/x-www-form-urlencoded" , AppNone);
-        __return.insert("application/xml" , AppXML);
-        __return.insert("application/json", AppJson);
-        __return.insert("application/cbor", AppCBOR);
-        __return.insert("application/octet-stream", AppOctetStream);
-        __return.insert("application/x-www-form-urlencoded" , AppXwwwForm);
-        __return.insert("image/png" , AppPNG);
-        __return.insert("image/jpg" , AppJPGE);
-        __return.insert("image/gif" , AppGIF);
-        __return.insert("application/pdf" , AppPDF);
-        __return.insert("text/plain; charset=utf-8" , AppTXT);
-        __return.insert("text/html; charset=utf-8", AppHTML);
-        __return.insert("text/css" , AppCSS);
-        __return.insert("text/javascript", AppJS);
-        __return.insert("image/svg+xml" , AppSVG);
-        __return.insert("font/woff", AppWOFF);
-        __return.insert("font/woff2" , AppWOFF2);
-        __return.insert("application/x-font-ttf" , AppTTF);
-        __return.insert("application/vnd.ms-fontobject" , AppEOT);
-        __return.insert("application/font-otf" , AppOTF);
-        return __return;
-    }
-
-    const auto ContentTypeHeaderToHeaderType=___ContentTypeHeaderToHeaderType();
-
-    static auto ___QRPCContentTypeHeaderToExtension()
-    {
-        QHash<ContentType,QString> __return;
-        __return.insert(AppXML, "xml");
-        __return.insert(AppJson, "json");
-        __return.insert(AppCBOR, "cbor");
-        __return.insert(AppPNG, "png");
-        __return.insert(AppJPGE, "jpg");
-        __return.insert(AppGIF, "gif");
-        __return.insert(AppPDF, "pdf");
-        __return.insert(AppTXT, "txt");
-        __return.insert(AppHTML, "html");
-        __return.insert(AppCSS, "css");
-        __return.insert(AppJS, "js");
-        __return.insert(AppSVG, "svg");
-        __return.insert(AppWOFF, "woff");
-        __return.insert(AppWOFF2, "woff2");
-        __return.insert(AppTTF, "ttf");
-        __return.insert(AppEOT, "eot");
-        __return.insert(AppOTF, "otf");
-
-        return __return;
-    }
-
-    const auto QRPCContentTypeHeaderToExtension=___QRPCContentTypeHeaderToExtension();
-
-    static auto ___QRPCContentTypeExtensionToHeader()
-    {
-        QHash<QString, ContentType> __return;
-        __return.insert("", AppOctetStream);
-        __return.insert("xml", AppXML);
-        __return.insert("json", AppJson);
-        __return.insert("cbor", AppCBOR);
-        __return.insert("png", AppPNG);
-        __return.insert("jpg", AppJPGE);
-        __return.insert("gif", AppGIF);
-        __return.insert("pdf", AppPDF);
-        __return.insert("txt", AppTXT);
-        __return.insert("html", AppHTML);
-        __return.insert("css", AppCSS);
-        __return.insert("js", AppJS);
-        __return.insert("svg", AppSVG);
-        __return.insert("woff", AppWOFF);
-        __return.insert("woff2", AppWOFF2);
-        __return.insert("ttf", AppTTF);
-        __return.insert("eot", AppEOT);
-        __return.insert("otf", AppOTF);
-        return __return;
-    }
-
-    const auto QRPCContentTypeExtensionToHeader=___QRPCContentTypeExtensionToHeader();
+typedef QHash<QByteArray, QMetaMethod> ControllerMethod;
+typedef QHash<QByteArray, ControllerMethod> ControllerMethodCollection;
 
 
-    enum RequestMethod {Head=1, Get=2, Post=4, Put=8, Delete=16, Options=32, Patch=64, Trace=128, MaxMethod=Trace};
+typedef QPair<int, const QMetaObject *> ListenMetaObject;
+typedef QVector<ListenMetaObject> ListenMetaObjectList;
+typedef QMultiHash<QByteArray, QMetaMethod> MethodsMultHash;
+typedef QMultiHash<QByteArray, MethodsMultHash> MultStringMethod;
+typedef QVector<ListenQRPCSlot *> ListenSlotList;
+typedef QHash<QByteArray, ListenSlotList *> ListenSlotCache;
+typedef QMultiHash<QByteArray, QStringList> MultStringList;
+typedef QVector<const QMetaObject *> MetaObjectVector;
+typedef QVector<QByteArray> ByteArrayVector;
 
-    static auto ___RequestMethodName()
-    {
-        QHash<int, QString> r;
-        r.insert(Head, QT_STRINGIFY2(Head));
-        r.insert(Get, QT_STRINGIFY2(Get));
-        r.insert(Post, QT_STRINGIFY2(Post));
-        r.insert(Put, QT_STRINGIFY2(Put));
-        r.insert(Delete, QT_STRINGIFY2(Delete));
-        r.insert(Options, QT_STRINGIFY2(Options));
-        r.insert(Patch, QT_STRINGIFY2(Patch));
-        r.insert(Trace, QT_STRINGIFY2(Trace));
-        return r;
-    }
-    static const auto RequestMethodName = ___RequestMethodName();
-    static const auto RequestMethodNameList = ___RequestMethodName().values();
+static const auto ContentTypeName = "Content-Type";
+static const auto ContentDispositionName = "Content-Disposition";
 
-    static auto ___RequestMethodType()
-    {
-        QHash<QString,RequestMethod> r;
-        r.insert(QT_STRINGIFY2(head), Head);
-        r.insert(QT_STRINGIFY2(get), Get);
-        r.insert(QT_STRINGIFY2(post), Post);
-        r.insert(QT_STRINGIFY2(put), Put);
-        r.insert(QT_STRINGIFY2(delete), Delete);
-        r.insert(QT_STRINGIFY2(options), Options);
-        r.insert(QT_STRINGIFY2(patch), Patch);
-        r.insert(QT_STRINGIFY2(trace), Trace);
+namespace Private {
+const QHash<QString, int> &___ProtocolType();
+const QHash<int, QString> &___ProtocolName();
+const QHash<int, QString> &___ProtocolUrlName();
+const QHash<int, QString> &___QSslProtocolToName();
+const QHash<QString, QSsl::SslProtocol> &___QSslProtocolNameToProtocol();
+const QHash<ContentType, QString> &___ContentTypeHeaderTypeToHeader();
+const QHash<QString, ContentType> &___ContentTypeHeaderToHeaderType();
+const QHash<ContentType, QString> &___ContentTypeHeaderToExtension();
+const QHash<QString, ContentType> &___ContentTypeExtensionToHeader();
+const QHash<int, QString> &___RequestMethodName();
+const QHash<QString, RequestMethod> &___RequestMethodType();
+} // namespace Private
 
-        r.insert(QT_STRINGIFY2(Head), Head);
-        r.insert(QT_STRINGIFY2(Get), Get);
-        r.insert(QT_STRINGIFY2(Post), Post);
-        r.insert(QT_STRINGIFY2(Put), Put);
-        r.insert(QT_STRINGIFY2(Delete), Delete);
-        r.insert(QT_STRINGIFY2(Options), Options);
-        r.insert(QT_STRINGIFY2(Patch), Patch);
-        r.insert(QT_STRINGIFY2(Trace), Trace);
-        return r;
-    }
-    static const auto RequestMethodType=___RequestMethodType();
-    enum QRPCProtocol {TcpSocket=1, UdpSocket=2, WebSocket=4, Mqtt=8, Amqp=16, Http=32, Https=64, DataBase=128, Kafka=256, LocalSocket=612};
-    Q_DECLARE_FLAGS(QRPCProtocols, QRPCProtocol)
-    static auto ___QRPCProtocolType()
-    {
-        QHash<QString,int> r;
-        r.insert(QT_STRINGIFY2(RPC), QRPCProtocol(0));
-        r.insert(QT_STRINGIFY2(TcpSocket), TcpSocket);
-        r.insert(QT_STRINGIFY2(UdpSocket), UdpSocket);
-        r.insert(QT_STRINGIFY2(WebSocket), WebSocket);
-        r.insert(QT_STRINGIFY2(Mqtt), Mqtt);
-        r.insert(QT_STRINGIFY2(Amqp), Amqp);
-        r.insert(QT_STRINGIFY2(Http), Http);
-        r.insert(QT_STRINGIFY2(Https), Https);
-        r.insert(QT_STRINGIFY2(DataBase), DataBase);
-        r.insert(QT_STRINGIFY2(Kafka), Kafka);
-        r.insert(QT_STRINGIFY2(LocalSocket), LocalSocket);
+static const auto &ContentTypeHeaderTypeToHeader = Private::___ContentTypeHeaderTypeToHeader();
+static const auto &ContentTypeHeaderToHeaderType = Private::___ContentTypeHeaderToHeaderType();
+static const auto &ContentTypeHeaderToExtension = Private::___ContentTypeHeaderToExtension();
+static const auto &ContentTypeExtensionToHeader = Private::___ContentTypeExtensionToHeader();
+static const auto &RequestMethodName = Private::___RequestMethodName();
+static const auto &RequestMethodNameList = Private::___RequestMethodName().values();
+static const auto &RequestMethodType = Private::___RequestMethodType();
+static const auto &ProtocolName = Private::___ProtocolName();
+static const auto &ProtocolType = Private::___ProtocolType();
+static const auto &ProtocolUrlName = Private::___ProtocolUrlName();
+static const auto &QSslProtocolToName = Private::___QSslProtocolToName();
+static const auto &QSslProtocolNameToProtocol = Private::___QSslProtocolNameToProtocol();
 
-        r.insert(QT_STRINGIFY2(tcp), TcpSocket);
-        r.insert(QT_STRINGIFY2(udp), UdpSocket);
-        r.insert(QT_STRINGIFY2(wss), WebSocket);
-        r.insert(QT_STRINGIFY2(mqtt), Mqtt);
-        r.insert(QT_STRINGIFY2(amqp), Amqp);
-        r.insert(QT_STRINGIFY2(http), Http);
-        r.insert(QT_STRINGIFY2(https), Https);
-        r.insert(QT_STRINGIFY2(database), DataBase);
-        r.insert(QT_STRINGIFY2(dataBase), DataBase);
-        r.insert(QT_STRINGIFY2(kafka), Kafka);
-        r.insert(QT_STRINGIFY2(LocalSocket), LocalSocket);
-        return r;
-    }
+} // namespace QRpc
 
-    static auto ___QRPCProtocolName()
-    {
-        QHash<int, QString> r;
-        r.insert(int(0), QT_STRINGIFY2(rpc));
-        r.insert(TcpSocket, QT_STRINGIFY2(tcpsocket));
-        r.insert(UdpSocket, QT_STRINGIFY2(udpsocket));
-        r.insert(WebSocket, QT_STRINGIFY2(websocket));
-        r.insert(Mqtt, QT_STRINGIFY2(mqtt));
-        r.insert(Amqp, QT_STRINGIFY2(amqp));
-        r.insert(Http, QT_STRINGIFY2(http));
-        r.insert(Https, QT_STRINGIFY2(https));
-        r.insert(DataBase, QT_STRINGIFY2(database));
-        r.insert(LocalSocket, QT_STRINGIFY2(localsocket));
-        r.insert(Kafka, QT_STRINGIFY2(kafka));
-        return r;
-    }
-
-    static auto ___QRPCProtocolUrlName()
-    {
-        QHash<int, QString> r;
-        r.insert(QRPCProtocol(0), QT_STRINGIFY2(rpc));
-        r.insert(TcpSocket, QT_STRINGIFY2(tcp));
-        r.insert(UdpSocket, QT_STRINGIFY2(udp));
-        r.insert(WebSocket, QT_STRINGIFY2(wss));
-        r.insert(Mqtt, QT_STRINGIFY2(mqtt));
-        r.insert(Amqp, QT_STRINGIFY2(amqp));
-        r.insert(Http, QT_STRINGIFY2(http));
-        r.insert(Https, QT_STRINGIFY2(https));
-        r.insert(DataBase, QT_STRINGIFY2(database));
-        r.insert(LocalSocket, QT_STRINGIFY2(localsocket));
-        r.insert(Kafka, QT_STRINGIFY2(dpkafka));
-        return r;
-    }
-
-    static const auto QRPCProtocolName=___QRPCProtocolName();
-    static const auto QRPCProtocolType=___QRPCProtocolType();
-    static const auto QRPCProtocolUrlName=___QRPCProtocolUrlName();
-    static const auto rpcProtocolMin=QRPCProtocol(1);
-    static const auto rpcProtocolMax=LocalSocket;
-    class Listen;
-    class ListenProtocol;
-
-
-    static auto ___QSslSslProtocolToName()
-    {
-        static QHash<int, QString> r;
-#if QT_VERSION <= QT_VERSION_CHECK(5, 15, 0)
-        r.insert(QSsl::SslProtocol::SslV3, QT_STRINGIFY2(SslV3));
-        r.insert(QSsl::SslProtocol::SslV2, QT_STRINGIFY2(SslV2));
-        r.insert(QSsl::SslProtocol::TlsV1SslV3, QT_STRINGIFY2(TlsV1SslV3));
-#endif
-        r.insert(QSsl::SslProtocol::TlsV1_0, QT_STRINGIFY2(TlsV1_0));
-        r.insert(QSsl::SslProtocol::TlsV1_1, QT_STRINGIFY2(TlsV1_1));
-        r.insert(QSsl::SslProtocol::TlsV1_2, QT_STRINGIFY2(TlsV1_2));
-        r.insert(QSsl::SslProtocol::AnyProtocol, QT_STRINGIFY2(AnyProtocol));
-        r.insert(QSsl::SslProtocol::SecureProtocols, QT_STRINGIFY2(SecureProtocols));
-        r.insert(QSsl::SslProtocol::TlsV1_0OrLater, QT_STRINGIFY2(TlsV1_0OrLater));
-        r.insert(QSsl::SslProtocol::TlsV1_1OrLater, QT_STRINGIFY2(TlsV1_1OrLater));
-        r.insert(QSsl::SslProtocol::TlsV1_2OrLater, QT_STRINGIFY2(TlsV1_2OrLater));
-        r.insert(QSsl::SslProtocol::DtlsV1_0, QT_STRINGIFY2(DtlsV1_0));
-        r.insert(QSsl::SslProtocol::DtlsV1_0OrLater, QT_STRINGIFY2(DtlsV1_0OrLater));
-        r.insert(QSsl::SslProtocol::DtlsV1_2, QT_STRINGIFY2(DtlsV1_2));
-        r.insert(QSsl::SslProtocol::DtlsV1_2OrLater, QT_STRINGIFY2(DtlsV1_2OrLater));
-        r.insert(QSsl::SslProtocol::TlsV1_3, QT_STRINGIFY2(TlsV1_3));
-        r.insert(QSsl::SslProtocol::TlsV1_3OrLater, QT_STRINGIFY2(TlsV1_3OrLater));
-
-        return r;
-    }
-
-    static const auto QSslSslProtocolToName=___QSslSslProtocolToName();
-
-
-    static auto ___QSslProtocolNameToProtocol()
-    {
-        static QHash<QString, QSsl::SslProtocol> r;
-#if QT_VERSION <= QT_VERSION_CHECK(5, 15, 0)
-        r.insert( QString(QT_STRINGIFY2(SslV3)).toLower(), QSsl::SslProtocol::SslV3);
-        r.insert( QString(QT_STRINGIFY2(SslV2)).toLower(), QSsl::SslProtocol::SslV2);
-        r.insert( QString(QT_STRINGIFY2(TlsV1SslV3)).toLower(), QSsl::SslProtocol::TlsV1SslV3);
-#endif
-        r.insert( QString(QT_STRINGIFY2(TlsV1_0)).toLower(), QSsl::SslProtocol::TlsV1_0);
-        r.insert( QString(QT_STRINGIFY2(TlsV1_1)).toLower(), QSsl::SslProtocol::TlsV1_1);
-        r.insert( QString(QT_STRINGIFY2(TlsV1_2)).toLower(), QSsl::SslProtocol::TlsV1_2);
-        r.insert( QString(QT_STRINGIFY2(AnyProtocol)).toLower(), QSsl::SslProtocol::AnyProtocol);
-        r.insert( QString(QT_STRINGIFY2(SecureProtocols)).toLower(), QSsl::SslProtocol::SecureProtocols);
-        r.insert( QString(QT_STRINGIFY2(TlsV1_0OrLater)).toLower(), QSsl::SslProtocol::TlsV1_0OrLater);
-        r.insert( QString(QT_STRINGIFY2(TlsV1_1OrLater)).toLower(), QSsl::SslProtocol::TlsV1_1OrLater);
-        r.insert( QString(QT_STRINGIFY2(TlsV1_2OrLater)).toLower(), QSsl::SslProtocol::TlsV1_2OrLater);
-        r.insert( QString(QT_STRINGIFY2(DtlsV1_0)).toLower(), QSsl::SslProtocol::DtlsV1_0);
-        r.insert( QString(QT_STRINGIFY2(DtlsV1_0OrLater)).toLower(), QSsl::SslProtocol::DtlsV1_0OrLater);
-        r.insert( QString(QT_STRINGIFY2(DtlsV1_2)).toLower(), QSsl::SslProtocol::DtlsV1_2);
-        r.insert( QString(QT_STRINGIFY2(DtlsV1_2OrLater)).toLower(), QSsl::SslProtocol::DtlsV1_2OrLater);
-        r.insert( QString(QT_STRINGIFY2(TlsV1_3)).toLower(), QSsl::SslProtocol::TlsV1_3);
-        r.insert( QString(QT_STRINGIFY2(TlsV1_3OrLater)).toLower(), QSsl::SslProtocol::TlsV1_3OrLater);
-
-        return r;
-    }
-
-    static const auto QSslProtocolNameToProtocol=___QSslProtocolNameToProtocol();
-}
-
-Q_DECLARE_OPERATORS_FOR_FLAGS(QRpc::QRPCProtocols)
+namespace QRpc {
+Q_DECLARE_FLAGS(Protocols, QRpc::Protocol);
+} // namespace QRpc
+Q_DECLARE_OPERATORS_FOR_FLAGS(QRpc::Protocols)

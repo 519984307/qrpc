@@ -1,10 +1,10 @@
 #include "./qrpc_listen_colletion.h"
-#include <QSettings>
-#include <QDir>
-#include <QMutex>
-#include "./qrpc_server.h"
 #include "./qrpc_listen.h"
 #include "./qrpc_listen_protocol.h"
+#include "./qrpc_server.h"
+#include <QDir>
+#include <QMutex>
+#include <QSettings>
 
 #include "./private/p_qrpc_server.h"
 //#include "./private/p_qrpc_listen_tcp.h"
@@ -17,84 +17,76 @@
 //#include "./private/p_qrpc_listen_http.h"
 //#include "./private/p_qrpc_listen_qrpc.h"
 
-
 namespace QRpc {
 
-#define dPvt()\
-    auto&p =*reinterpret_cast<ListenColletionsPvt*>(this->p)
+#define dPvt() auto &p = *reinterpret_cast<ListenColletionsPvt *>(this->p)
 
-class ListenColletionsPvt:public QObject{
+class ListenColletionsPvt : public QObject
+{
 public:
     QMutex lockMake;
     QMutex lockWaitRun;
     QMutex lockWaitQuit;
     QMutex lockRunning;
-    QHash<int,Listen*> listensActive;
+    QHash<int, Listen *> listensActive;
     ListenProtocols listenProtocol;
-    Server*server=nullptr;
+    Server *server = nullptr;
     QVariantHash settings;
 
     ListenColletions *collections()
     {
-        auto collections=dynamic_cast<ListenColletions*>(this->parent());
+        auto collections = dynamic_cast<ListenColletions *>(this->parent());
         return collections;
     }
 
-    explicit ListenColletionsPvt(Server*server, const QVariantHash&settings, ListenColletions*parent):QObject(parent)
+    explicit ListenColletionsPvt(Server *server,
+                                 const QVariantHash &settings,
+                                 ListenColletions *parent)
+        : QObject(parent)
     {
-        this->server=server;
-        this->settings=settings;
+        this->server = server;
+        this->settings = settings;
         this->makeListens();
     }
 
-    ~ListenColletionsPvt()
-    {
-    }
+    ~ListenColletionsPvt() {}
 
-    void setSettings(const QVariantHash&settings)
+    void setSettings(const QVariantHash &settings)
     {
-        this->settings=settings;
+        this->settings = settings;
         this->loadSettings();
     }
 
     void loadSettings()
     {
+        if(this->listenProtocol.isEmpty())
+            return;
+
         auto settingsDefault = this->settings.value(qsl("default")).toHash();
-        for(auto&v : this->listenProtocol){
-            auto optionName=v->optionName();
+        for (auto &v : this->listenProtocol) {
+            auto optionName = v->optionName();
             auto settings = this->settings.value(optionName).toHash();
-            if(!settings.isEmpty())
+            if (!settings.isEmpty())
                 v->setSettings(settings, settingsDefault);
         }
 
-        auto list=this->listenProtocol.value(0);
-        if(list!=nullptr)
+        auto list = this->listenProtocol.value(0);
+        if (list != nullptr)
             list->setEnabled(true);
     }
 
     void makeListens()
     {
-        auto vList=Listen::listenList();
-        for(auto&item:vList){
+        auto &vList = Listen::listenList();
+        for (auto &item : vList)
             this->makeOption(item.first, *item.second);
-        }
-//        this->makeOption(0, ListenQRPC::staticMetaObject);
-//        this->makeOption(QRPCProtocol::TcpSocket, ListenTCP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::UdpSocket, ListenUDP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::WebSocket, ListenWebSocket::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Mqtt, ListenBrokerMQTT::staticMetaObject);
-//        //this->makeOption(QRPCProtocol::DataBase, ListenBrokerDataBase::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Amqp, ListenBrokerAMQP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Kafka, ListenBrokerKAFKA::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Http, ListenHTTP::staticMetaObject);
-//        this->makeOption(QRPCProtocol::Https, ListenHTTP::staticMetaObject);
         this->loadSettings();
     }
 
-    bool makeOption(int protocol, const QMetaObject&metaObject)
+    bool makeOption(int protocol, const QMetaObject &metaObject)
     {
         QMutexLOCKER locker(&this->lockMake);
-        if(this->listenProtocol.contains(protocol))
+        if (this->listenProtocol.contains(protocol))
             return true;
 
         auto option = new ListenProtocol(protocol, metaObject, this->parent());
@@ -103,16 +95,15 @@ public:
         return true;
     }
 
-
     void listenClear()
     {
-        if(this->listensActive.isEmpty())
+        if (this->listensActive.isEmpty())
             return;
 
-        auto aux=this->listensActive.values();
+        auto aux = this->listensActive.values();
         this->listensActive.clear();
-        for(auto&listen:aux){
-            if(!listen->isRunning())
+        for (auto &listen : aux) {
+            if (!listen->isRunning())
                 continue;
 
             listen->quit();
@@ -124,40 +115,37 @@ public:
     void listenStart()
     {
         this->listenClear();
-        auto listenProtocol=this->listenProtocol.values();
-        for(auto&protocol:listenProtocol){
-            if(!protocol->enabled())
+        QVector<Listen*> listenStartOrder;
+        for (auto &protocol : listenProtocol) {
+            if (!protocol->enabled())
                 continue;
 
-            auto listen=protocol->makeListen();
-            if(listen==nullptr)
+            auto listen = protocol->makeListen();
+            if (listen == nullptr)
                 continue;
 
             listen->setServer(this->server);
             listen->setColletions(this->collections());
             this->listensActive.insert(protocol->protocol(), listen);
+            listenStartOrder<<listen;
         }
 
-        auto listenPool=this->collections()->listenPool();
-        if(listenPool==nullptr){
+        auto listenPool = this->collections()->listenPool();
+        if (listenPool == nullptr) {
             qFatal("invalid pool");
         }
 
-        for(auto&listen:this->listensActive){
+        for (auto &listen : this->listensActive) {
             listenPool->registerListen(listen);
             listen->setServer(this->server);
             listen->setColletions(this->collections());
         }
 
-        for(auto&listen:this->listensActive){
-            if(listen==nullptr)
-                continue;
+        for (auto &listen : listenStartOrder)
             listen->start();
-        }
-        if(!this->lockWaitRun.tryLock(10))
-            this->lockWaitRun.unlock();
-        else
-            this->lockWaitRun.unlock();
+
+        this->lockWaitRun.tryLock(10);
+        this->lockWaitRun.unlock();
     }
 
     void listenQuit()
@@ -166,15 +154,14 @@ public:
         this->lockRunning.tryLock(1);
         this->lockRunning.unlock();
     }
-
 };
 
-ListenColletions::ListenColletions(Server *server):QThread(nullptr)
+ListenColletions::ListenColletions(Server *server) : QThread{nullptr}
 {
-    this->p = new ListenColletionsPvt(server, QVariantHash(),this);
+    this->p = new ListenColletionsPvt(server, {}, this);
 }
 
-ListenColletions::ListenColletions(const QVariantHash&settings, Server *server)
+ListenColletions::ListenColletions(const QVariantHash &settings, Server *server)
 {
     this->p = new ListenColletionsPvt(server, settings, this);
 }
@@ -182,31 +169,39 @@ ListenColletions::ListenColletions(const QVariantHash&settings, Server *server)
 ListenColletions::~ListenColletions()
 {
     dPvt();
-    delete&p;
+    delete &p;
 }
 
 ListenProtocol &ListenColletions::protocol()
 {
-    return this->protocol(QRPCProtocol::Http);
+    return this->protocol(Protocol::Http);
 }
 
-ListenProtocol &ListenColletions::protocol(const QRPCProtocol &protocol)
+ListenProtocol &ListenColletions::protocol(const Protocol &protocol)
 {
-    if((protocol>=rpcProtocolMin) && (protocol<=rpcProtocolMax)){
-        dPvt();
-        auto&listenProtocol=p.listenProtocol;
-        auto ___return=listenProtocol.value(protocol);
-        if(___return==nullptr){
-            if(protocol==Http || protocol==Https){
-                auto __protocol=(protocol==Http)?Https:protocol;
-                ___return=listenProtocol.value(__protocol);
-            }
-        }
-        if(___return!=nullptr)
-            return*___return;
-    }
-    static ListenProtocol __protocol;
-    return __protocol;
+    static ListenProtocol staticDefaultProtocol;
+
+    if (protocol < rpcProtocolMin)
+        return staticDefaultProtocol;
+
+    if(protocol > rpcProtocolMax)
+        return staticDefaultProtocol;
+
+    dPvt();
+    auto &listenProtocol = p.listenProtocol;
+    auto ___return = listenProtocol.value(protocol);
+    if (___return != nullptr)
+        return *___return;
+
+    if (protocol != Http && protocol != Https)
+        return *___return;
+
+    auto __protocolType = (protocol == Http) ? Https : protocol;
+    ___return = listenProtocol.value(__protocolType);
+    if (___return == nullptr)
+        return staticDefaultProtocol;
+
+    return *___return;
 }
 
 ListenProtocols &ListenColletions::protocols()
@@ -241,7 +236,7 @@ Server *ListenColletions::server()
     return p.server;
 }
 
-void ListenColletions::setSettings(const QVariantHash &settings)const
+void ListenColletions::setSettings(const QVariantHash &settings) const
 {
     dPvt();
     return p.setSettings(settings);
@@ -250,14 +245,14 @@ void ListenColletions::setSettings(const QVariantHash &settings)const
 ListenQRPC *ListenColletions::listenPool()
 {
     dPvt();
-    QHashIterator<int, Listen*> i(p.listensActive);
+    QHashIterator<int, Listen *> i(p.listensActive);
     while (i.hasNext()) {
         i.next();
-        if(i.value()==nullptr)
+        if (i.value() == nullptr)
             continue;
 
-        auto listen = dynamic_cast<ListenQRPC*>(i.value());
-        if(listen!=nullptr)
+        auto listen = dynamic_cast<ListenQRPC *>(i.value());
+        if (listen != nullptr)
             return listen;
     }
     return nullptr;
@@ -266,12 +261,12 @@ ListenQRPC *ListenColletions::listenPool()
 bool ListenColletions::start()
 {
     dPvt();
-    bool __return=false;
-    if(p.lockRunning.tryLock(1000)){
+    bool __return = false;
+    if (p.lockRunning.tryLock(1000)) {
         p.lockWaitRun.lock();
         QThread::start();
         QMutexLOCKER locker(&p.lockWaitRun);
-        __return=this->isRunning();
+        __return = this->isRunning();
     }
     return __return;
 }
@@ -285,7 +280,8 @@ bool ListenColletions::quit()
 {
     dPvt();
     p.lockWaitQuit.lock();
-    QMutexLOCKER lockerRun(&p.lockWaitRun);//evitar crash antes da inicializacao de todos os listainers
+    QMutexLOCKER lockerRun(
+        &p.lockWaitRun); //evitar crash antes da inicializacao de todos os listainers
     p.listenQuit();
     QThread::quit();
     QMutexLOCKER lockerQuit(&p.lockWaitQuit);
@@ -293,4 +289,4 @@ bool ListenColletions::quit()
     return true;
 }
 
-}
+} // namespace QRpc
