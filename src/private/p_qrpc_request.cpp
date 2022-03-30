@@ -68,7 +68,7 @@ Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir)
 
 
 RequestPvt::RequestPvt(Request *parent):
-    QObject(parent),
+    QObject{parent},
     exchange(parent),
     qrpcHeader(parent),
     qrpcBody(parent),
