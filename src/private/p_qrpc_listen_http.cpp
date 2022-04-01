@@ -268,28 +268,28 @@ public:
         }
 #endif
         if (request.co().isOK() && rpc_url.isValid()) { //se for download
-            if (rpc_url.isLocalFile()) {
-                QHashIterator<QString, QVariant> i(request.responseHeader());
-                while (i.hasNext()) {
-                    i.next();
-                    auto &k = i.key();
-                    auto &v = i.value();
-                    rpc_url.headers().insert(k, v);
-                }
-
-                HttpHeaders headers(rpc_url.headers());
-                if (!headers.contentDisposition().isValid()) {
-                    auto fileName = rpc_url.toLocalFile().split(qsl("/")).last();
-                    rpc_url.headers().insert(QString(ContentDispositionName).toUtf8(),
-                                             qsl("inline; filename=\"%1\"").arg(fileName).toUtf8());
-                    if (!headers.contentType().isValid())
-                        headers.setContentType(rpc_url.url());
-                }
-                request.setResponseHeader(rpc_url.headers());
-            } else {
+            if (!rpc_url.isLocalFile()){
                 ret.redirect(rpc_url.toString().toUtf8());
                 return;
             }
+
+            QHashIterator<QString, QVariant> i(request.responseHeader());
+            while (i.hasNext()) {
+                i.next();
+                auto &k = i.key();
+                auto &v = i.value();
+                rpc_url.headers().insert(k, v);
+            }
+
+            HttpHeaders headers(rpc_url.headers());
+            if (!headers.contentDisposition().isValid()) {
+                auto fileName = rpc_url.toLocalFile().split(qsl("/")).last();
+                rpc_url.headers().insert(QString(ContentDispositionName).toUtf8(),
+                                         qsl("inline; filename=\"%1\"").arg(fileName).toUtf8());
+                if (!headers.contentType().isValid())
+                    headers.setContentType(rpc_url.url());
+            }
+            request.setResponseHeader(rpc_url.headers());
         }
         if (ret.isConnected()) {
             QHashIterator<QString, QVariant> i(request.responseHeader());
