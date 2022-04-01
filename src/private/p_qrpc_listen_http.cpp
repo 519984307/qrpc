@@ -120,7 +120,7 @@ public:
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QHashIterator<QByteArray, QByteArray> i(getHeaders);
 #else
-            QMultiHashIterator<QByteArray, QByteArray> i(getHeaderHash);
+            QMultiHashIterator<QByteArray, QByteArray> i(getHeaders);
 #endif
 
             while (i.hasNext()) {
@@ -136,7 +136,7 @@ public:
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             QHashIterator<QByteArray, QByteArray> i(getParameters);
 #else
-            QMultiHashIterator<QByteArray, QByteArray> i(getParameterHash);
+            QMultiHashIterator<QByteArray, QByteArray> i(getParameters);
 #endif
             while (i.hasNext()) {
                 i.next();
@@ -239,7 +239,7 @@ public:
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                     QHashIterator<QByteArray, QByteArray> i(getHeaders);
 #else
-                    QMultiHashIterator<QByteArray, QByteArray> i(getHeaderHash);
+                    QMultiHashIterator<QByteArray, QByteArray> i(getHeaders);
 #endif
                     while (i.hasNext()) {
                         i.next();
@@ -248,7 +248,12 @@ public:
                 }
 #if Q_RPC_LOG_SUPER_VERBOSE
                 {
-                    QHashIterator<QByteArray, QByteArray> i(getParameterHash);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                    QHashIterator<QByteArray, QByteArray> i(getParameter);
+#else
+                    QHashIterator<QByteArray, QByteArray> i(getParameter);
+#endif
+
                     while (i.hasNext()) {
                         i.next();
                         cWarning() << qbl("   parameter - ") + i.key() + qbl(":") + i.value();
