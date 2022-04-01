@@ -28,12 +28,13 @@ class ListenRequestParserPvt
 {
 public:
     Controller *controller = nullptr;
+    QStringList basePathList;
     explicit ListenRequestParserPvt(QObject *parent = nullptr) { Q_UNUSED(parent) }
 
     virtual ~ListenRequestParserPvt() {}
 };
 
-ListenRequestParser::ListenRequestParser(QObject *parent) : QObject{parent}
+ListenRequestParser::ListenRequestParser(QObject *parent) : QObject{parent}, QRpcPrivate::NotationsExtended{this}
 {
     this->p = new ListenRequestParserPvt(parent);
 }
@@ -42,6 +43,39 @@ ListenRequestParser::~ListenRequestParser()
 {
     dPvt();
     delete &p;
+}
+
+QStringList &ListenRequestParser::basePath() const
+{
+    dPvt();
+    if(!p.basePathList.isEmpty())
+        return p.basePathList;
+
+    auto &notations=this->notation();
+    const auto &notation = notations.find(apiBasePath());
+    QVariantList vList;
+    if(notation.isValid()){
+        auto v = notation.value();
+        switch (qTypeId(v)) {
+        case QMetaType_QStringList:
+        case QMetaType_QVariantList:{
+            vList=v.toList();
+            break;
+        }
+        default:
+            vList<<v;
+        }
+
+        for (auto &row : vList) {
+            auto line = row.toString().trimmed().toLower();
+            if (line.isEmpty())
+                continue;
+            p.basePathList<<line;
+        }
+    }
+    if(p.basePathList.isEmpty())
+        p.basePathList<<QStringList{qsl("/")};
+    return p.basePathList;
 }
 
 Controller &ListenRequestParser::controller()
@@ -113,26 +147,28 @@ void ListenRequestParser::initializeInstalleds(const QMetaObject &metaObject)
     if (staticMetaObjectRoute->contains(className))
         return;
 
-    auto route = parser->basePath();
+    auto routeList = parser->basePath();
 
     QMutexLOCKER locker(staticMetaObjectLock);
-    staticMetaObjectRoute->insert(className, route);
-    for (int methodIndex = 0; methodIndex < metaObject.methodCount(); ++methodIndex) {
-        auto method = metaObject.method(methodIndex);
-        if (method.returnType() != QMetaType_Bool)
-            continue;
+    for(auto&route:routeList){
+        staticMetaObjectRoute->insert(className, route);
+        for (int methodIndex = 0; methodIndex < metaObject.methodCount(); ++methodIndex) {
+            auto method = metaObject.method(methodIndex);
+            if (method.returnType() != QMetaType_Bool)
+                continue;
 
-        if (method.parameterCount() > 0)
-            continue;
+            if (method.parameterCount() > 0)
+                continue;
 
-        if (ignoreNames.contains(method.name()))
-            continue;
+            if (ignoreNames.contains(method.name()))
+                continue;
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-        staticMetaObjectMetaMethod->insert(className, method);
+            staticMetaObjectMetaMethod->insert(className, method);
 #else
-        staticMetaObjectMetaMethod->insertMulti(className, method);
+            staticMetaObjectMetaMethod->insertMulti(className, method);
 #endif
+        }
     }
 }
 

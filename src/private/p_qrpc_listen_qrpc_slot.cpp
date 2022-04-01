@@ -1,5 +1,6 @@
 #include "./p_qrpc_listen_qrpc_slot.h"
 #include "../qrpc_controller.h"
+#include "../qrpc_request.h"
 #include "../qrpc_controller_router.h"
 #include "../qrpc_listen_request.h"
 #include "../qrpc_listen_request_parser.h"
@@ -23,6 +24,7 @@ public:
     QList<const QMetaObject *> listenControllers;
     QList<const QMetaObject *> listenQRPCParserRequest;
     ControllerMethodCollection controllerMethods;
+    MultStringList controllerRedirect;
 
     explicit ListenQRPCSlotPvt(ListenQRPCSlot *slot, ListenQRPC *listenQRPC) : QObject(slot)
     {
@@ -34,11 +36,35 @@ public:
         this->listenControllers = listenQRPC->controllers().values();
         this->listenQRPCParserRequest = listenQRPC->controllerParsers().values();
         this->controllerMethods=listenQRPC->controllerMethods();
+        this->controllerRedirect=listenQRPC->controllerRedirect();
         this->controllerRouter = ControllerRouter::newRouter(this);
     }
 
     virtual ~ListenQRPCSlotPvt() {}
 
+    bool canRedirectCheckBasePath(const QByteArray &className, const QByteArray &basePath)
+    {
+        const auto classNameA = className.toLower();
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        QHashIterator<QByteArray, QStringList> i(this->controllerRedirect);
+#else
+        QMultiHashIterator<QByteArray, QStringList> i(this->controllerRedirect);
+#endif
+        while (i.hasNext()) {
+            i.next();
+            const auto classNameB = i.key().toLower();
+            const auto &vList = i.value();
+
+            if (!className.isEmpty() && (classNameB != classNameA))
+                continue;
+
+            if (!Request::startsWith(basePath, vList))
+                continue;
+
+            return true;
+        }
+        return false;
+    }
 
     bool invokeSecurity(Controller *controller, QMetaMethod &metaMethod)
     {
@@ -145,14 +171,14 @@ public:
         QList<const QMetaObject *> __return;
         for (auto &mObjController : this->listenControllers) {
             auto className = QByteArray(mObjController->className()).toLower();
-            auto routeMethods = this->controllerMethods.value(className);
-            if (routeMethods.contains(requestPath)){
+
+            if (canRedirectCheckBasePath(className, requestPath)){
                 __return<<mObjController;
                 continue;
             }
 
-            auto routeRedirect = Controller::redirectCheckBasePath(className, requestPath);
-            if (routeRedirect){
+            auto routeMethods = this->controllerMethods.value(className);
+            if (routeMethods.contains(requestPath)){
                 __return<<mObjController;
                 continue;
             }
@@ -185,11 +211,7 @@ public:
         for (auto &mObjController : listenControllers) {
             auto className = QByteArray(mObjController->className()).toLower();
             auto routeMethods = this->controllerMethods.value(className);
-            if (!routeMethods.contains(requestPath)) {
-                auto routeRedirect = Controller::redirectCheckBasePath(className, requestPath);
-                if (!routeRedirect)
-                    continue;
-            }
+
             auto object = mObjController->newInstance(Q_ARG(QObject*, parentController));
 
             if (object == nullptr)
@@ -202,14 +224,9 @@ public:
             }
 
             outMetaMethod = routeMethods.value(requestPath);
-            if (!outController->redirectMethod(className, requestPath, outMetaMethod)) {
-#if Q_RPC_LOG_VERBOSE
-                sWarning() << qsl("redirectMethod:: fail");
-#endif
-                if (request.co().isOK())
-                    request.co().setNotFound();
-                return {};
-            }
+
+            if(!outMetaMethod.isValid())
+                outController->requestRedirect(outMetaMethod);
 
             if (!outMetaMethod.isValid()) {
 #if Q_RPC_LOG
@@ -254,14 +271,14 @@ public:
             return {};
         }
 
-        if (controller->requestRedirect()) {
-#if Q_RPC_LOG_VERBOSE
-            sWarning() << qsl("requestRedirect:: fail");
-#endif
-            if (controller->rq().co().isOK())
-                controller->rq().co().setInternalServerError();
-            return {};
-        }
+//        if (controller->requestRedirect()) {
+//#if Q_RPC_LOG_VERBOSE
+//            sWarning() << qsl("requestRedirect:: fail");
+//#endif
+//            if (controller->rq().co().isOK())
+//                controller->rq().co().setInternalServerError();
+//            return {};
+//        }
 
         if (!controller->canOperation(metaMethod)) {
 #if Q_RPC_LOG_VERBOSE

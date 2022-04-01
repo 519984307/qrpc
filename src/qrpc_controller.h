@@ -61,34 +61,7 @@ public:
     //! \brief redirectCheck
     //! \return
     //!
-
     virtual bool redirectCheck() const;
-
-    //!
-    //! \brief redirectCheckClass
-    //! \param className
-    //! \return
-    //!
-    static bool redirectCheckClass(const QByteArray &className);
-
-    //!
-    //! \brief redirectCheckBasePath
-    //! \param className
-    //! \param basePath
-    //! \return
-    //!
-    static bool redirectCheckBasePath(const QByteArray &className, const QByteArray &basePath);
-
-    //!
-    //! \brief redirectMethod
-    //! \param className
-    //! \param routePath
-    //! \param method
-    //! \return
-    //!
-    virtual bool redirectMethod(const QByteArray &className,
-                                const QByteArray &path,
-                                QMetaMethod &method);
 
     //!
     //! \brief description
@@ -187,7 +160,14 @@ public:
     //! \brief requestRedirect
     //! \return
     //!
-    virtual bool requestRedirect();
+    Q_INVOKABLE virtual bool requestRedirect();
+
+    //!
+    //! \brief requestRedirect
+    //! \param outMethod
+    //! \return
+    //!
+    virtual bool requestRedirect(QMetaMethod&outMethod);
 
     //!
     //! \brief requestAfterInvoke

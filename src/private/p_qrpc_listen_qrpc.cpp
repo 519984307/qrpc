@@ -332,6 +332,12 @@ ControllerMethodCollection &ListenQRPC::controllerMethods()
     return p.controllerMethods;
 }
 
+MultStringList &ListenQRPC::controllerRedirect()
+{
+    dPvt();
+    return p.controllerRedirect;
+}
+
 void ListenQRPC::registerListen(Listen *listen)
 {
     dPvt();

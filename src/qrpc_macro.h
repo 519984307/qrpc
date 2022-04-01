@@ -198,14 +198,6 @@
         return {}; \
     }
 
-#define QRPC_REDIRECT_VIRIFY() \
-public: \
-    virtual bool redirectCheck() const override { return true; }
-
-#define QRPC_REDIRECT_NO_VERIFY() \
-public: \
-    virtual bool redirectCheck() const override { return false; }
-
 #define QRPC_CONTROLLER_AUTO_REGISTER(ClassName) \
     static auto ClassName##ApiInstalled = QRpc::Controller::install(ClassName::staticMetaObject);
 
@@ -215,21 +207,6 @@ public: \
 
 #define QRPC_LISTTEN_AUTO_REGISTER(Type, Listen) \
     static const auto &Listen##Type##_MetaObject = QRpc::Listen::install(Type, Listen::staticMetaObject);
-
-#define QRPC_PARSER_DECLARE_BASE_PATH(Controller, v1) \
-public: \
-    Q_INVOKABLE virtual QByteArray basePath() const \
-    { \
-        return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral("")); \
-    }
-
-#define QRPC_PARSER_DECLARE_ROUTE(Controller, v1) \
-    QRPC_PARSER_DECLARE_BASE_PATH(Controller, v1) \
-    QT_DEPRECATED_X("Use basePath;") \
-    Q_INVOKABLE virtual QByteArray route() const \
-    { \
-        return QByteArray(v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral("")); \
-    }
 
 #define Q_RPC_DECLARE_INTERFACE_METHOD_CHECK() \
 public: \

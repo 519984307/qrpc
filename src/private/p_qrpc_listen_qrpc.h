@@ -53,6 +53,12 @@ public:
     //! \return
     //!
     ControllerMethodCollection &controllerMethods();
+
+    //!
+    //! \brief controllerRedirect
+    //! \return
+    //!
+    MultStringList &controllerRedirect();
 protected:
     //!
     //! \brief registerListen

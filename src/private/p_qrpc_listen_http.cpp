@@ -110,22 +110,22 @@ public:
         Q_UNUSED(ret)
         const auto time_start = QDateTime::currentDateTime();
 
-        const auto getHeaderHash = req.getHeaderMap();
-        const auto getParameterHash = req.getParameterMap();
+        const auto getHeaders = req.getHeaderMap();
+        const auto getParameters = req.getParameterMap();
 
-        QVariantHash requestHeaderMap;
-        QVariantHash requestParameterMap;
+        QVariantHash requestHeaders;
+        QVariantHash requestParameters;
 
         {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            QHashIterator<QByteArray, QByteArray> i(getHeaderHash);
+            QHashIterator<QByteArray, QByteArray> i(getHeaders);
 #else
             QMultiHashIterator<QByteArray, QByteArray> i(getHeaderHash);
 #endif
 
             while (i.hasNext()) {
                 i.next();
-                requestHeaderMap[i.key()] = i.value();
+                requestHeaders[i.key()] = i.value();
 #if Q_RPC_LOG_SUPER_VERBOSE
                 sInfo() << "   header - " + i.key() + ":" + i.value();
 #endif
@@ -134,13 +134,13 @@ public:
 
         {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            QHashIterator<QByteArray, QByteArray> i(getParameterHash);
+            QHashIterator<QByteArray, QByteArray> i(getParameters);
 #else
             QMultiHashIterator<QByteArray, QByteArray> i(getParameterHash);
 #endif
             while (i.hasNext()) {
                 i.next();
-                requestParameterMap[i.key()] = i.value();
+                requestParameters[i.key()] = i.value();
 #if Q_RPC_LOG_SUPER_VERBOSE
                 sInfo() << "   parameter - " + i.key() + ":" + i.value();
 #endif
@@ -161,8 +161,8 @@ public:
 
         request.setRequestProtocol(QRpc::Http);
         request.setRequestPath(requestPath.toUtf8());
-        request.setRequestHeader(requestHeaderMap);
-        request.setRequestParameter(requestParameterMap);
+        request.setRequestHeader(requestHeaders);
+        request.setRequestParameter(requestParameters);
         request.setRequestMethod(requestMethod);
         request.setRequestBody(requestBody);
 
@@ -185,29 +185,38 @@ public:
         const auto responseCode = request.responseCode();
         const auto responsePhrase = QString::fromUtf8(request.responsePhrase());
 
-        QByteArray body;
 
         static const auto staticUrlNames = QVector<int>{QMetaType_QUrl,
                                                         QMetaType_QVariantMap,
+                                                        QMetaType_QVariantHash,
                                                         QMetaType_QString,
                                                         QMetaType_QByteArray,
                                                         QMetaType_QChar,
                                                         QMetaType_QBitArray};
-        const auto &responseBody = request.responseBody();
         Url rpc_url;
-        if (!staticUrlNames.contains(qTypeId(responseBody)))
-            body = request.responseBodyBytes();
-        else if (!rpc_url.read(responseBody).isValid())
-            body = request.responseBodyBytes();
-        else if (rpc_url.isLocalFile()) {
+
+        auto getBody=[&request, &rpc_url]()
+        {
+            const auto &responseBody = request.responseBody();
+            if (!staticUrlNames.contains(qTypeId(responseBody)))
+                return request.responseBodyBytes();
+
+            if (!rpc_url.read(responseBody).isValid())
+                return request.responseBodyBytes();
+
+            if (!rpc_url.isLocalFile())
+                return QByteArray();
+
             QFile file(rpc_url.toLocalFile());
             if (!file.open(file.ReadOnly)) {
                 request.co().setNotFound();
-            } else {
-                body = file.readAll();
-                file.close();
+                return QByteArray();
             }
-        }
+            auto body = file.readAll();
+            file.close();
+            return body;
+        };
+        auto body=getBody();
 
 #if Q_RPC_LOG
 
@@ -228,7 +237,7 @@ public:
             {
                 {
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-                    QHashIterator<QByteArray, QByteArray> i(getHeaderHash);
+                    QHashIterator<QByteArray, QByteArray> i(getHeaders);
 #else
                     QMultiHashIterator<QByteArray, QByteArray> i(getHeaderHash);
 #endif

@@ -11,10 +11,9 @@ namespace QRpc {
 //!
 //! \brief The ListenRequestParser class
 //!
-class Q_RPC_EXPORT ListenRequestParser : public QObject
+class Q_RPC_EXPORT ListenRequestParser : public QObject, public QRpcPrivate::NotationsExtended
 {
     Q_OBJECT
-    QRPC_PARSER_DECLARE_BASE_PATH(ListenRequestParser, "/")
     friend class ListenQRPCSlotPvt;
 
 public:
@@ -28,6 +27,9 @@ public:
     //! \brief ~ListenRequestParser
     //!
     ~ListenRequestParser();
+
+
+    virtual QStringList &basePath() const;
 
     //!
     //! \brief controller

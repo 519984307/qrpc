@@ -13,18 +13,12 @@
 
 namespace QRpc {
 
-
-
-
 typedef QMultiHash<QByteArray, QRpc::MethodsMultHash> MultStringMethod;
-typedef QHash<QByteArray, QVariantHash> NotationMaked;
 
 #define dPvt() auto &p = *reinterpret_cast<ControllerPvt *>(this->p)
 
-Q_GLOBAL_STATIC(MultStringList, staticControllerRedirect);
 Q_GLOBAL_STATIC(MetaObjectVector, staticInstalled);
 Q_GLOBAL_STATIC(MetaObjectVector, staticParserInstalled);
-
 
 static void initBasePathParser()
 {
@@ -48,6 +42,8 @@ public:
     ControllerSetting setting;
     bool enabled = true;
 
+    ListenRequest ____static_request;
+
     explicit ControllerPvt() {}
 
     virtual ~ControllerPvt() {}
@@ -70,8 +66,8 @@ QStringList &Controller::basePath() const
     if(!p.basePathList.isEmpty())
         return p.basePathList;
 
-    auto&notations=this->notation();
-    const auto&notation=notations.find(apiBasePath());
+    auto &notations=this->notation();
+    const auto &notation = notations.find(apiBasePath());
     QVariantList vList;
     if(notation.isValid()){
         auto v = notation.value();
@@ -99,8 +95,8 @@ QStringList &Controller::basePath() const
 
 QString Controller::module() const
 {
-    auto&notations=this->notation();
-    const auto&notation=notations.find(apiModule());
+    auto &notations=this->notation();
+    const auto &notation = notations.find(apiModule());
     if(notation.isValid())
         return notation.value().toString();
     return {};
@@ -113,54 +109,17 @@ QUuid Controller::moduleUuid() const
 
 bool Controller::redirectCheck() const
 {
-    return false;
-}
-
-bool Controller::redirectCheckClass(const QByteArray &className)
-{
-    if (staticControllerRedirect->contains(className.toLower()))
+    auto &notations=this->notation();
+    const auto &notation = notations.find(apiRedirect);
+    if(notation.isValid())
         return true;
-    return false;
-}
-
-bool Controller::redirectCheckBasePath(const QByteArray &className, const QByteArray &basePath)
-{
-    const auto classNameA = className.toLower();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QHashIterator<QByteArray, QStringList> i(*staticControllerRedirect);
-#else
-    QMultiHashIterator<QByteArray, QStringList> i(staticControllerRedirect);
-#endif
-    while (i.hasNext()) {
-        i.next();
-        const auto classNameB = i.key().toLower();
-        const auto &vList = i.value();
-
-        if (!className.isEmpty() && (classNameB != classNameA))
-            continue;
-
-        if (!Request::startsWith(basePath, vList))
-            continue;
-
-        return true;
-    }
-    return false;
-}
-
-bool Controller::redirectMethod(const QByteArray &className,
-                                const QByteArray &path,
-                                QMetaMethod &method)
-{
-    Q_UNUSED(className)
-    Q_UNUSED(path)
-    Q_UNUSED(method)
-    return true;
+    return {};
 }
 
 QString Controller::description() const
 {
     const auto &notations = this->notation();
-    const auto&notation=notations.find(apiDescription());
+    const auto &notation = notations.find(apiDescription());
 
     if(!notation.isValid())
         return notation.value().toString();
@@ -195,8 +154,7 @@ ListenRequest &Controller::request()
 ListenRequest &Controller::rq()
 {
     dPvt();
-    static ListenRequest ____request;
-    return (p.request == nullptr) ? (____request) : (*p.request);
+    return (p.request == nullptr) ? (p.____static_request) : (*p.request);
 }
 
 bool Controller::requestSettings()
@@ -358,6 +316,36 @@ bool Controller::requestBeforeInvoke()
 bool Controller::requestRedirect()
 {
     return false;
+}
+
+bool Controller::requestRedirect(QMetaMethod &outMethod)
+{
+    if(!this->redirectCheck())
+        return false;
+
+    static QMetaMethod staticRedirectMethod;
+    static const auto methodName=QByteArray(__func__).trimmed();
+
+    if(!staticRedirectMethod.isValid()){
+        auto&metaObject = *this->metaObject();
+        for(int col = 0; col < metaObject.methodCount(); ++col) {
+            auto method = metaObject.method(col);
+
+            if(method.methodType()!=method.Method)
+                continue;
+
+            if(method.parameterCount()>0)
+                continue;
+
+            if(method.name()!=methodName)
+                continue;
+
+            staticRedirectMethod=method;
+            break;
+        }
+    }
+    outMethod=staticRedirectMethod;
+    return outMethod.isValid();
 }
 
 bool Controller::requestAfterInvoke()

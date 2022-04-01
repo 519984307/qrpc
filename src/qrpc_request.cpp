@@ -16,14 +16,27 @@ Request::~Request()
 
 bool Request::startsWith(const QString &requestPath, const QVariant &requestPathBase)
 {
-    auto list=requestPathBase.toStringList();
-    for(auto&requestPathBase:list){
-        auto startWith=requestPathBase.contains(qsl("*"));
+    QStringList paths;
+
+    switch (qTypeId(requestPathBase)){
+    case QMetaType_QStringList:
+    case QMetaType_QVariantList:
+    {
+        for(auto&v:requestPathBase.toList())
+            paths<<v.toString().trimmed();
+        break;
+    }
+    default:
+        paths<<requestPathBase.toString().trimmed();
+    }
+
+    for(auto&pathItem:paths){
+        auto startWith=pathItem.contains(qsl("*"));
         if(startWith){
-            requestPathBase=requestPathBase.split(qsl("*")).first();
+            pathItem=pathItem.split(qsl("*")).first();
         }
 
-        auto route=qsl("/%1/").arg(requestPathBase.trimmed().toLower());
+        auto route=qsl("/%1/").arg(pathItem.trimmed().toLower());
         auto path=qsl("/%1/").arg(requestPath.trimmed().toLower());
 
         while(route.contains(qsl("//")))
@@ -55,7 +68,10 @@ bool Request::isEqual(const QString &requestPath)
 
 bool Request::isEqual(const QString &requestPath, const QVariant &requestPathBase)
 {
-    return Request::startsWith(requestPath,requestPathBase);
+    if(!Request::startsWith(requestPath, requestPathBase))
+        return false;
+
+    return true;
 }
 
 bool Request::canRequest() const

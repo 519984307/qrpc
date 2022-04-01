@@ -50,6 +50,11 @@ public:
     Q_NOTATION_DECLARE_FUNC(apiModule, Information)
 
     //!
+    //! \brief apiRedirect
+    //!
+    Q_NOTATION_DECLARE(apiRedirect, Information)
+
+    //!
     //! \brief apiBasePath
     //!
     Q_NOTATION_DECLARE_FUNC(apiBasePath, Information)
