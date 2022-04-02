@@ -126,7 +126,10 @@ public:
     //!
     Q_NOTATION_DECLARE(rqSecurityIgnore, Security)
 
-
+    //!
+    //! \brief apiRedirect
+    //!
+    Q_NOTATION_DECLARE(rqRedirect, Operation)
 private:
 
 };
