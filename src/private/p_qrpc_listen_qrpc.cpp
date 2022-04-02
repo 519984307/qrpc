@@ -126,16 +126,20 @@ public:
         if (controller == nullptr)
             return;
 
-        if (controller->redirectCheck())
+        auto controllerIsRedirect=controller->notation().contains(controller->apiRedirect);
+        if (controllerIsRedirect)
             controllerRedirect.insert(className, controller->basePath());
+
+
 
 #if Q_RPC_LOG_SUPER_VERBOSE
         sWarning() << "registered class : " << makeObject->metaObject()->className();
 #endif
 
+        static auto nottionExcludeMethod=QVariantList{controller->rqRedirect, controller->rqExcludePath};
         const auto &methodBlackList = *staticControllerMethodBlackList;
-        const auto &vList = controller->basePath();
-        if (vList.isEmpty())
+        const auto &vBasePathList = controller->basePath();
+        if (vBasePathList.isEmpty())
             return;
 
         for (auto i = 0; i < metaObject->methodCount(); ++i) {
@@ -163,7 +167,12 @@ public:
             if (methodName.startsWith(qbl("_"))) //ignore methods with [_] in start name
                 continue;
 
-            for (auto &v : vList) {
+            const auto&notations=controller->notation(method);
+
+            if(notations.contains(nottionExcludeMethod))
+                continue;
+
+            for (auto &v : vBasePathList) {
                 auto path = basePathParser(v, methodName);
                 if (methodList.contains(path))
                     continue;

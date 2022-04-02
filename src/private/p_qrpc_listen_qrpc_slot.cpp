@@ -66,6 +66,42 @@ public:
         return false;
     }
 
+    bool invokeRequestRedirect(Controller*controller, QMetaMethod &outMethod)
+    {
+        auto redirectCheck=[controller]()
+        {
+            auto &notations=controller->notation();
+            const auto &notation = notations.find(controller->apiRedirect);
+            if(notation.isValid())
+                return true;
+            return false;
+        };
+
+        if(!redirectCheck())
+            return {};
+
+        outMethod={};
+        auto&metaObject = *controller->metaObject();
+        for(int col = 0; col < metaObject.methodCount(); ++col) {
+            auto method = metaObject.method(col);
+
+            if(method.methodType()!=method.Method)
+                continue;
+
+            if(method.parameterCount()>0)
+                continue;
+
+            auto &notations=controller->notation(method);
+
+            if(!notations.contains(controller->rqRedirect))
+                continue;
+
+            outMethod=method;
+            break;
+        }
+        return outMethod.isValid();
+    }
+
     bool invokeSecurity(Controller *controller, QMetaMethod &metaMethod)
     {
         if (controller == nullptr) {
@@ -166,9 +202,9 @@ public:
         return true;
     }
 
-    QList<const QMetaObject *> invokeControllers(const QByteArray &requestPath)
+    QVector<const QMetaObject *> invokeControllers(const QByteArray &requestPath)
     {
-        QList<const QMetaObject *> __return;
+        QVector<const QMetaObject *> __return;
         for (auto &mObjController : this->listenControllers) {
             auto className = QByteArray(mObjController->className()).toLower();
 
@@ -207,6 +243,13 @@ public:
 
         const auto requestPath = request.requestPath().toLower();
 
+        auto returnOK=[&outController, &request, this](){
+            outController->setRequest(request);
+            outController->setServer(this->listenQRPC->server());
+            request.co().setOK();
+            return true;
+        };
+
         auto listenControllers=invokeControllers(requestPath);
         for (auto &mObjController : listenControllers) {
             auto className = QByteArray(mObjController->className()).toLower();
@@ -223,28 +266,21 @@ public:
                 continue;
             }
 
+            if(invokeRequestRedirect(outController, outMetaMethod) && outMetaMethod.isValid())
+                return returnOK();
+
             outMetaMethod = routeMethods.value(requestPath);
 
-            if(!outMetaMethod.isValid())
-                outController->requestRedirect(outMetaMethod);
+            if (!outMetaMethod.isValid())
+                continue;
 
-            if (!outMetaMethod.isValid()) {
+            return returnOK();
+        }
 #if Q_RPC_LOG
                 sWarning() << qsl("QMetaMethod is not valid:: fail");
 #endif
-                if (request.co().isOK())
-                    request.co().setNotFound();
-                return {};
-            }
-
-            outController->setRequest(request);
-            outController->setServer(this->listenQRPC->server());
-
-            request.co().setOK();
-
-            return true;
-        }
-
+        if (request.co().isOK())
+            request.co().setNotFound();
         return {};
     }
 

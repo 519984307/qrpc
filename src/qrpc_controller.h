@@ -58,12 +58,6 @@ public:
     virtual QUuid moduleUuid() const;
 
     //!
-    //! \brief redirectCheck
-    //! \return
-    //!
-    virtual bool redirectCheck() const;
-
-    //!
     //! \brief description
     //! \return
     //!
@@ -155,19 +149,6 @@ public:
     //! \return
     //!
     virtual bool requestBeforeInvoke();
-
-    //!
-    //! \brief requestRedirect
-    //! \return
-    //!
-    Q_INVOKABLE virtual bool requestRedirect();
-
-    //!
-    //! \brief requestRedirect
-    //! \param outMethod
-    //! \return
-    //!
-    virtual bool requestRedirect(QMetaMethod&outMethod);
 
     //!
     //! \brief requestAfterInvoke
