@@ -93,12 +93,18 @@ public:
 
     bool v_load(const QVariant &v)
     {
-        auto typeId = qTypeId(v);
-        if (QMetaTypeUtilVariantList.contains(typeId))
+        switch (qTypeId(v)){
+        case QMetaType_QVariantList:
+        case QMetaType_QStringList:
             return this->load(v.toStringList());
-        if (QMetaTypeUtilVariantDictionary.contains(typeId))
+        case QMetaType_QVariantHash:
+        case QMetaType_QVariantMap:
             return this->load(v.toHash());
-        return this->load(v.toString());
+        default:
+            if(v.toString().trimmed().isEmpty())
+                return this->load(QStringLiteral("qrc:/settings.json"));
+            return this->load(v.toString());
+        }
     }
 
     bool load(const QStringList &settingsFileName)
