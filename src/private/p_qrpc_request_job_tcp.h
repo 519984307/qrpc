@@ -25,11 +25,11 @@ public:
 
 private slots:
 
-    void onConnected();;
+    void onConnected();
 
-    void onClosed();;
+    void onClosed();
 
-    void onReplyError(QAbstractSocket::SocketError e);;
+    void onReplyError(QAbstractSocket::SocketError e);
 
 //    void onReplyTimeout(){
 //        response->response_qt_status_code=QNetworkReply::TimeoutError;

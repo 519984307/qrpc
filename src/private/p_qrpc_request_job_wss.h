@@ -31,20 +31,20 @@ public:
 
 private slots:
 
-    void onConnected();;
+    void onConnected();
 
-    void onClosed();;
+    void onClosed();
 
-    void onReplyError(QAbstractSocket::SocketError e);;
+    void onReplyError(QAbstractSocket::SocketError e);
 
-    void onBinaryMessageReceived(const QByteArray &message);;
+    void onBinaryMessageReceived(const QByteArray &message);
 
 
-    void onReplyTimeout();;
+    void onReplyTimeout();
 
     void onReplyPong(quint64 elapsedTime, const QByteArray &payload);
 
-    void onReplyReadFinished();;
+    void onReplyReadFinished();
 
     void onFinish();
 

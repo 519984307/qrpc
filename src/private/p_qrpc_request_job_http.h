@@ -44,12 +44,12 @@ public:
 
 private slots:
 
-    void onReplyError(QNetworkReply::NetworkError e);;
+    void onReplyError(QNetworkReply::NetworkError e);
 
-    void onReplyFinish();;
-    void onReplyTimeout();;
+    void onReplyFinish();
+    void onReplyTimeout();
 
-    void onReplyDelete();;
+    void onReplyDelete();
 
     void onReplyProgressUpload(qint64 bytesSent, qint64 bytesTotal);
 

@@ -373,7 +373,7 @@ void RequestJobHttp::onFinish()
         if(response->response_status_code!=QNetworkReply::TimeoutError){
             response->response_qt_status_code = localReply->error();
             response->response_body = localReply->readAll();
-            response->response_status_code = localReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();;
+            response->response_status_code = localReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
             response->response_status_reason_phrase = localReply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toByteArray();
             if(response->response_qt_status_code==QNetworkReply::ConnectionRefusedError)
                 response->response_status_code=502;

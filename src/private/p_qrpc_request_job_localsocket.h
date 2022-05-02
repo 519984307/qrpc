@@ -27,9 +27,9 @@ public:
 
 private slots:
 
-    void onConnected();;
+    void onConnected();
 
-    void onReplyError(QAbstractSocket::SocketError e);;
+    void onReplyError(QAbstractSocket::SocketError e);
 
     void onFinish();
 };
