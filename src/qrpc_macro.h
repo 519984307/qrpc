@@ -5,86 +5,50 @@
 #include <QThread>
 
 #define QRPC_METHOD_CHECK_GET() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!this->rq().canMethodGet()) { \
+    if (!this->rq().canMethodGet()) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
 
 #define QRPC_METHOD_CHECK_HEADER() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!this->rq().canMethodHead()) { \
+    if (!this->rq().canMethodHead()) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
 
 #define QRPC_METHOD_CHECK_POST() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!this->rq().canMethodPost()) { \
+    if (!this->rq().canMethodPost()) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
 
 #define QRPC_METHOD_CHECK_PUT() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!this->rq().canMethodPut()) { \
+    if (!this->rq().canMethodPut()) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
 
 #define QRPC_METHOD_CHECK_UPLOAD() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!this->rq().isMethodUpload()) { \
+    if (!this->rq().isMethodUpload()) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
 
-#define QRPC_METHOD_CHECK_CRUD(vCRUDBody) \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!(this->rq().isMethodGet() || this->rq().isMethodPost() || this->rq().isMethodPut() \
-                 || this->rq().isMethodDelete())) { \
-        this->rq().co().setBadGateway(); \
-        return {}; \
-    } \
-    QVariantHash QRPC_V_CRUD({{QStringLiteral("method"), this->rq().requestMethod()}, \
-                              {QStringLiteral("source"), this->rq().requestParamHash()}});
-
 #define QRPC_METHOD_CHECK_POST_PUT() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!(this->rq().canMethodPost() || this->rq().canMethodPut())) { \
+    if (!(this->rq().canMethodPost() || this->rq().canMethodPut())) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
 
 #define QRPC_METHOD_CHECK_POST_PUT_GET() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!(this->rq().canMethodPost() || this->rq().canMethodPut() \
+    if (!(this->rq().canMethodPost() || this->rq().canMethodPut() \
                  || this->rq().canMethodGet())) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
 
 #define QRPC_METHOD_CHECK_DELETE() \
-    if (this->rq().isMethodOptions()) { \
-        this->rq().co().setOK(); \
-        return {}; \
-    } else if (!this->rq().canMethodDelete()) { \
+    if (!this->rq().canMethodDelete()) { \
         this->rq().co().setNotFound(); \
         return {}; \
     }
@@ -117,7 +81,7 @@
         return {}; \
     }
 
-#define QRPC_V_CRUD vCRUDBody
+#define QRPC_V_CRUD QVariantHash({{qsl("method"), this->rq().requestMethod()}, {qsl("source"), this->rq().requestParamHash()}})
 
 #define QRPC_V_SET_METHOD(v) auto v = this->rq().requestMethod()
 
