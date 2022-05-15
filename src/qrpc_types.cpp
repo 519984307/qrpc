@@ -201,25 +201,25 @@ const QHash<int, QString> &___QSslProtocolToName()
     {
 #if QT_VERSION <= QT_VERSION_CHECK(5, 15, 0)
         {QSsl::SslProtocol::SslV3, QT_STRINGIFY2(SslV3)},
-            {QSsl::SslProtocol::SslV2, QT_STRINGIFY2(SslV2)},
-            {QSsl::SslProtocol::TlsV1SslV3, QT_STRINGIFY2(TlsV1SslV3)},
+        {QSsl::SslProtocol::SslV2, QT_STRINGIFY2(SslV2)},
+        {QSsl::SslProtocol::TlsV1SslV3, QT_STRINGIFY2(TlsV1SslV3)},
+        {QSsl::SslProtocol::TlsV1_0, QT_STRINGIFY2(TlsV1_0)},
+        {QSsl::SslProtocol::TlsV1_1, QT_STRINGIFY2(TlsV1_1)},
+        {QSsl::SslProtocol::TlsV1_2, QT_STRINGIFY2(TlsV1_2)},
+        {QSsl::SslProtocol::TlsV1_3, QT_STRINGIFY2(TlsV1_3)},
+        {QSsl::SslProtocol::TlsV1_0OrLater, QT_STRINGIFY2(TlsV1_0OrLater)},
+        {QSsl::SslProtocol::TlsV1_1OrLater, QT_STRINGIFY2(TlsV1_1OrLater)},
+        {QSsl::SslProtocol::DtlsV1_0, QT_STRINGIFY2(DtlsV1_0)},
+        {QSsl::SslProtocol::DtlsV1_0OrLater, QT_STRINGIFY2(DtlsV1_0OrLater)},
 #endif
-            {QSsl::SslProtocol::TlsV1_0, QT_STRINGIFY2(TlsV1_0)},
-            {QSsl::SslProtocol::TlsV1_1, QT_STRINGIFY2(TlsV1_1)},
             {QSsl::SslProtocol::TlsV1_2, QT_STRINGIFY2(TlsV1_2)},
+            {QSsl::SslProtocol::TlsV1_3, QT_STRINGIFY2(TlsV1_3)},
             {QSsl::SslProtocol::AnyProtocol, QT_STRINGIFY2(AnyProtocol)},
             {QSsl::SslProtocol::SecureProtocols, QT_STRINGIFY2(SecureProtocols)},
-            {QSsl::SslProtocol::TlsV1_0OrLater, QT_STRINGIFY2(TlsV1_0OrLater)},
-            {QSsl::SslProtocol::TlsV1_1OrLater, QT_STRINGIFY2(TlsV1_1OrLater)},
             {QSsl::SslProtocol::TlsV1_2OrLater, QT_STRINGIFY2(TlsV1_2OrLater)},
-            {QSsl::SslProtocol::DtlsV1_0, QT_STRINGIFY2(DtlsV1_0)},
-            {QSsl::SslProtocol::DtlsV1_0OrLater, QT_STRINGIFY2(DtlsV1_0OrLater)},
             {QSsl::SslProtocol::DtlsV1_2, QT_STRINGIFY2(DtlsV1_2)},
             {QSsl::SslProtocol::DtlsV1_2OrLater, QT_STRINGIFY2(DtlsV1_2OrLater)},
-            {QSsl::SslProtocol::TlsV1_3, QT_STRINGIFY2(TlsV1_3)},
-        {
-            QSsl::SslProtocol::TlsV1_3OrLater, QT_STRINGIFY2(TlsV1_3OrLater)
-        }
+            {QSsl::SslProtocol::TlsV1_3OrLater, QT_STRINGIFY2(TlsV1_3OrLater)}
     };
     return r;
 }
@@ -232,17 +232,17 @@ const QHash<QString, QSsl::SslProtocol> &___QSslProtocolNameToProtocol()
         {QString(QT_STRINGIFY2(SslV3)).toLower(), QSsl::SslProtocol::SslV3},
             {QString(QT_STRINGIFY2(SslV2)).toLower(), QSsl::SslProtocol::SslV2},
             {QString(QT_STRINGIFY2(TlsV1SslV3)).toLower(), QSsl::SslProtocol::TlsV1SslV3},
-#endif
             {QString(QT_STRINGIFY2(TlsV1_0)).toLower(), QSsl::SslProtocol::TlsV1_0},
             {QString(QT_STRINGIFY2(TlsV1_1)).toLower(), QSsl::SslProtocol::TlsV1_1},
+            {QString(QT_STRINGIFY2(TlsV1_0OrLater)).toLower(), QSsl::SslProtocol::TlsV1_0OrLater},
+            {QString(QT_STRINGIFY2(TlsV1_1OrLater)).toLower(), QSsl::SslProtocol::TlsV1_1OrLater},
+            {QString(QT_STRINGIFY2(DtlsV1_0)).toLower(), QSsl::SslProtocol::DtlsV1_0},
+            {QString(QT_STRINGIFY2(DtlsV1_0OrLater)).toLower(), QSsl::SslProtocol::DtlsV1_0OrLater},
+#endif
             {QString(QT_STRINGIFY2(TlsV1_2)).toLower(), QSsl::SslProtocol::TlsV1_2},
             {QString(QT_STRINGIFY2(AnyProtocol)).toLower(), QSsl::SslProtocol::AnyProtocol},
             {QString(QT_STRINGIFY2(SecureProtocols)).toLower(), QSsl::SslProtocol::SecureProtocols},
-            {QString(QT_STRINGIFY2(TlsV1_0OrLater)).toLower(), QSsl::SslProtocol::TlsV1_0OrLater},
-            {QString(QT_STRINGIFY2(TlsV1_1OrLater)).toLower(), QSsl::SslProtocol::TlsV1_1OrLater},
             {QString(QT_STRINGIFY2(TlsV1_2OrLater)).toLower(), QSsl::SslProtocol::TlsV1_2OrLater},
-            {QString(QT_STRINGIFY2(DtlsV1_0)).toLower(), QSsl::SslProtocol::DtlsV1_0},
-            {QString(QT_STRINGIFY2(DtlsV1_0OrLater)).toLower(), QSsl::SslProtocol::DtlsV1_0OrLater},
             {QString(QT_STRINGIFY2(DtlsV1_2)).toLower(), QSsl::SslProtocol::DtlsV1_2},
             {QString(QT_STRINGIFY2(DtlsV1_2OrLater)).toLower(), QSsl::SslProtocol::DtlsV1_2OrLater},
             {QString(QT_STRINGIFY2(TlsV1_3)).toLower(), QSsl::SslProtocol::TlsV1_3},
