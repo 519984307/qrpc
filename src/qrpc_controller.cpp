@@ -242,6 +242,9 @@ bool Controller::canOperation(const QMetaMethod &method)
     if (!notations.containsClassification(ApiOperation))
         return true;
 
+    if (notations.contains(opCrud))
+        return true;
+
     auto operation = qsl("op%1").arg(QString::fromUtf8(rq.requestMethod())).toLower();
     if (notations.contains(operation))
         return true;
