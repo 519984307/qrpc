@@ -72,13 +72,15 @@ public:
     ListenRequestCode listenCode;
     int _responseCode=0;
     int _requestTimeout=0;
-    void*_data=nullptr;
+    void *_data=nullptr;
     ListenRequest*parent=nullptr;
+
     explicit ListenRequestPvt(ListenRequest*parent):QObject{parent}, listenCode(parent)
     {
         this->parent=parent;
         QObject::connect(parent, &ListenRequest::finish, this, &ListenRequestPvt::onRequestFinish);
     }
+
     virtual ~ListenRequestPvt()
     {
         this->freeFiles();
@@ -89,21 +91,24 @@ public:
         Q_DECLARE_VU;
         auto&r=*this->parent;
         r.mergeMap(vu.toMap(v));
-        if(r.isMethodGet() || r.isMethodDelete()){
-            auto requestBody=r.requestBody().toByteArray();
-            if(r.requestParameter().isEmpty() && !requestBody.isEmpty()){
-                auto c=requestBody.at(0);
-                if(c=='{'){
-                    QVariantHash requestParameter;
-                    auto body=QJsonDocument::fromJson(requestBody).toVariant().toHash();
-                    Q_V_HASH_ITERATOR(body){
-                        i.next();
-                        requestParameter[i.key()]=i.value();
-                    }
-                    r.setRequestParameter(requestParameter);
-                }
-            }
+        if(!r.isMethodGet() && !r.isMethodDelete())
+            return;
+
+        auto requestBody=r.requestBody().toByteArray().trimmed();
+
+        if(!r.requestParameter().isEmpty() || requestBody.isEmpty())
+            return;
+
+        if(requestBody.at(0)!='{')
+            return;
+
+        QVariantHash requestParameter;
+        auto body=QJsonDocument::fromJson(requestBody).toVariant().toHash();
+        Q_V_HASH_ITERATOR(body){
+            i.next();
+            requestParameter[i.key()]=i.value();
         }
+        r.setRequestParameter(requestParameter);
     }
 
     QVariantHash&requestParamCache()
@@ -155,7 +160,7 @@ public:
     void clear()
     {
         this->eventLoop.quit();
-        this->_listenUuid=QUuid();
+        this->_listenUuid={};
         this->_data=nullptr;
         this->parent->vu.clear();
         this->_requestParamCache.clear();
@@ -165,18 +170,18 @@ public:
 
     void clearRequest()
     {
-        this->_requestUuid=QUuid();
-        this->_requestHeader=QVariantHash();
-        this->_requestParameter=QVariantHash();
-        this->_requestBody=QVariant();
+        this->_requestUuid={};
+        this->_requestHeader={};
+        this->_requestParameter={};
+        this->_requestBody={};
     }
 
     void clearResponse()
     {
-        this->_responseHeader=QVariantHash();
-        this->_responseBody=QVariant();
+        this->_responseHeader={};
+        this->_responseBody={};
         this->_responseCode=0;
-        this->_responsePhrase=QByteArray();
+        this->_responsePhrase={};
         this->_data=nullptr;
     }
 
@@ -1211,7 +1216,7 @@ void ListenRequest::setRequestBody(const QVariant &value)
             _body=QCborValue::fromVariant(value).toVariant();
             break;
         default:
-            _body=QVariant();
+            _body={};
             if(!_body.isValid())
                 _body=QJsonDocument::fromJson(value.toByteArray()).toVariant();
             if(!_body.isValid())
@@ -1400,7 +1405,7 @@ void ListenRequest::setResponseBody(const QVariant &value)
     case QMetaType_QChar:
     {
         if(value.toString().trimmed().isEmpty()){
-            p._responseBody=QVariant();
+            p._responseBody={};
             return;
         }
         p._responseBody=value;
