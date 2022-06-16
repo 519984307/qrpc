@@ -96,10 +96,10 @@ public:
             return;
 
         auto requestBody=r.requestBody().toByteArray().trimmed();
-        if(!r.requestParameter().isEmpty() || !requestBody.isEmpty())
+        if(!r.requestParameter().isEmpty() || requestBody.isEmpty())
             return;
 
-        if(requestBody.at(0)!='{')
+        if(requestBody.isEmpty() || requestBody.at(0)!='{')
             return;
 
         QVariantHash requestParameter;
