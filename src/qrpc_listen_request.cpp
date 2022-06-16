@@ -73,13 +73,15 @@ public:
     ListenRequestCode listenCode;
     int _responseCode=0;
     int _requestTimeout=0;
-    void*_data=nullptr;
+    void *_data=nullptr;
     ListenRequest*parent=nullptr;
+
     explicit ListenRequestPvt(ListenRequest*parent):QObject{parent}, listenCode(parent)
     {
         this->parent=parent;
         QObject::connect(parent, &ListenRequest::finish, this, &ListenRequestPvt::onRequestFinish);
     }
+
     virtual ~ListenRequestPvt()
     {
         this->freeFiles();
@@ -93,12 +95,11 @@ public:
         if(!r.isMethodGet() && !r.isMethodDelete())
             return;
 
-        auto requestBody=r.requestBody().toByteArray();
+        auto requestBody=r.requestBody().toByteArray().trimmed();
         if(!r.requestParameter().isEmpty() || !requestBody.isEmpty())
             return;
 
-        auto c=requestBody.at(0);
-        if(c!='{')
+        if(requestBody.at(0)!='{')
             return;
 
         QVariantHash requestParameter;
@@ -159,7 +160,7 @@ public:
     void clear()
     {
         this->eventLoop.quit();
-        this->_listenUuid=QUuid();
+        this->_listenUuid={};
         this->_data=nullptr;
         this->parent->vu.clear();
         this->_requestParamCache.clear();
@@ -1215,7 +1216,7 @@ void ListenRequest::setRequestBody(const QVariant &value)
             _body=QCborValue::fromVariant(value).toVariant();
             break;
         default:
-            _body=QVariant();
+            _body={};
             if(!_body.isValid())
                 _body=QJsonDocument::fromJson(value.toByteArray()).toVariant();
             if(!_body.isValid())
@@ -1404,7 +1405,7 @@ void ListenRequest::setResponseBody(const QVariant &value)
     case QMetaType_QChar:
     {
         if(value.toString().trimmed().isEmpty()){
-            p._responseBody=QVariant();
+            p._responseBody={};
             return;
         }
         p._responseBody=value;
