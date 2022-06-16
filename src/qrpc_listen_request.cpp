@@ -31,7 +31,8 @@
 
 namespace QRpc {
 
-static const QByteArray makeBaseUuid(){
+static const QByteArray makeBaseUuid()
+{
     QStringList lst;
 #ifdef Q_OS_IOS
     lst << QString::number(qApp->applicationPid());
@@ -89,21 +90,24 @@ public:
         Q_DECLARE_VU;
         auto&r=*this->parent;
         r.mergeMap(vu.toMap(v));
-        if(r.isMethodGet() || r.isMethodDelete()){
-            auto requestBody=r.requestBody().toByteArray();
-            if(r.requestParameter().isEmpty() && !requestBody.isEmpty()){
-                auto c=requestBody.at(0);
-                if(c=='{'){
-                    QVariantHash requestParameter;
-                    auto body=QJsonDocument::fromJson(requestBody).toVariant().toHash();
-                    Q_V_HASH_ITERATOR(body){
-                        i.next();
-                        requestParameter[i.key()]=i.value();
-                    }
-                    r.setRequestParameter(requestParameter);
-                }
-            }
+        if(!r.isMethodGet() && !r.isMethodDelete())
+            return;
+
+        auto requestBody=r.requestBody().toByteArray();
+        if(!r.requestParameter().isEmpty() || !requestBody.isEmpty())
+            return;
+
+        auto c=requestBody.at(0);
+        if(c!='{')
+            return;
+
+        QVariantHash requestParameter;
+        auto body=QJsonDocument::fromJson(requestBody).toVariant().toHash();
+        Q_V_HASH_ITERATOR(body){
+            i.next();
+            requestParameter[i.key()]=i.value();
         }
+        r.setRequestParameter(requestParameter);
     }
 
     QVariantHash&requestParamCache()
@@ -165,18 +169,18 @@ public:
 
     void clearRequest()
     {
-        this->_requestUuid=QUuid();
-        this->_requestHeader=QVariantHash();
-        this->_requestParameter=QVariantHash();
-        this->_requestBody=QVariant();
+        this->_requestUuid={};
+        this->_requestHeader={};
+        this->_requestParameter={};
+        this->_requestBody={};
     }
 
     void clearResponse()
     {
-        this->_responseHeader=QVariantHash();
-        this->_responseBody=QVariant();
+        this->_responseHeader={};
+        this->_responseBody={};
         this->_responseCode=0;
-        this->_responsePhrase=QByteArray();
+        this->_responsePhrase={};
         this->_data=nullptr;
     }
 
@@ -684,7 +688,7 @@ bool ListenRequest::fromResponseMap(const QVariantHash &vRequest)
     const QMetaObject* metaObject = this->metaObject();
     for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
         auto property = metaObject->property(i);
-        auto key = QByteArray(property.name());
+        auto key = QByteArray{property.name()};
         if(!key.startsWith(qbl("requestUuid")) && !key.startsWith(qbl("response")))
             continue;
 
@@ -757,7 +761,7 @@ bool ListenRequest::fromResponseHash(const QVariantHash &vRequest)
     const QMetaObject* metaObject = this->metaObject();
     for(int i = metaObject->propertyOffset() ; i < metaObject->propertyCount() ; i++){
         auto property = metaObject->property(i);
-        auto key = QByteArray(property.name());
+        auto key = QByteArray{property.name()};
         if(!key.startsWith(qbl("requestUuid")) && !key.startsWith(qbl("response")))
             continue;
 
@@ -970,7 +974,7 @@ QVariantMap ListenRequest::requestBodyMap() const
         break;
     default:
         if(this->isMethodGet() || this->isMethodDelete())
-            return QVariant(p._requestParameter).toMap();
+            return QVariant{p._requestParameter}.toMap();
         return {};
     }
 }
@@ -986,7 +990,7 @@ QVariantHash ListenRequest::requestBodyHash() const
         break;
     default:
         if(this->isMethodGet() || this->isMethodDelete())
-            return QVariant(p._requestParameter).toHash();
+            return QVariant{p._requestParameter}.toHash();
     }
     return {};
 }
@@ -1140,7 +1144,7 @@ QVariantMap ListenRequest::requestParamMap()const
 {
     if(this->isMethodPost() || this->isMethodPut())
         return this->requestBodyMap();
-    return QVariant(this->requestParameter()).toMap();
+    return QVariant{this->requestParameter()}.toMap();
 }
 
 QVariant ListenRequest::requestParamHash(const QByteArray &key) const
@@ -1162,7 +1166,7 @@ QVariant ListenRequest::requestParamHash(const QByteArray &key) const
         case QMetaType_QByteArray:
         {
             auto s=v.toByteArray();
-            return(s.isEmpty())?QVariant():s;
+            return s.isEmpty()?QVariant{}:s;
         }
         default:
             return v;
