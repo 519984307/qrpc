@@ -63,7 +63,7 @@ ControllerSetting&ControllerOptions::setting()
     return this->setting(qsl_null);
 }
 
-ControllerSetting&ControllerOptions::setting(const QString&value)
+ControllerSetting&ControllerOptions::setting(const QString &value)
 {
     dPvt();
     return p.settingGetCheck(value);

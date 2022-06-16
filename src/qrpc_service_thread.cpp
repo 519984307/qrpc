@@ -5,7 +5,7 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<ServiceThreadPvt*>(this->p)
+    auto &p =*reinterpret_cast<ServiceThreadPvt*>(this->p)
 
 static qlonglong serviceThreadCount=0;
 
@@ -32,7 +32,7 @@ public:
     }
 
 public slots:
-    void onRequestReceived(const QUuid &uuid, const QVariant&v){
+    void onRequestReceived(const QUuid &uuid, const QVariant &v){
         --stats.queue;
         emit service->request_state(uuid, service->Success, v);
         service->received(uuid, v);
@@ -62,7 +62,7 @@ public slots:
 
 void ServiceThread::Stats::clear()
 {
-    auto&p=*this;
+    auto &p=*this;
     p.started=p.started.currentDateTime();
     p.received=0;
     p.success=0;
@@ -78,7 +78,7 @@ QVariantHash ServiceThread::Stats::toMap()const
 
 QVariantHash ServiceThread::Stats::toHash() const
 {
-    auto&p=*this;
+    auto &p=*this;
     QVariantHash v;
     v.insert(qsl("running" ),(p.service==nullptr)?false:p.service->isRunning());
     v.insert(qsl("started" ), p.started     );

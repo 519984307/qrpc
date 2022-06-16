@@ -97,7 +97,7 @@ public:
         //! \brief setBody
         //! \param value
         //!
-        virtual void setBody(const QVariant&value);
+        virtual void setBody(const QVariant &value);
 
         //!
         //! \brief toString
@@ -173,7 +173,7 @@ public:
     //! \return
     //!
     virtual QString url() const;
-    virtual QString url(const QString&path) const;
+    virtual QString url(const QString &path) const;
 
     //!
     //! \brief protocol
@@ -328,7 +328,7 @@ public:
     //! \param body
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString&route, const QVariant&body);
+    virtual HttpResponse&call(const RequestMethod&method, const QString &route, const QVariant&body);
 
     //!
     //! \brief call
@@ -362,7 +362,7 @@ public:
     //! \param objectBody
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString&route, const QObject&objectBody);
+    virtual HttpResponse&call(const RequestMethod&method, const QString &route, const QObject&objectBody);
 
     //!
     //! \brief call
@@ -378,7 +378,7 @@ public:
     //! \param route
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString&route);
+    virtual HttpResponse&call(const RequestMethod&method, const QString &route);
 
     //!
     //! \brief call
@@ -387,7 +387,7 @@ public:
     //! \param ioDeviceBody
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString&route, QIODevice&ioDeviceBody);
+    virtual HttpResponse&call(const RequestMethod&method, const QString &route, QIODevice&ioDeviceBody);
 
     //!
     //! \brief operator =

@@ -150,7 +150,7 @@ void ListenRequestParser::initializeInstalleds(const QMetaObject &metaObject)
     auto routeList = parser->basePath();
 
     QMutexLOCKER locker(staticMetaObjectLock);
-    for(auto&route:routeList){
+    for(auto &route:routeList){
         staticMetaObjectRoute->insert(className, route);
         for (int methodIndex = 0; methodIndex < metaObject.methodCount(); ++methodIndex) {
             auto method = metaObject.method(methodIndex);

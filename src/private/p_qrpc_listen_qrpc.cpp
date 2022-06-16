@@ -167,7 +167,7 @@ public:
             if (methodName.startsWith(qbl("_"))) //ignore methods with [_] in start name
                 continue;
 
-            const auto&notations=controller->notation(method);
+            const auto &notations=controller->notation(method);
 
             if(notations.contains(nottionExcludeMethod))
                 continue;

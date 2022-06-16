@@ -83,14 +83,14 @@ public:
     //! \param output
     //! \return
     //!
-    virtual RequestExchangeSetting&print(const QString&output=QString());
+    virtual RequestExchangeSetting&print(const QString &output=QString());
 
     //!
     //! \brief printOut
     //! \param output
     //! \return
     //!
-    virtual QStringList printOut(const QString&output=QString());
+    virtual QStringList printOut(const QString &output=QString());
 
     //!
     //! \brief method
@@ -98,7 +98,7 @@ public:
     //!
     virtual RequestMethod method() const;
     virtual void setMethod(const int&value);
-    virtual void setMethod(const QString&value);
+    virtual void setMethod(const QString &value);
 
     //!
     //! \brief methodName
@@ -114,7 +114,7 @@ public:
     virtual QString protocolName() const;
     virtual QString protocolUrlName() const;
     virtual void setProtocol(const Protocol &value);
-    virtual void setProtocol(const QVariant&value);
+    virtual void setProtocol(const QVariant &value);
 
     //!
     //! \brief driver

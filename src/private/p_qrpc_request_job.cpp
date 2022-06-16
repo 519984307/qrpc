@@ -28,7 +28,7 @@ Q_GLOBAL_STATIC(QVector<RequestJob*>, requestJobPool)
 
 
 #define dPvt()\
-auto&p =*reinterpret_cast<RequestJobPvt*>(this->p)
+auto &p =*reinterpret_cast<RequestJobPvt*>(this->p)
 
 class RequestJobPvt:public QObject{
 public:
@@ -163,7 +163,7 @@ RequestJob *RequestJob::newJob(Request::Action action, const QString &action_fil
         }
         requestJobMutex->unlock();
     }
-    auto&p=*static_cast<RequestJobPvt*>(job->p);
+    auto &p=*static_cast<RequestJobPvt*>(job->p);
     p.action=action;
     p.action_fileName=action_fileName;
     return job;
@@ -227,7 +227,7 @@ void RequestJob::onRunCallback(const QVariant &v)
 void RequestJob::onRun()
 {
     dPvt();
-    const auto&e=this->response().request_exchange.call();
+    const auto &e=this->response().request_exchange.call();
     const auto iprotocol=e.protocol();
     auto protocol=p._requestJobProtocolHash[iprotocol];
 

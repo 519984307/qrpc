@@ -503,7 +503,7 @@ public:
     //! \param fileName
     //! \return
     //!
-    QFile *temporaryFile(const QString&fileName);
+    QFile *temporaryFile(const QString &fileName);
 
     //!
     //! \brief responseHeader

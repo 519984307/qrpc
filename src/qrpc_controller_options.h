@@ -19,7 +19,7 @@ public:
     //!
     Q_INVOKABLE explicit ControllerOptions(QObject *parent = nullptr);
     explicit ControllerOptions(const QStringList&settingFileName, QObject *parent = nullptr);
-    explicit ControllerOptions(const QString&settingFileName, QObject *parent = nullptr);
+    explicit ControllerOptions(const QString &settingFileName, QObject *parent = nullptr);
     ~ControllerOptions();
 
     //!

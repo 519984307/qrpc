@@ -12,7 +12,7 @@ class Q_RPC_EXPORT HttpHeaders: public QObject{
 public:
     Q_INVOKABLE explicit HttpHeaders(QObject*parent=nullptr);
 
-    explicit HttpHeaders(const QVariant&v,QObject*parent=nullptr);
+    explicit HttpHeaders(const QVariant &v,QObject*parent=nullptr);
     ~HttpHeaders();
 
     //!
@@ -72,11 +72,11 @@ public:
     //! \param credentials
     //! \return
     //!
-    virtual HttpHeaders&setAuthorization(const QString&authorization, const QString&type, const QVariant &credentials);
-    virtual HttpHeaders&setAuthorization(const QString&authorization, const AuthorizationType&type, const QVariant &credentials);
+    virtual HttpHeaders&setAuthorization(const QString &authorization, const QString &type, const QVariant &credentials);
+    virtual HttpHeaders&setAuthorization(const QString &authorization, const AuthorizationType&type, const QVariant &credentials);
     virtual HttpHeaders&setAuthorization(const AuthorizationType&type, const QVariant &credentials);
     virtual HttpHeaders&setAuthorization(const AuthorizationType&type, const QVariant &userName, const QVariant &passWord);
-    //virtual Header&setAuthorization(const QString&type, const QVariant &credentials);
+    //virtual Header&setAuthorization(const QString &type, const QVariant &credentials);
 
     //!
     //! \brief setProxyAuthorization
@@ -85,7 +85,7 @@ public:
     //! \return
     //!
     virtual HttpHeaders&setProxyAuthorization(const AuthorizationType&type, const QVariant &credentials);
-    virtual HttpHeaders&setProxyAuthorization(const QString&type, const QVariant &credentials);
+    virtual HttpHeaders&setProxyAuthorization(const QString &type, const QVariant &credentials);
 
     //!
     //! \brief setWWWAuthenticate
@@ -94,7 +94,7 @@ public:
     //! \return
     //!
     virtual HttpHeaders&setWWWAuthenticate(const AuthorizationType&type, const QVariant &credentials);
-    virtual HttpHeaders&setWWWAuthenticate(const QString&type, const QVariant &credentials);
+    virtual HttpHeaders&setWWWAuthenticate(const QString &type, const QVariant &credentials);
 
     //!
     //! \brief cookies
@@ -109,10 +109,10 @@ public:
     //! \param type
     //! \return
     //!
-    virtual QVariant authorization(const QString&authorization, const QString&type);
-    virtual QVariant authorization(const QString&authorization, const AuthorizationType &type);
+    virtual QVariant authorization(const QString &authorization, const QString &type);
+    virtual QVariant authorization(const QString &authorization, const AuthorizationType &type);
     virtual QVariant authorization(const AuthorizationType&type);
-    virtual QVariant authorization(const QString&type);
+    virtual QVariant authorization(const QString &type);
 
     //!
     //! \brief proxyAuthorization
@@ -120,7 +120,7 @@ public:
     //! \return
     //!
     virtual QVariant proxyAuthorization(const AuthorizationType&type);
-    virtual QVariant proxyAuthorization(const QString&type);
+    virtual QVariant proxyAuthorization(const QString &type);
 
     //!
     //! \brief wwwAuthenticate
@@ -128,29 +128,29 @@ public:
     //! \return
     //!
     virtual QVariant wwwAuthenticate(const AuthorizationType&type);
-    virtual QVariant wwwAuthenticate(const QString&type);
+    virtual QVariant wwwAuthenticate(const QString &type);
 
     //!
     //! \brief print
     //! \param output
     //! \return
     //!
-    virtual HttpHeaders&print(const QString&output=QString());
+    virtual HttpHeaders&print(const QString &output=QString());
 
     //!
     //! \brief printOut
     //! \param output
     //! \return
     //!
-    virtual QStringList printOut(const QString&output=QString());
+    virtual QStringList printOut(const QString &output=QString());
 
     //!
     //! \brief operator =
     //! \param v
     //! \return
     //!
-    HttpHeaders&operator =(const QVariant&v);
-    HttpHeaders&operator <<(const QVariant&v);
+    HttpHeaders&operator =(const QVariant &v);
+    HttpHeaders&operator <<(const QVariant &v);
 private:
     void*p = nullptr;
 };

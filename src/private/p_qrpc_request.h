@@ -28,7 +28,7 @@ namespace QRpc {
 
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<RequestPvt*>(this->p)
+    auto &p =*reinterpret_cast<RequestPvt*>(this->p)
 
 class RequestPvt:public QObject{
     Q_OBJECT
@@ -60,17 +60,17 @@ public:
     void setSettings(const ServiceSetting &setting);
 
 
-    QString parseFileName(const QString&fileName);
+    QString parseFileName(const QString &fileName);
 
     void writeLog(RequestJobResponse&response, const QVariant&request);
 
-    HttpResponse &upload(const QString &route, const QString&fileName);
+    HttpResponse &upload(const QString &route, const QString &fileName);
 
-    HttpResponse &download(const QString &route, const QString&fileName);
+    HttpResponse &download(const QString &route, const QString &fileName);
 
     HttpResponse&call(const RequestMethod&method, const QVariant &vRoute, const QVariant &body);
 signals:
-    void runJob(const QSslConfiguration*sslConfig, const QVariantHash&headers, const QVariant&url, const QString&fileName, QRpc::Request*request);
+    void runJob(const QSslConfiguration*sslConfig, const QVariantHash&headers, const QVariant&url, const QString &fileName, QRpc::Request*request);
 };
 
 }

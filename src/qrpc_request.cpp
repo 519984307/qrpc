@@ -22,7 +22,7 @@ bool Request::startsWith(const QString &requestPath, const QVariant &requestPath
     case QMetaType_QStringList:
     case QMetaType_QVariantList:
     {
-        for(auto&v:requestPathBase.toList())
+        for(auto &v:requestPathBase.toList())
             paths<<v.toString().trimmed();
         break;
     }
@@ -30,7 +30,7 @@ bool Request::startsWith(const QString &requestPath, const QVariant &requestPath
         paths<<requestPathBase.toString().trimmed();
     }
 
-    for(auto&pathItem:paths){
+    for(auto &pathItem:paths){
         auto startWith=pathItem.contains(qsl("*"));
         if(startWith){
             pathItem=pathItem.split(qsl("*")).first();
@@ -96,7 +96,7 @@ Request &Request::setSettings(const QVariantHash &setting)
 {
     ServiceSetting _setting;
     _setting.fromHash(setting);
-    auto&request=*this;
+    auto &request=*this;
     request.header().addRawHeader(_setting.headers());//precisa ser add
     request.setProtocol(_setting.protocol());
     request.setPort(_setting.port());
@@ -121,7 +121,7 @@ QString Request::url() const
 
 QString Request::url(const QString &path) const
 {
-    auto&rq=*this;
+    auto &rq=*this;
 
     auto spath=path.trimmed().isEmpty()?this->route().trimmed():path.trimmed();
     spath=qsl("/%1").arg(spath);
@@ -365,14 +365,14 @@ LastError &Request::lastError()
 HttpResponse &Request::call()
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     return p.call(e.method(), e.route(), QByteArray());
 }
 
 HttpResponse &Request::call(const QVariant &route)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     return p.call(e.method(), e.route(), this->body().body());
 }
@@ -380,7 +380,7 @@ HttpResponse &Request::call(const QVariant &route)
 HttpResponse &Request::call(const QVariant &route, const QVariant &body)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     return p.call(e.method(), e.route(), body);
 }
@@ -388,7 +388,7 @@ HttpResponse &Request::call(const QVariant &route, const QVariant &body)
 HttpResponse &Request::call(const QVariant &route, const QVariant&body, const QString &method, const QVariantHash parameter)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setMethod(method);
     e.setRoute(route);
     e.setParameter(parameter);
@@ -398,7 +398,7 @@ HttpResponse &Request::call(const QVariant &route, const QVariant&body, const QS
 HttpResponse &Request::call(const RequestMethod &method, const QString &route, const QVariant &body)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(method);
     return p.call(e.method(), e.route(), body);
@@ -407,9 +407,9 @@ HttpResponse &Request::call(const RequestMethod &method, const QString &route, c
 HttpResponse &Request::call(const RequestMethod &method)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setMethod(method);
-    auto&body=this->body().body();
+    auto &body=this->body().body();
     return p.call(e.method(), e.route(), body);
 }
 
@@ -421,7 +421,7 @@ HttpResponse &Request::call(const QVariant &route, const QObject &objectBody)
         mapObject.insert(property.name(), property.read(&objectBody));
     }
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setMethod(QRpc::Post);
     e.setRoute(route);
     return p.call(e.method(), route, QJsonDocument::fromVariant(mapObject).toJson());
@@ -435,7 +435,7 @@ HttpResponse &Request::call(const RequestMethod &method, const QString &route, c
         mapObject.insert(property.name(), property.read(&objectBody));
     }
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(method);
     return p.call(e.method(), e.route(), mapObject);
@@ -445,7 +445,7 @@ HttpResponse &Request::call(const QVariant &route, QIODevice &ioDeviceBody)
 {
     dPvt();
     auto body=ioDeviceBody.readAll();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setMethod(QRpc::Post);
     e.setRoute(route);
     return p.call(e.method(), e.route(), body);
@@ -454,7 +454,7 @@ HttpResponse &Request::call(const QVariant &route, QIODevice &ioDeviceBody)
 HttpResponse &Request::call(const RequestMethod &method, const QString &route)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(method);
     return p.call(e.method(), e.route(), this->body().body());
@@ -464,7 +464,7 @@ HttpResponse &Request::call(const RequestMethod &method, const QString &route, Q
 {
     dPvt();
     auto body=ioDeviceBody.readAll();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(method);
     return p.call(e.method(), e.route(), body);
@@ -479,7 +479,7 @@ Request &Request::operator=(const QRpc::ServiceSetting &value)
 HttpResponse &Request::upload(QFile &file)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setMethod(QRpc::Post);
     p.upload(e.route(), file.fileName());
     file.close();
@@ -489,7 +489,7 @@ HttpResponse &Request::upload(QFile &file)
 HttpResponse &Request::upload(const QVariant &route, const QByteArray &buffer)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(QRpc::Post);
     QTemporaryFile file;
@@ -507,7 +507,7 @@ HttpResponse &Request::upload(const QVariant &route, const QByteArray &buffer)
 HttpResponse &Request::upload(const QVariant &route, QFile &file)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(QRpc::Post);
     p.upload(e.route(), file.fileName());
@@ -518,7 +518,7 @@ HttpResponse &Request::upload(const QVariant &route, QFile &file)
 HttpResponse &Request::upload(const QVariant &route, QString &fileName, QFile &file)
 {
     dPvt();
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(QRpc::Post);
     p.upload(e.route(), fileName);
@@ -531,9 +531,9 @@ HttpResponse &Request::download(QString &fileName)
 {
     dPvt();
     auto _fileName=p.parseFileName(fileName);
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setMethod(QRpc::Get);
-    auto&response=p.download(e.route(), _fileName);
+    auto &response=p.download(e.route(), _fileName);
     if(response)
         fileName=_fileName;
     return this->response();
@@ -543,10 +543,10 @@ HttpResponse &Request::download(const QVariant &route, QString &fileName)
 {
     dPvt();
     auto _fileName=p.parseFileName(fileName);
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(QRpc::Get);
-    auto&response=p.download(e.route(), _fileName);
+    auto &response=p.download(e.route(), _fileName);
     if(response)
         fileName=_fileName;
     return response;
@@ -556,11 +556,11 @@ HttpResponse &Request::download(const QVariant &route, QString &fileName, const 
 {
     dPvt();
     auto _fileName=p.parseFileName(fileName);
-    auto&e=p.exchange.call();
+    auto &e=p.exchange.call();
     e.setRoute(route);
     e.setMethod(QRpc::Get);
     this->setBody(parameter);
-    auto&response=p.download(e.route(), _fileName);
+    auto &response=p.download(e.route(), _fileName);
     if(response)
         fileName=_fileName;
     return response;
@@ -576,7 +576,7 @@ Request &Request::autoSetCookie()
         if(!i.key().toLower().startsWith(qsl("set-cookie")))
             continue;
         auto cookieList=i.value().toString().split(qsl(";"));
-        for(auto&cookie:cookieList){
+        for(auto &cookie:cookieList){
             if(!cookies.contains(cookie))
                 cookies.append(cookie);
         }
@@ -588,7 +588,7 @@ Request &Request::autoSetCookie()
 QString Request::toString() const
 {
     dPvt();\
-    auto&response=p.qrpcResponse;
+    auto &response=p.qrpcResponse;
     auto qt_text=ListenRequestCode::qt_network_error_phrase(p.response_qt_status_code);
     auto msg=qsl("%1:QtStatus: Status:%2, %3, %4").arg(p.exchange.call().url(), QString::number(response.qtStatusCode()),response.reasonPhrase(), qt_text);
     return msg;
@@ -615,7 +615,7 @@ Request&Request::setSslConfiguration(const QSslConfiguration &value)
 
 Request &Request::print()
 {
-    for(auto&v:this->printOut())
+    for(auto &v:this->printOut())
         sInfo()<<v;
     return*this;
 }
@@ -623,11 +623,11 @@ Request &Request::print()
 QStringList Request::printOut()
 {
     QStringList out;
-    for(auto&v:this->exchange().printOut(qsl("exchange")))
+    for(auto &v:this->exchange().printOut(qsl("exchange")))
         out<<v;
-    for(auto&v:this->header().printOut(qsl("request")))
+    for(auto &v:this->header().printOut(qsl("request")))
         out<<v;
-    for(auto&v:this->response().printOut(qsl("response")))
+    for(auto &v:this->response().printOut(qsl("response")))
         out<<v;
     return out;
 }

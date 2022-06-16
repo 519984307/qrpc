@@ -5,7 +5,7 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<RequestExchangeSettingPvt*>(this->p)
+    auto &p =*reinterpret_cast<RequestExchangeSettingPvt*>(this->p)
 
 const static auto defaultLimit=60000;
 
@@ -35,13 +35,13 @@ public:
 
     QString protocolName()const
     {
-        const auto&v=ProtocolName.value(this->protocol);
+        const auto &v=ProtocolName.value(this->protocol);
         return v;
     }
 
     QString protocolUrlName()const
     {
-        const auto&v=ProtocolUrlName.value(this->protocol);
+        const auto &v=ProtocolUrlName.value(this->protocol);
         return v;
     }
 };
@@ -72,7 +72,7 @@ RequestExchangeSetting&RequestExchangeSetting::operator=(const RequestExchangeSe
 
 RequestExchangeSetting &RequestExchangeSetting::clear()
 {
-    auto&e=*this;
+    auto &e=*this;
     for(int i = 0; i < e.metaObject()->propertyCount(); ++i) {
         auto property=e.metaObject()->property(i);
         if(QByteArray(property.name()) == qbl("objectName"))
@@ -93,7 +93,7 @@ RequestExchangeSetting &RequestExchangeSetting::operator=(const QVariantHash &e)
 QVariantMap RequestExchangeSetting::toMap() const
 {
     QVariantMap map;
-    auto&e=*this;
+    auto &e=*this;
     for(int i = 0; i < e.metaObject()->propertyCount(); ++i) {
         auto property=e.metaObject()->property(i);
         if(QByteArray(property.name()) == qbl("objectName"))
@@ -109,7 +109,7 @@ QVariantMap RequestExchangeSetting::toMap() const
 QVariantHash RequestExchangeSetting::toHash() const
 {
     QVariantHash map;
-    auto&e=*this;
+    auto &e=*this;
     for(int i = 0; i < e.metaObject()->propertyCount(); ++i) {
         auto property=e.metaObject()->property(i);
         if(QByteArray(property.name()) == qbl("objectName"))
@@ -142,7 +142,7 @@ bool RequestExchangeSetting::isValid() const
 
 RequestExchangeSetting &RequestExchangeSetting::print(const QString &output)
 {
-    for(auto&v:this->printOut(output))
+    for(auto &v:this->printOut(output))
         sInfo()<<v;
     return*this;
 }
@@ -187,10 +187,10 @@ void RequestExchangeSetting::setMethod(const QString &value)
 {
     dPvt();
     const auto vv=value.trimmed().toLower();
-    for (const auto&v : RequestMethodNameList){
+    for (const auto &v : RequestMethodNameList){
         if(v.trimmed().toLower()!=vv)
             return;
-        const auto&i = RequestMethodName.key(v);
+        const auto &i = RequestMethodName.key(v);
         p.method=RequestMethod(i);
         return;
     }
@@ -231,7 +231,7 @@ void RequestExchangeSetting::setProtocol(const Protocol &value)
 void RequestExchangeSetting::setProtocol(const QVariant &value)
 {
     dPvt();
-    auto&v=p.protocol;
+    auto &v=p.protocol;
     if(value.isNull() || !value.isValid())
         v=Protocol::Http;
     else if(QString::number(value.toInt())==value)

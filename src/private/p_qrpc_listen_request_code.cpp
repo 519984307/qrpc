@@ -158,7 +158,7 @@ static const QHash<int,QString>&makeStateCodes()
     return state_codes;
 }
 
-static const auto&stateCodes=makeStateCodes();
+static const auto &stateCodes=makeStateCodes();
 
 
 static QMap<QNetworkReply::NetworkError, QString>&makeStaticError(){
@@ -200,7 +200,7 @@ static QMap<QNetworkReply::NetworkError, QString>&makeStaticError(){
     return staticError;
 }
 
-const static auto&staticErrors=makeStaticError();
+const static auto &staticErrors=makeStaticError();
 
 ListenRequestCode::ListenRequestCode(QObject *parent) : QObject{parent}
 {
@@ -281,7 +281,7 @@ const QString ListenRequestCode::qt_network_error_phrase(const QNetworkReply::Ne
     return staticErrors.value(networkError);
 }
 
-ListenRequestCode &ListenRequestCode::setCode(QVariant code, const QString&phrase)
+ListenRequestCode &ListenRequestCode::setCode(QVariant code, const QString &phrase)
 {
     auto parent=this->parent();
     auto request=(parent==nullptr)?nullptr:dynamic_cast<ListenRequest*>(parent);
@@ -292,207 +292,207 @@ ListenRequestCode &ListenRequestCode::setCode(QVariant code, const QString&phras
     return*this;
 }
 
-ListenRequestCode &ListenRequestCode::setContinue(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setContinue(const QString &phrase)
 {
     return this->setCode(ssContinue, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setSwitchingProtocols(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setSwitchingProtocols(const QString &phrase)
 {
     return this->setCode(ssSwitchingProtocols, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setOK(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setOK(const QString &phrase)
 {
     return this->setCode(ssOK, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setCreated(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setCreated(const QString &phrase)
 {
     return this->setCode(ssCreated, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setAccepted(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setAccepted(const QString &phrase)
 {
     return this->setCode(ssAccepted, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setNonAuthoritativeInformation(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNonAuthoritativeInformation(const QString &phrase)
 {
     return this->setCode(ssNonAuthoritativeInformation, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setNoContent(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNoContent(const QString &phrase)
 {
     return this->setCode(ssNoContent, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setResetContent(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setResetContent(const QString &phrase)
 {
     return this->setCode(ssResetContent, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setPartialContent(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPartialContent(const QString &phrase)
 {
     return this->setCode(ssPartialContent, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setMultipleChoices(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setMultipleChoices(const QString &phrase)
 {
     return this->setCode(ssMultipleChoices, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setMovedPermanently(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setMovedPermanently(const QString &phrase)
 {
     return this->setCode(ssMovedPermanently, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setFound(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setFound(const QString &phrase)
 {
     return this->setCode(ssFound, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setSeeOther(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setSeeOther(const QString &phrase)
 {
     return this->setCode(ssSeeOther, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setNotModified(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotModified(const QString &phrase)
 {
     return this->setCode(ssNotModified, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setUseProxy(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUseProxy(const QString &phrase)
 {
     return this->setCode(ssUseProxy, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setTemporaryRedirect(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setTemporaryRedirect(const QString &phrase)
 {
     return this->setCode(ssTemporaryRedirect, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setBadRequest(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setBadRequest(const QString &phrase)
 {
     return this->setCode(ssBadRequest, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setUnauthorized(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUnauthorized(const QString &phrase)
 {
     return this->setCode(ssUnauthorized, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setPaymentRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPaymentRequired(const QString &phrase)
 {
     return this->setCode(ssPaymentRequired, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setForbidden(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setForbidden(const QString &phrase)
 {
     return this->setCode(ssPaymentRequired, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setNotFound(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotFound(const QString &phrase)
 {
     return this->setCode(ssNotFound, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setMethodNotAllowed(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setMethodNotAllowed(const QString &phrase)
 {
     return this->setCode(ssMethodNotAllowed, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setNotAcceptable(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotAcceptable(const QString &phrase)
 {
     return this->setCode(ssNotAcceptable, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setProxyAuthenticationRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setProxyAuthenticationRequired(const QString &phrase)
 {
     return this->setCode(ssProxyAuthenticationRequired, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setRequestTimeout(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setRequestTimeout(const QString &phrase)
 {
     return this->setCode(ssRequestTimeout, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setConflict(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setConflict(const QString &phrase)
 {
     return this->setCode(ssConflict, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setGone(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setGone(const QString &phrase)
 {
     return this->setCode(ssGone, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setLengthRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setLengthRequired(const QString &phrase)
 {
     return this->setCode(ssLengthRequired, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setPreconditionFailed(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPreconditionFailed(const QString &phrase)
 {
     return this->setCode(ssPreconditionFailed, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setPayloadTooLarge(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setPayloadTooLarge(const QString &phrase)
 {
     return this->setCode(ssPayloadTooLarge, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setURITooLong(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setURITooLong(const QString &phrase)
 {
     return this->setCode(ssURITooLong, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setUnsupportedMediaType(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUnsupportedMediaType(const QString &phrase)
 {
     return this->setCode(ssURITooLong, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setRangeNotSatisfiable(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setRangeNotSatisfiable(const QString &phrase)
 {
     return this->setCode(ssRangeNotSatisfiable, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setExpectationFailed(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setExpectationFailed(const QString &phrase)
 {
     return this->setCode(ssRangeNotSatisfiable, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setUpgradeRequired(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setUpgradeRequired(const QString &phrase)
 {
     return this->setCode(ssUpgradeRequired, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setInternalServerError(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setInternalServerError(const QString &phrase)
 {
     return this->setCode(ssInternalServerError, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setNotImplemented(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setNotImplemented(const QString &phrase)
 {
     return this->setCode(ssNotImplemented, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setBadGateway(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setBadGateway(const QString &phrase)
 {
     return this->setCode(ssBadGateway, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setServiceUnavailable(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setServiceUnavailable(const QString &phrase)
 {
     return this->setCode(ssServiceUnavailable, phrase);
 }
 
-ListenRequestCode &ListenRequestCode::setGatewayTimeout(const QString&phrase)
+ListenRequestCode &ListenRequestCode::setGatewayTimeout(const QString &phrase)
 {
     return this->setCode(ssGatewayTimeout, phrase);
 }
 
-ListenRequestCode&ListenRequestCode::setHTTPVersionNotSupported(const QString&phrase)
+ListenRequestCode&ListenRequestCode::setHTTPVersionNotSupported(const QString &phrase)
 {
     return this->setCode(ssHTTPVersionNotSupported, phrase);
 }

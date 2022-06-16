@@ -28,7 +28,7 @@ public:
     //! \brief setBody
     //! \param vBody
     //!
-    virtual void setBody(const QVariant&vBody);
+    virtual void setBody(const QVariant &vBody);
 
     //!
     //! \brief body
@@ -161,14 +161,14 @@ public:
     //! \param output
     //! \return
     //!
-    virtual HttpResponse &print(const QString&output=QString());
+    virtual HttpResponse &print(const QString &output=QString());
 
     //!
     //! \brief printOut
     //! \param output
     //! \return
     //!
-    virtual QStringList printOut(const QString&output=QString());
+    virtual QStringList printOut(const QString &output=QString());
 
 private:
     void*p = nullptr;

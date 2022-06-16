@@ -51,9 +51,9 @@ public:
     //! \param parent
     //!
     Q_INVOKABLE explicit ServiceThread(QObject *parent = nullptr);
-    explicit ServiceThread(const QString&serviceName, QObject *parent = nullptr);
+    explicit ServiceThread(const QString &serviceName, QObject *parent = nullptr);
     explicit ServiceThread(const ServiceManager&manager,QObject *parent = nullptr);
-    explicit ServiceThread(const ServiceManager&manager, const QString&serviceName, QObject *parent = nullptr);
+    explicit ServiceThread(const ServiceManager&manager, const QString &serviceName, QObject *parent = nullptr);
     ~ServiceThread();
 
     //!
@@ -116,14 +116,14 @@ public:
     //! \param uuid
     //! \param v
     //!
-    virtual void received(const QUuid &uuid, const QVariant&v);
+    virtual void received(const QUuid &uuid, const QVariant &v);
 
     //!
     //! \brief dispatcher
     //! \param uuid
     //! \param v
     //!
-    void dispatcher(const QUuid &uuid, const QVariant&v);
+    void dispatcher(const QUuid &uuid, const QVariant &v);
 
 signals:
 
@@ -144,14 +144,14 @@ signals:
     //! \param uuid
     //! \param v
     //!
-    void request_send(const QUuid &uuid, const QVariant&v);
+    void request_send(const QUuid &uuid, const QVariant &v);
 
     //!
     //! \brief request_received
     //! \param uuid
     //! \param v
     //!
-    void request_received(const QUuid &uuid, const QVariant&v);
+    void request_received(const QUuid &uuid, const QVariant &v);
 
     //!
     //! \brief request_success

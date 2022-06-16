@@ -81,7 +81,7 @@ public:
     //! \param v
     //! \return
     //!
-    ListenRequestCode&operator=(const QVariant&v);
+    ListenRequestCode&operator=(const QVariant &v);
 
     //!
     //! \brief emptyData
@@ -129,50 +129,50 @@ public:
     //! \param phrase
     //! \return
     //!
-    ListenRequestCode&setCode(QVariant code, const QString&phrase=QString());
+    ListenRequestCode&setCode(QVariant code, const QString &phrase=QString());
 
 
-    ListenRequestCode&setContinue(const QString&phrase=QString());
-    ListenRequestCode&setSwitchingProtocols(const QString&phrase=QString());
-    ListenRequestCode&setOK(const QString&phrase=QString());
-    ListenRequestCode&setCreated(const QString&phrase=QString());
-    ListenRequestCode&setAccepted(const QString&phrase=QString());
-    ListenRequestCode&setNonAuthoritativeInformation(const QString&phrase=QString());
-    ListenRequestCode&setNoContent(const QString&phrase=QString());
-    ListenRequestCode&setResetContent(const QString&phrase=QString());
-    ListenRequestCode&setPartialContent(const QString&phrase=QString());
-    ListenRequestCode&setMultipleChoices(const QString&phrase=QString());
-    ListenRequestCode&setMovedPermanently(const QString&phrase=QString());
-    ListenRequestCode&setFound(const QString&phrase=QString());
-    ListenRequestCode&setSeeOther(const QString&phrase=QString());
-    ListenRequestCode&setNotModified(const QString&phrase=QString());
-    ListenRequestCode&setUseProxy(const QString&phrase=QString());
-    ListenRequestCode&setTemporaryRedirect(const QString&phrase=QString());
-    ListenRequestCode&setBadRequest(const QString&phrase=QString());
-    ListenRequestCode&setUnauthorized(const QString&phrase=QString());
-    ListenRequestCode&setPaymentRequired(const QString&phrase=QString());
-    ListenRequestCode&setForbidden(const QString&phrase=QString());
-    ListenRequestCode&setNotFound(const QString&phrase=QString());
-    ListenRequestCode&setMethodNotAllowed(const QString&phrase=QString());
-    ListenRequestCode&setNotAcceptable(const QString&phrase=QString());
-    ListenRequestCode&setProxyAuthenticationRequired(const QString&phrase=QString());
-    ListenRequestCode&setRequestTimeout(const QString&phrase=QString());
-    ListenRequestCode&setConflict(const QString&phrase=QString());
-    ListenRequestCode&setGone(const QString&phrase=QString());
-    ListenRequestCode&setLengthRequired(const QString&phrase=QString());
-    ListenRequestCode&setPreconditionFailed(const QString&phrase=QString());
-    ListenRequestCode&setPayloadTooLarge(const QString&phrase=QString());
-    ListenRequestCode&setURITooLong(const QString&phrase=QString());
-    ListenRequestCode&setUnsupportedMediaType(const QString&phrase=QString());
-    ListenRequestCode&setRangeNotSatisfiable(const QString&phrase=QString());
-    ListenRequestCode&setExpectationFailed(const QString&phrase=QString());
-    ListenRequestCode&setUpgradeRequired(const QString&phrase=QString());
-    ListenRequestCode&setInternalServerError(const QString&phrase=QString());
-    ListenRequestCode&setNotImplemented(const QString&phrase=QString());
-    ListenRequestCode&setBadGateway(const QString&phrase=QString());
-    ListenRequestCode&setServiceUnavailable(const QString&phrase=QString());
-    ListenRequestCode&setGatewayTimeout(const QString&phrase=QString());
-    ListenRequestCode &setHTTPVersionNotSupported(const QString&phrase=QString());
+    ListenRequestCode&setContinue(const QString &phrase=QString());
+    ListenRequestCode&setSwitchingProtocols(const QString &phrase=QString());
+    ListenRequestCode&setOK(const QString &phrase=QString());
+    ListenRequestCode&setCreated(const QString &phrase=QString());
+    ListenRequestCode&setAccepted(const QString &phrase=QString());
+    ListenRequestCode&setNonAuthoritativeInformation(const QString &phrase=QString());
+    ListenRequestCode&setNoContent(const QString &phrase=QString());
+    ListenRequestCode&setResetContent(const QString &phrase=QString());
+    ListenRequestCode&setPartialContent(const QString &phrase=QString());
+    ListenRequestCode&setMultipleChoices(const QString &phrase=QString());
+    ListenRequestCode&setMovedPermanently(const QString &phrase=QString());
+    ListenRequestCode&setFound(const QString &phrase=QString());
+    ListenRequestCode&setSeeOther(const QString &phrase=QString());
+    ListenRequestCode&setNotModified(const QString &phrase=QString());
+    ListenRequestCode&setUseProxy(const QString &phrase=QString());
+    ListenRequestCode&setTemporaryRedirect(const QString &phrase=QString());
+    ListenRequestCode&setBadRequest(const QString &phrase=QString());
+    ListenRequestCode&setUnauthorized(const QString &phrase=QString());
+    ListenRequestCode&setPaymentRequired(const QString &phrase=QString());
+    ListenRequestCode&setForbidden(const QString &phrase=QString());
+    ListenRequestCode&setNotFound(const QString &phrase=QString());
+    ListenRequestCode&setMethodNotAllowed(const QString &phrase=QString());
+    ListenRequestCode&setNotAcceptable(const QString &phrase=QString());
+    ListenRequestCode&setProxyAuthenticationRequired(const QString &phrase=QString());
+    ListenRequestCode&setRequestTimeout(const QString &phrase=QString());
+    ListenRequestCode&setConflict(const QString &phrase=QString());
+    ListenRequestCode&setGone(const QString &phrase=QString());
+    ListenRequestCode&setLengthRequired(const QString &phrase=QString());
+    ListenRequestCode&setPreconditionFailed(const QString &phrase=QString());
+    ListenRequestCode&setPayloadTooLarge(const QString &phrase=QString());
+    ListenRequestCode&setURITooLong(const QString &phrase=QString());
+    ListenRequestCode&setUnsupportedMediaType(const QString &phrase=QString());
+    ListenRequestCode&setRangeNotSatisfiable(const QString &phrase=QString());
+    ListenRequestCode&setExpectationFailed(const QString &phrase=QString());
+    ListenRequestCode&setUpgradeRequired(const QString &phrase=QString());
+    ListenRequestCode&setInternalServerError(const QString &phrase=QString());
+    ListenRequestCode&setNotImplemented(const QString &phrase=QString());
+    ListenRequestCode&setBadGateway(const QString &phrase=QString());
+    ListenRequestCode&setServiceUnavailable(const QString &phrase=QString());
+    ListenRequestCode&setGatewayTimeout(const QString &phrase=QString());
+    ListenRequestCode &setHTTPVersionNotSupported(const QString &phrase=QString());
 
 };
 

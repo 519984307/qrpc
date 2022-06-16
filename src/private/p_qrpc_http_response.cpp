@@ -19,7 +19,7 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<HttpResponsePvt*>(this->p)
+    auto &p =*reinterpret_cast<HttpResponsePvt*>(this->p)
 
 class HttpResponsePvt{
 public:
@@ -275,7 +275,7 @@ HttpResponse &HttpResponse::setResponse(QObject *objectResponse)
 {
     dPvt();
     if(objectResponse!=nullptr && QRpc::RequestJobResponse::staticMetaObject.cast(objectResponse)){
-        auto&response=*dynamic_cast<QRpc::RequestJobResponse*>(objectResponse);
+        auto &response=*dynamic_cast<QRpc::RequestJobResponse*>(objectResponse);
         p.response_header.setRawHeader(response.responseHeader);
         p.response_status_code=response.response_status_code;
         p.response_qt_status_code=response.response_qt_status_code;
@@ -288,7 +288,7 @@ HttpResponse &HttpResponse::setResponse(QObject *objectResponse)
 QString HttpResponse::toString() const
 {
     dPvt();
-    auto&response=*this;
+    auto &response=*this;
     auto qt_text=ListenRequestCode::qt_network_error_phrase(p.response_qt_status_code);
     auto msg=qsl("QtStatus: Status:%1, %2, %3").arg(QString::number(response.qtStatusCode()), response.reasonPhrase(),qt_text);
     return msg;
@@ -308,7 +308,7 @@ HttpResponse::operator bool() const
 
 HttpResponse&HttpResponse::print(const QString &output)
 {
-    for(auto&v:this->printOut(output))
+    for(auto &v:this->printOut(output))
         sInfo()<<v;
     return*this;
 }

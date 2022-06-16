@@ -81,7 +81,7 @@ public:
             return {};
 
         outMethod={};
-        auto&metaObject = *controller->metaObject();
+        auto &metaObject = *controller->metaObject();
         for(int col = 0; col < metaObject.methodCount(); ++col) {
             auto method = metaObject.method(col);
 

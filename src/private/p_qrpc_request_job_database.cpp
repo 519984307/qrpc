@@ -11,7 +11,7 @@ RequestJobDataBase::~RequestJobDataBase(){
 
 ListenRequest &RequestJobDataBase::requestMake(RequestJobResponse *response){
 
-    const auto&request_url=response->request_url;
+    const auto &request_url=response->request_url;
     this->response=response;
 
     static const auto removeHeaders=QStringList{qsl("host"),qsl("content-length")};
@@ -45,7 +45,7 @@ ListenRequest &RequestJobDataBase::requestMake(RequestJobResponse *response){
             case QMetaType_QStringList:
             {
                 auto vList=v.toList();
-                for(auto&r:vList){
+                for(auto &r:vList){
                     headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                 }
                 break;
@@ -116,7 +116,7 @@ bool RequestJobDataBase::connectionMake(QSqlDatabase &outConnection)
 {
     this->connectionClose();
 
-    auto&exchange_call=this->response->request_exchange.call();
+    auto &exchange_call=this->response->request_exchange.call();
 
 
     auto driver=exchange_call.driver().trimmed();
@@ -163,7 +163,7 @@ bool RequestJobDataBase::connectionMake(QSqlDatabase &outConnection)
             this->onBrokerError(msg);
         }
         else{
-            QObject::connect(sqlDriver, QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &RequestJobDataBase::onReceiveBroker);
+            QObject::connect(sqlDriver, QOverload<const QString &, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &RequestJobDataBase::onReceiveBroker);
         }
     }
     outConnection=__connection;
@@ -173,7 +173,7 @@ bool RequestJobDataBase::connectionMake(QSqlDatabase &outConnection)
 bool RequestJobDataBase::call(RequestJobResponse *response)
 {
     this->response=response;
-    auto&request=this->requestMake(response);
+    auto &request=this->requestMake(response);
     QSqlDatabase __connection;
     if(!this->connectionMake(__connection)){
         this->onBrokerError(qsl("invalid database connection"));
@@ -248,7 +248,7 @@ void RequestJobDataBase::onBrokerError(const QString &error)
 
 void RequestJobDataBase::onFinish()
 {
-    QObject::disconnect(this->sqlDriver, QOverload<const QString&, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &RequestJobDataBase::onReceiveBroker);
+    QObject::disconnect(this->sqlDriver, QOverload<const QString &, QSqlDriver::NotificationSource, const QVariant &>::of(&QSqlDriver::notification), this, &RequestJobDataBase::onReceiveBroker);
     auto __connection=QSqlDatabase::database(this->sqlConnectionName);
     if(__connection.isValid()){
         __connection.close();

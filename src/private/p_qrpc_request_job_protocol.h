@@ -25,10 +25,10 @@ public:
     virtual bool call(RequestJobResponse*response);
 
 signals:
-    void callback(const QVariant&vHash);
-    void ____verify(const QVariant&v);
+    void callback(const QVariant &vHash);
+    void ____verify(const QVariant &v);
 public slots:
-    virtual void ____onVerify(const QVariant&v);
+    virtual void ____onVerify(const QVariant &v);
 };
 
 }

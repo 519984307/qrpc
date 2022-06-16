@@ -9,7 +9,7 @@ namespace QRpc {
 static const auto staticDefaultContentType=QRpc::AppJson;
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<HttpHeadersPvt*>(this->p)
+    auto &p =*reinterpret_cast<HttpHeadersPvt*>(this->p)
 
 class HttpHeadersPvt{
 public:
@@ -26,7 +26,7 @@ public:
     {
     }
 
-    QVariant header_v(const QString&key)const
+    QVariant header_v(const QString &key)const
     {
         auto vkey=key.trimmed().toLower();
         QHashIterator<QString, QVariant> i(this->header);
@@ -37,14 +37,14 @@ public:
             if(i.key().trimmed().toLower()!=vkey)
                 continue;
 
-            auto&v=i.value();
+            auto &v=i.value();
             switch (qTypeId(v)) {
             case QMetaType_QStringList:
                 vList=v.toStringList();
                 break;
             case QMetaType_QVariantList:
             {
-                for(auto&v:v.toList())
+                for(auto &v:v.toList())
                     vList<<v.toString();
                 break;
             }
@@ -106,7 +106,7 @@ QVariant HttpHeaders::rawHeader(const QString &headername)const
         if(i.key().toLower()!=headername.toLower())
             continue;
 
-        auto&v=i.value();
+        auto &v=i.value();
         QStringList vList;
         switch (qTypeId(v)) {
         case QMetaType_QStringList:
@@ -117,7 +117,7 @@ QVariant HttpHeaders::rawHeader(const QString &headername)const
             vList=v.toString().split(qsl(";"));
         }
 
-        for(auto&header:vList)
+        for(auto &header:vList)
             returnList<<header;
     }
     return QVariant(returnList);
@@ -126,7 +126,7 @@ QVariant HttpHeaders::rawHeader(const QString &headername)const
 HttpHeaders &HttpHeaders::setRawHeader(const QVariantHash &rawHeader)
 {
     dPvt();
-    auto&header=p.header;
+    auto &header=p.header;
     header.clear();
     QHashIterator<QString, QVariant> i(rawHeader);
     while (i.hasNext()) {
@@ -145,7 +145,7 @@ HttpHeaders &HttpHeaders::setRawHeader(const QString &header, const QVariant &va
     case QMetaType_QStringList:
     case QMetaType_QVariantList:
     {
-        for(auto&v:value.toList())
+        for(auto &v:value.toList())
             list<<v;
         break;
     }
@@ -157,7 +157,7 @@ HttpHeaders &HttpHeaders::setRawHeader(const QString &header, const QVariant &va
     const auto headerName=QRpc::Util::headerFormatName(header);
     auto vList=p.header[headerName].toStringList();
     vList.clear();
-    for(auto&v:list){
+    for(auto &v:list){
         auto vv=v.toByteArray().trimmed();
         if(vv.isEmpty())
             continue;
@@ -166,7 +166,7 @@ HttpHeaders &HttpHeaders::setRawHeader(const QString &header, const QVariant &va
             vList<<vv.trimmed();
     }
 
-    for(auto&v:vList){
+    for(auto &v:vList){
         auto x=v;
         if(x.startsWith(qbl_fy(Basic)) || x.startsWith(qbl_fy(basic))){
             auto x_toUtf8 = x.replace(qbl_fy(Basic), qsl_null).replace(qbl_fy(basic), qsl_null).trimmed().toUtf8();
@@ -199,7 +199,7 @@ HttpHeaders &HttpHeaders::addRawHeader(const QString &header, const QVariant &va
     case QMetaType_QStringList:
     case QMetaType_QVariantList:
     {
-        for(auto&v:value.toList())
+        for(auto &v:value.toList())
             list<<v;
         break;
     }
@@ -211,7 +211,7 @@ HttpHeaders &HttpHeaders::addRawHeader(const QString &header, const QVariant &va
     const auto headerName=QRpc::Util::headerFormatName(header);
     auto vList=p.header.value(headerName).toStringList();
     vList.clear();
-    for(auto&v:list){
+    for(auto &v:list){
         auto vv=v.toByteArray().trimmed();
 
         if(vv.isEmpty())
@@ -263,7 +263,7 @@ bool HttpHeaders::isContentType(int contentType) const
 {
     dPvt();
     const auto contenttype=p.header_v(ContentTypeName).toStringList();
-    for(auto&ct:contenttype){
+    for(auto &ct:contenttype){
         int cType=-1;
         if(!ContentTypeHeaderToHeaderType.contains(ct))
             continue;
@@ -420,7 +420,7 @@ QVariant HttpHeaders::authorization(const QString &authorization, const QString 
             continue;
 
         list.takeFirst();
-        for(auto&v:list){
+        for(auto &v:list){
             if(v.contains(qsl("="))){
                 auto sp=v.split(qsl("="));
                 QVariantHash map;
@@ -498,7 +498,7 @@ QVariant HttpHeaders::wwwAuthenticate(const QString &type)
 
 HttpHeaders &HttpHeaders::print(const QString &output)
 {
-    for(auto&v:this->printOut(output))
+    for(auto &v:this->printOut(output))
         sInfo()<<v;
     return*this;
 }

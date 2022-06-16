@@ -5,7 +5,7 @@ namespace QRpc {
 static bool static_log_register=false;
 static QString static_log_dir;
 
-static void static_log_dir_clear(const QString&ormLogDir)
+static void static_log_dir_clear(const QString &ormLogDir)
 {
     QStringList dir_found;
     QStringList dir_rm_file;
@@ -19,7 +19,7 @@ static void static_log_dir_clear(const QString&ormLogDir)
             continue;
 
         dir.setFilter(QDir::AllDirs);
-        for(auto&scanInDir:dir.entryList()){
+        for(auto &scanInDir:dir.entryList()){
             if(scanInDir==qsl(".") || scanInDir==qsl(".."))
                 continue;
 
@@ -30,14 +30,14 @@ static void static_log_dir_clear(const QString&ormLogDir)
     }
 
     auto ext=QStringList{qsl("*.*")};
-    for(auto&sdir:dir_rm_file){
+    for(auto &sdir:dir_rm_file){
         QDir scanDir(sdir);
         if(!scanDir.exists())
             continue;
         scanDir.setFilter(QDir::Drives | QDir::Files);
         scanDir.setNameFilters(ext);
         auto list=scanDir.entryList();
-        for(auto&dirFile : list){
+        for(auto &dirFile : list){
             auto fileName=sdir+qsl("/")+dirFile;
             QFile::remove(fileName);
         }
@@ -126,7 +126,7 @@ void RequestPvt::writeLog(RequestJobResponse &response, const QVariant &request)
         return;
 
     QTextStream outText(&file);
-    auto&e=response.request_exchange.call();
+    auto &e=response.request_exchange.call();
     outText << RequestMethodName[e.method()]<<qsl(": ")<<response.request_url.toString()<<qsl("\n");
     outText << QJsonDocument::fromVariant(request).toJson(QJsonDocument::Indented);
     outText << qsl("\n");
@@ -165,7 +165,7 @@ HttpResponse &RequestPvt::upload(const QString &route, const QString &fileName)
     if(!routeCall.startsWith(baseRoute))
         routeCall=qsl("/%1/%2").arg(baseRoute, route);
 
-    auto&e=this->exchange.call();
+    auto &e=this->exchange.call();
     e.setMethod(QRpc::Post);
     e.setRoute(routeCall);
 
@@ -216,10 +216,10 @@ HttpResponse &RequestPvt::download(const QString &route, const QString &fileName
     if(!routeCall.startsWith(baseRoute))
         routeCall=qsl("/%1/%2").arg(baseRoute, route);
 
-    auto&e=this->exchange.call();
+    auto &e=this->exchange.call();
     e.setMethod(QRpc::Get);
     e.setRoute(routeCall);
-    auto&vBody=this->request_body;
+    auto &vBody=this->request_body;
     auto method=e.method();
     QMultiHash<QString,QVariant> paramsGet;
     switch (method) {
@@ -248,7 +248,7 @@ HttpResponse &RequestPvt::download(const QString &route, const QString &fileName
         auto request_url_str = qsl("%1%2/%3").arg(e.hostName(), e_port, e.route()).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/"));
         auto request_url_part = request_url_str.split(qsl("/"));
         request_url_str.clear();
-        for(auto&line:request_url_part){
+        for(auto &line:request_url_part){
             if(line.trimmed().isEmpty())
                 continue;
             if(!request_url_str.isEmpty())
@@ -266,7 +266,7 @@ HttpResponse &RequestPvt::download(const QString &route, const QString &fileName
 #endif
             while (i.hasNext()){
                 i.next();
-                const auto&k=i.key();
+                const auto &k=i.key();
                 const auto v=Util::parseQueryItem(i.value());
                 url_query.addQueryItem(k, v);
             }
@@ -307,7 +307,7 @@ HttpResponse &RequestPvt::call(const RequestMethod &method, const QVariant &vRou
     if(!routeCall.startsWith(baseRoute))
         routeCall=qsl("/%1/%2").arg(baseRoute,route);
 
-    auto&e=this->exchange.call();
+    auto &e=this->exchange.call();
     e.setMethod(method);
     e.setRoute(routeCall);
 
@@ -338,7 +338,7 @@ HttpResponse &RequestPvt::call(const RequestMethod &method, const QVariant &vRou
         auto request_url_str = qsl("%1%2/%3").arg(e.hostName(), e_port, e.route()).replace(qsl("\""), qsl_null).replace(qsl("//"), qsl("/"));
         auto request_url_part = request_url_str.split(qsl("/"));
         request_url_str.clear();
-        for(auto&line:request_url_part){
+        for(auto &line:request_url_part){
             if(line.trimmed().isEmpty())
                 continue;
             if(!request_url_str.isEmpty())
@@ -430,7 +430,7 @@ HttpResponse &RequestPvt::call(const RequestMethod &method, const QVariant &vRou
     default:
         this->request_body = vBody;
     }
-    const auto&requestRecovery=this->requestRecovery;
+    const auto &requestRecovery=this->requestRecovery;
     auto job = RequestJob::newJob(Request::acRequest);
     QObject::connect(this, &RequestPvt::runJob, job, &RequestJob::onRunJob);
     int executeCount=0;

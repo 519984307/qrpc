@@ -3,7 +3,7 @@
 namespace QRpc {
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<RequestExchangePvt*>(this->p)
+    auto &p =*reinterpret_cast<RequestExchangePvt*>(this->p)
 
 class RequestExchangePvt{
 public:
@@ -81,7 +81,7 @@ QVariantHash RequestExchange::toHash() const
 
 RequestExchange &RequestExchange::print(const QString &output)
 {
-    for(auto&v:this->printOut(output))
+    for(auto &v:this->printOut(output))
         sInfo()<<v;
     return*this;
 }
@@ -94,13 +94,13 @@ QStringList RequestExchange::printOut(const QString &output)
     if(p.call.isValid()){
         out<<qsl("%1%2 exchange.call").arg(space, output).trimmed();
         auto outtext=space+qsl(".    ");
-        for(auto&v:p.call.printOut(outtext))
+        for(auto &v:p.call.printOut(outtext))
             out<<v;
     }
     if(p.back.isValid()){
         out<<qsl("%1%2 exchange.back").arg(space, output).trimmed();
         auto outtext=space+qsl(".    ");
-        for(auto&v:p.back.printOut(outtext))
+        for(auto &v:p.back.printOut(outtext))
             out<<v;
     }
     return out;

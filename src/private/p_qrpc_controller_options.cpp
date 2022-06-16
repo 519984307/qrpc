@@ -25,7 +25,7 @@ bool ControllerOptionsPrv::isLoaded()
         if(i.key().trimmed().isEmpty())
             continue;
 
-        auto&v=i.value();
+        auto &v=i.value();
         if(v->isValid())
             return true;
     }
@@ -37,7 +37,7 @@ bool ControllerOptionsPrv::isEmpty()
     QHashIterator<QString, ControllerSetting*> i(this->settings);
     while (i.hasNext()) {
         i.next();
-        auto&v=i.value();
+        auto &v=i.value();
         if(v->isValid())
             return false;
     }
@@ -56,7 +56,7 @@ QVariantHash ControllerOptionsPrv::toHash()
     QVariantHash vSettings;
     auto vList=QList<ControllerSetting*>()<<&this->settingsDefault;
     vList=vList+this->settings.values();
-    for(auto&v:vList)
+    for(auto &v:vList)
         vSettings.insert(v->name(), v->toHash());
     return vSettings;
 }
@@ -64,7 +64,7 @@ QVariantHash ControllerOptionsPrv::toHash()
 ControllerSetting &ControllerOptionsPrv::settingGetCheck(const QString &settingName)
 {
     const auto p1=settingName.toLower().trimmed();
-    for(auto&setting:this->settings){
+    for(auto &setting:this->settings){
         if(setting->macth(p1)){
             return*setting;
         }
@@ -77,7 +77,7 @@ ControllerSetting &ControllerOptionsPrv::settingGetCheck(const QString &settingN
 
 ControllerOptions &ControllerOptionsPrv::insert(const QVariantHash &value)
 {
-    auto&p=*this;
+    auto &p=*this;
     auto vValue=value;
     if(vValue.isEmpty())
         return*this->parent;
@@ -90,7 +90,7 @@ ControllerOptions &ControllerOptionsPrv::insert(const QVariantHash &value)
         setting->deleteLater();
 
     auto l=QStringList{QT_STRINGIFY2(activityLimit),QT_STRINGIFY2(activityInterval)};
-    for(auto&property:l){
+    for(auto &property:l){
         auto v=vValue.value(property);
         if(!v.isValid())
             continue;
@@ -124,7 +124,7 @@ bool ControllerOptionsPrv::v_load(const QVariant &v)
 
 bool ControllerOptionsPrv::load(QObject *settingsObject)
 {
-    auto&p=*this;
+    auto &p=*this;
     if(settingsObject==nullptr)
         return false;
 
@@ -152,8 +152,8 @@ bool ControllerOptionsPrv::load(QObject *settingsObject)
 bool ControllerOptionsPrv::load(const QStringList &settingsFileName)
 {
     QVariantList vList;
-    auto&p=*this;
-    for(auto&fileName:settingsFileName){
+    auto &p=*this;
+    for(auto &fileName:settingsFileName){
         QFile file(fileName);
         if(fileName.isEmpty()){
             continue;
@@ -208,7 +208,7 @@ bool ControllerOptionsPrv::load(const QStringList &settingsFileName)
 bool ControllerOptionsPrv::load(const QString &fileName)
 {
     auto load=[this, fileName](){
-        auto&p=*this;
+        auto &p=*this;
         QFile file(fileName);
         if(fileName.trimmed().isEmpty()){
 #if Q_RPC_LOG
@@ -268,7 +268,7 @@ bool ControllerOptionsPrv::load(const QString &fileName)
 
 bool ControllerOptionsPrv::load(const QVariantHash &settings)
 {
-    auto&p=*this;
+    auto &p=*this;
     p.settingBody=settings;
 
     auto arguments=settings.value(qsl("arguments"));
@@ -277,7 +277,7 @@ bool ControllerOptionsPrv::load(const QVariantHash &settings)
     case QMetaType_QVariantList:
     case QMetaType_QStringList:
     {
-        for(auto&v:arguments.toList()){
+        for(auto &v:arguments.toList()){
             auto l=v.toString().split(qsl("="));
             if(l.isEmpty()){
                 continue;

@@ -48,7 +48,7 @@ static const QByteArray makeBaseUuid()
 static auto const baseUuid=makeBaseUuid();
 
 #define dPvt()\
-    auto&p =*reinterpret_cast<ListenRequestPvt*>(this->p)
+    auto &p =*reinterpret_cast<ListenRequestPvt*>(this->p)
 
 class ListenRequestPvt:public QObject{
 public:
@@ -87,10 +87,10 @@ public:
         this->freeFiles();
     }
 
-    void mergeMap(const QVariant&v)
+    void mergeMap(const QVariant &v)
     {
         Q_DECLARE_VU;
-        auto&r=*this->parent;
+        auto &r=*this->parent;
         r.mergeMap(vu.toMap(v));
         if(!r.isMethodGet() && !r.isMethodDelete())
             return;
@@ -142,7 +142,7 @@ public:
 
     void freeFiles()
     {
-        for(auto&v:this->uploadedFiles){
+        for(auto &v:this->uploadedFiles){
             v->close();
             delete v;
         }
@@ -211,7 +211,7 @@ public:
 
     QByteArray authorizationParser(const QByteArray&type) const
     {
-        auto&p=*this;
+        auto &p=*this;
         const auto stype=type.toLower();
         //TODO ADAPTER FOR MULT AUTHORIZATION
         QHashIterator<QString, QVariant> i(p._requestHeader);
@@ -452,7 +452,7 @@ bool ListenRequest::fromMap(const QVariantMap &vRequest)
 
 bool ListenRequest::mergeMap(const QVariantMap &vRequest)
 {
-    auto&metaObject =*this->metaObject();
+    auto &metaObject =*this->metaObject();
     for(auto i = metaObject.propertyOffset() ; i < metaObject.propertyCount() ; i++){
         auto property = metaObject.property(i);
         auto key = property.name();
@@ -488,7 +488,7 @@ bool ListenRequest::mergeMap(const QVariantMap &vRequest)
             auto vLst=vVal.toList();
             if(!vLst.isEmpty()){
                 auto mNew=vNew.toList();
-                for(auto&v:mNew){
+                for(auto &v:mNew){
                     if(vLst.contains(v))
                         continue;
                     vLst<<v;
@@ -571,7 +571,7 @@ bool ListenRequest::fromHash(const QVariantHash &vRequest)
 
 bool ListenRequest::mergeHash(const QVariantHash &vRequest)
 {
-    auto&metaObject =*this->metaObject();
+    auto &metaObject =*this->metaObject();
     for(auto i = metaObject.propertyOffset() ; i < metaObject.propertyCount() ; i++){
         auto property = metaObject.property(i);
         auto key = property.name();
@@ -607,7 +607,7 @@ bool ListenRequest::mergeHash(const QVariantHash &vRequest)
             auto vLst=vVal.toList();
             if(!vLst.isEmpty()){
                 auto mNew=vNew.toList();
-                for(auto&v:mNew){
+                for(auto &v:mNew){
                     if(vLst.contains(v))
                         continue;
                     else
@@ -1022,7 +1022,7 @@ bool ListenRequest::requestParserBodyMap(const QVariant &property, QVariantMap &
         case QMetaType_QVariantList:
         case QMetaType_QStringList:
         {
-            for(auto&v:property.toList()){
+            for(auto &v:property.toList()){
                 auto s=v.toString().toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
@@ -1033,7 +1033,7 @@ bool ListenRequest::requestParserBodyMap(const QVariant &property, QVariantMap &
         case QMetaType_QVariantHash:
         {
             auto vKeys=property.toHash().keys();
-            for(auto&v:vKeys){
+            for(auto &v:vKeys){
                 auto s=v.toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
@@ -1047,10 +1047,10 @@ bool ListenRequest::requestParserBodyMap(const QVariant &property, QVariantMap &
             auto vBody=this->requestParamMap();
             QVariantList vPropBody;
             auto vKeys=vBody.keys();
-            for(auto&v:vKeys){
+            for(auto &v:vKeys){
                 vPropBody<<v.toLower().trimmed();
             }
-            for(auto&prop:p._requestParserProperty){
+            for(auto &prop:p._requestParserProperty){
                 if(!vPropBody.contains(prop)){
                     sInfo()<<qsl("parameter not found: ")+prop.toString();
                     __return=false;
@@ -1089,7 +1089,7 @@ bool ListenRequest::requestParserBodyHash(const QVariant &property, QVariantHash
         case QMetaType_QVariantList:
         case QMetaType_QStringList:
         {
-            for(auto&v:property.toList()){
+            for(auto &v:property.toList()){
                 auto s=v.toString().toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
@@ -1100,7 +1100,7 @@ bool ListenRequest::requestParserBodyHash(const QVariant &property, QVariantHash
         case QMetaType_QVariantHash:
         {
             auto vKeys=property.toHash().keys();
-            for(auto&v:vKeys){
+            for(auto &v:vKeys){
                 auto s=v.toLower().trimmed();
                 if(!p._requestParserProperty.contains(s))
                     p._requestParserProperty<<s;
@@ -1114,10 +1114,10 @@ bool ListenRequest::requestParserBodyHash(const QVariant &property, QVariantHash
             auto vBody=this->requestParamMap();
             QVariantList vPropBody;
             auto vKeys=vBody.keys();
-            for(auto&v:vKeys){
+            for(auto &v:vKeys){
                 vPropBody<<v.toLower().trimmed();
             }
-            for(auto&prop:p._requestParserProperty){
+            for(auto &prop:p._requestParserProperty){
                 if(!vPropBody.contains(prop)){
                     sInfo()<<qsl("parameter not found: ")+prop.toString();
                     __return=false;
@@ -1151,7 +1151,7 @@ QVariantMap ListenRequest::requestParamMap()const
 QVariant ListenRequest::requestParamHash(const QByteArray &key) const
 {
     dPvt();
-    const auto&map=p.requestParamCache();
+    const auto &map=p.requestParamCache();
     auto akey=key.trimmed().toLower();
     QHashIterator<QString, QVariant> i(map);
     while (i.hasNext()) {
@@ -1161,7 +1161,7 @@ QVariant ListenRequest::requestParamHash(const QByteArray &key) const
         if(akey!=bKey)
             continue;
 
-        auto&v=i.value();
+        auto &v=i.value();
         switch (qTypeId(p._requestBody)) {
         case QMetaType_QString:
         case QMetaType_QByteArray:
@@ -1279,7 +1279,7 @@ void ListenRequest::setUploadedFiles(const QVariant &vFiles)
     dPvt();
     auto files=vFiles.toStringList();
     p.freeFiles();
-    for(const auto&v:files){
+    for(const auto &v:files){
         auto file=new QFile(v);
         if(!file->open(QFile::ReadOnly)){
             delete file;
@@ -1310,7 +1310,7 @@ void ListenRequest::setResponseHeader(const QVariantHash &value)
     p._responseHeader.clear();
     Q_V_HASH_ITERATOR(value){
         i.next();
-        auto&v=i.value();
+        auto &v=i.value();
         auto typeId=qTypeId(v);
         auto s=(typeId==QMetaType_QStringList || typeId==QMetaType_QVariantList)?v.toStringList().join(' '):v.toString();
         p._responseHeader.insert(i.key(), s);
@@ -1494,8 +1494,8 @@ void ListenRequest::setControllerSetting(const ControllerSetting&setting)
     if(!setting.enabled())
         return;
 
-    auto&set=setting;
-    auto&rq=*this;
+    auto &set=setting;
+    auto &rq=*this;
     Q_DECLARE_VU;
     {
         auto vDes=rq.requestHeader();

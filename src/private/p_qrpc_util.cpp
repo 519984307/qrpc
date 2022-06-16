@@ -6,7 +6,7 @@ namespace QRpc {
 
 namespace Util {
 
-const QString routeParser(const QVariant&vRouteBase)
+const QString routeParser(const QVariant &vRouteBase)
 {
     auto routeBase=vRouteBase.toString();
     if(routeBase.contains(qsl("/"))){
@@ -20,14 +20,14 @@ const QString routeParser(const QVariant&vRouteBase)
     return routeBase.toUtf8();
 }
 
-const QByteArray routeExtractMethod(const QString&routeBase)
+const QByteArray routeExtractMethod(const QString &routeBase)
 {
     if(routeBase.contains(qsl("/")))
         return routeBase.split(qsl("/")).last().toUtf8().toLower();
     return {};
 }
 
-const QByteArray routeExtract(const QString&routeBase)
+const QByteArray routeExtract(const QString &routeBase)
 {
     if(routeBase.contains(qsl("/"))){
         auto lst=routeBase.split(qsl("/"));
@@ -37,14 +37,14 @@ const QByteArray routeExtract(const QString&routeBase)
     return {};
 }
 
-const QString headerFormatName(const QString&name)
+const QString headerFormatName(const QString &name)
 {
     auto sname=name.trimmed();
     auto separator=QStringList{qsl("-")};
     QStringList newHeaderName;
-    for(auto&v:separator){
+    for(auto &v:separator){
         auto nameList=sname.split(v);
-        for(auto&name:nameList){
+        for(auto &name:nameList){
             if(name.trimmed().isEmpty())
                 continue;
             name=name.toLower();
@@ -56,14 +56,14 @@ const QString headerFormatName(const QString&name)
     return sname;
 }
 
-const QString parseQueryItem(const QVariant&v)
+const QString parseQueryItem(const QVariant &v)
 {
     if(qTypeId(v)==QMetaType_QUuid)
         return v.toUuid().toString();
     return v.toString();
 }
 
-const QVariantHash toMapResquest(int method, const QVariant&request_url, const QString&request_body, const QVariantHash&request_parameters, const QString&response_body, const QVariantHash&request_header, const QDateTime&request_start, const QDateTime&request_finish)
+const QVariantHash toMapResquest(int method, const QVariant&request_url, const QString &request_body, const QVariantHash&request_parameters, const QString &response_body, const QVariantHash&request_header, const QDateTime&request_start, const QDateTime&request_finish)
 {
     Q_DECLARE_VU;
     auto request_method=RequestMethodName.value(method).toUpper();
@@ -79,7 +79,7 @@ const QVariantHash toMapResquest(int method, const QVariant&request_url, const Q
     QHashIterator<QString, QVariant> i(request_header);
     while (i.hasNext()) {
         i.next();
-        const auto&k=i.key();
+        const auto &k=i.key();
         auto v=i.value();
         auto typeId=qTypeId(v);
         v = QMetaTypeUtilVariantList.contains(typeId)?v.toStringList().join(qsl(";")):v;

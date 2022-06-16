@@ -47,7 +47,7 @@ private slots:
 
     void onReceiveBroker(const QString &responseTopic, QSqlDriver::NotificationSource, const QVariant &responseBody);
 
-    void onBrokerError(const QString&error);
+    void onBrokerError(const QString &error);
 
     void onFinish();
 };

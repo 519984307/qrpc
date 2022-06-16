@@ -45,10 +45,10 @@ bool RequestJobHttp::call(RequestJobResponse *response)
     sWarning()<<tr("request.url: %1").arg(response->request_url);
 #endif
 
-    const auto&request_url=response->request_url.toUrl();
+    const auto &request_url=response->request_url.toUrl();
     this->response=response;
 
-    const auto&requestBody = response->request_body;
+    const auto &requestBody = response->request_body;
     this->request=QNetworkRequest(QUrl(request_url));
     this->request.setSslConfiguration(sslConfiguration);
     QHash<QByteArray,QByteArray> request_header_ignored;
@@ -70,7 +70,7 @@ bool RequestJobHttp::call(RequestJobResponse *response)
                     case QMetaType_QStringList:
                     {
                         auto vList=v.toList();
-                        for(auto&r:vList){
+                        for(auto &r:vList){
                             headerValues<<r.toString().replace(qsl("\n"), qsl(";"));
                         }
                         break;
@@ -108,8 +108,8 @@ bool RequestJobHttp::call(RequestJobResponse *response)
             QHashIterator<QByteArray,QByteArray> i(request_header);
             while (i.hasNext()) {
                 i.next();
-                const auto&k=i.key();
-                const auto&v=i.value();
+                const auto &k=i.key();
+                const auto &v=i.value();
                 this->request.setRawHeader(k, v);
             }
         }
@@ -122,8 +122,8 @@ bool RequestJobHttp::call(RequestJobResponse *response)
         QHashIterator<QByteArray,QByteArray> i(request_header_ignored);
         while (i.hasNext()) {
             i.next();
-            const auto&k=i.key();
-            const auto&v=i.value();
+            const auto &k=i.key();
+            const auto &v=i.value();
             this->request.setRawHeader(k, v);
         }
     };
@@ -154,8 +154,8 @@ bool RequestJobHttp::call(RequestJobResponse *response)
             QHashIterator<QByteArray,QByteArray> i(request_header_ignored);
             while (i.hasNext()) {
                 i.next();
-                const auto&k=i.key();
-                const auto&v=i.value();
+                const auto &k=i.key();
+                const auto &v=i.value();
                 httpPart.setRawHeader( k, v );
             }
             httpPart.setBodyDevice(&this->fileUpload);
@@ -367,7 +367,7 @@ void RequestJobHttp::onFinish()
     this->reply=nullptr;
 
     if(localReply!=nullptr){
-        for(auto&v:localReply->rawHeaderPairs())
+        for(auto &v:localReply->rawHeaderPairs())
             response->responseHeader.insert(v.first, v.second);
 
         if(response->response_status_code!=QNetworkReply::TimeoutError){
