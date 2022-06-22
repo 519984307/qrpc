@@ -6,7 +6,7 @@
 #include "./qrpc_listen_request.h"
 
 namespace QRpc {
-
+class ServerPvt;
 //!
 //! \brief The Server class
 //!
@@ -149,7 +149,7 @@ public:
     Q_INVOKABLE virtual void setServerName(const QString &value);
 
 private:
-    QObject *p = nullptr;
+    ServerPvt *p = nullptr;
 };
 
 //typedef QRpc::Server QRPCServer;

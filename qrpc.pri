@@ -3,7 +3,8 @@ QT += network
 QT += websockets
 
 QTREFORCE_QRPC=true
-QMAKE_CXXFLAGS += -DQTREFORCE_QRPC=\\\"$$QTREFORCE_QRPC\\\"
+DEFINES += QTREFORCE_QRPC
+#QMAKE_CXXFLAGS += -DQTREFORCE_QRPC=\\\"$$QTREFORCE_QRPC\\\"
 
 include($$PWD/src/qrpc-base.pri)
 include($$PWD/src/qrpc-token.pri)

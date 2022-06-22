@@ -11,11 +11,11 @@
 #include "./qrpc_service_setting.h"
 
 namespace QRpc {
-
+class ServiceThreadPvt;
 //!
 //! \brief The ServiceThread class
 //!
-class ServiceThread : public QThread
+class Q_RPC_EXPORT ServiceThread : public QThread
 {
     Q_OBJECT
 public:
@@ -189,7 +189,7 @@ signals:
     //!
     void request_state(const QUuid &uuid, const QRpc::ServiceThread::State state, const QVariant&detail);
 private:
-    void*p=nullptr;
+    ServiceThreadPvt *p=nullptr;
 };
 
 }

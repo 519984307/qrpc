@@ -328,7 +328,7 @@ public slots:
 class ListenHTTPPvt : public QObject
 {
 public:
-    HttpServer3rdparty *_listenServer = nullptr;
+    HttpServer3rdparty *listenServer = nullptr;
     ListenHTTP *parent = nullptr;
 
     explicit ListenHTTPPvt(ListenHTTP *parent) : QObject{parent} { this->parent = parent; }
@@ -338,25 +338,25 @@ public:
     bool start()
     {
         auto &p = *this;
-        p._listenServer = new HttpServer3rdparty(this->parent);
+        p.listenServer = new HttpServer3rdparty(this->parent);
         QObject::connect(this->parent,
                          &Listen::rpcResponse,
-                         p._listenServer,
+                         p.listenServer,
                          &HttpServer3rdparty::onRpcResponse);
-        return p._listenServer->isListening();
+        return p.listenServer->isListening();
     }
 
     bool stop()
     {
         auto &p = *this;
-        if (p._listenServer != nullptr) {
+        if (p.listenServer != nullptr) {
             QObject::disconnect(this->parent,
                                 &Listen::rpcResponse,
-                                p._listenServer,
+                                p.listenServer,
                                 &HttpServer3rdparty::onRpcResponse);
-            delete p._listenServer;
+            delete p.listenServer;
         }
-        p._listenServer = nullptr;
+        p.listenServer = nullptr;
         return true;
     }
 };
@@ -368,23 +368,21 @@ ListenHTTP::ListenHTTP(QObject *parent) : Listen{parent}
 
 ListenHTTP::~ListenHTTP()
 {
-    dPvt();
-    p.stop();
-    delete &p;
+    p->stop();
 }
 
 bool ListenHTTP::start()
 {
-    dPvt();
+
     Listen::start();
-    return p.start();
+    return p->start();
 }
 
 bool ListenHTTP::stop()
 {
     Listen::stop();
-    dPvt();
-    return p.stop();
+
+    return p->stop();
 }
 
 } // namespace QRpc
