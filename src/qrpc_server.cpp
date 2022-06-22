@@ -3,8 +3,6 @@
 
 namespace QRpc {
 
-#define dPvt() auto &p = *reinterpret_cast<ServerPvt *>(this->p)
-
 Server::Server(QObject *parent) : QObject{parent}
 {
     this->p = new ServerPvt{this};
@@ -13,33 +11,33 @@ Server::Server(QObject *parent) : QObject{parent}
 Server::Server(const QVariant &settings, QObject *parent) : QObject{parent}
 {
     this->p = new ServerPvt{this};
-    dPvt();
-    p.v_load(settings);
+
+    p->v_load(settings);
 }
 
 Server::~Server() {}
 
 ControllerOptions &Server::controllerOptions()
 {
-    dPvt();
-    return p.controllerOptions;
+
+    return p->controllerOptions;
 }
 
 bool Server::isFinished() const
 {
-    dPvt();
-    return p.listenColletions->isFinished();
+
+    return p->listenColletions->isFinished();
 }
 
 bool Server::isRunning() const
 {
-    dPvt();
-    return p.listenColletions->isRunning();
+
+    return p->listenColletions->isRunning();
 }
 
 bool Server::start()
 {
-    dPvt();
+
 
     this->controllers().clear();
     for (auto &v : Controller::staticApiList())
@@ -49,81 +47,81 @@ bool Server::start()
     for (auto &v : Controller::staticApiParserList())
         this->controllerParsers().append(v);
 
-    return p.serverStart();
+    return p->serverStart();
 }
 
 bool Server::stop()
 {
-    dPvt();
-    return p.listenColletions->quit();
+
+    return p->listenColletions->quit();
 }
 
 Server &Server::interfacesStart()
 {
-    dPvt();
-    p.enabledInterfaces = true;
+
+    p->enabledInterfaces = true;
     return *this;
 }
 
 Server &Server::interfacesStop()
 {
-    dPvt();
-    p.enabledInterfaces = false;
+
+    p->enabledInterfaces = false;
     return *this;
 }
 
 bool Server::interfacesRunning()
 {
-    dPvt();
-    return p.enabledInterfaces;
+
+    return p->enabledInterfaces;
 }
 
 QList<const QMetaObject *> &Server::controllers()
 {
-    dPvt();
-    return p.controllers;
+
+    return p->controllers;
 }
 
 QList<const QMetaObject *> &Server::controllerParsers()
 {
-    dPvt();
-    return p.controllerParsers;
+
+    return p->controllerParsers;
 }
 
 void Server::requestEnable()
 {
-    dPvt();
-    p.listenColletions->requestEnabled();
+
+    p->listenColletions->requestEnabled();
 }
 
 void Server::requestDisable()
 {
-    dPvt();
-    p.listenColletions->requestEnabled();
+
+    p->listenColletions->requestEnabled();
 }
 
 ListenColletions &Server::colletions()
 {
-    dPvt();
-    return *p.listenColletions;
+
+    return *p->listenColletions;
 }
 
 QVariant Server::settingsFileName()
 {
-    dPvt();
-    return p.settingsFileName;
+
+    return p->settingsFileName;
 }
 
 bool Server::setSettingsFileName(const QString &fileName)
 {
-    dPvt();
-    return p.v_load(qvsl{fileName});
+
+    return p->v_load(qvsl{fileName});
 }
 
 bool Server::setSettings(const QVariant &settings) const
 {
-    dPvt();
-    return p.v_load(settings);
+
+    return p->v_load(settings);
 }
 
 bool Server::authorizationRequest(const ListenRequest &request) const
@@ -134,14 +132,14 @@ bool Server::authorizationRequest(const ListenRequest &request) const
 
 QString Server::serverName() const
 {
-    dPvt();
-    return p.serverName.isEmpty() ? "Undef" : p.serverName;
+
+    return p->serverName.isEmpty() ? "Undef" : p->serverName;
 }
 
 void Server::setServerName(const QString &value)
 {
-    dPvt();
-    p.serverName = value;
+
+    p->serverName = value;
 }
 
 } // namespace QRpc

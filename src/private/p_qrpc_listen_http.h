@@ -3,7 +3,7 @@
 #include "../qrpc_listen.h"
 
 namespace QRpc {
-
+class ListenHTTPPvt;
 //!
 //! \brief The ListenHTTP class
 //!
@@ -27,7 +27,7 @@ public:
     bool stop() override;
 
 private:
-    void *p = nullptr;
+    ListenHTTPPvt *p = nullptr;
 };
 
 QRPC_LISTTEN_AUTO_REGISTER(Http, ListenHTTP)

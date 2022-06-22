@@ -4,8 +4,6 @@
 
 namespace QRpc {
 
-#define dPvt()\
-    auto &p =*reinterpret_cast<ServiceThreadPvt*>(this->p)
 
 static qlonglong serviceThreadCount=0;
 
@@ -62,13 +60,12 @@ public slots:
 
 void ServiceThread::Stats::clear()
 {
-    auto &p=*this;
-    p.started=p.started.currentDateTime();
-    p.received=0;
-    p.success=0;
-    p.error=0;
-    p.discated=0;
-    p.canceled=0;
+    this->started=QDateTime::currentDateTime();
+    this->received=0;
+    this->success=0;
+    this->error=0;
+    this->discated=0;
+    this->canceled=0;
 }
 
 QVariantHash ServiceThread::Stats::toMap()const
@@ -78,15 +75,14 @@ QVariantHash ServiceThread::Stats::toMap()const
 
 QVariantHash ServiceThread::Stats::toHash() const
 {
-    auto &p=*this;
     QVariantHash v;
-    v.insert(qsl("running" ),(p.service==nullptr)?false:p.service->isRunning());
-    v.insert(qsl("started" ), p.started     );
-    v.insert(qsl("received"), p.received    );
-    v.insert(qsl("success" ), p.success     );
-    v.insert(qsl("error"   ), p.error       );
-    v.insert(qsl("discated"), p.discated    );
-    v.insert(qsl("canceled"), p.canceled    );
+    v.insert(qsl("running" ),(this->service==nullptr)?false:this->service->isRunning());
+    v.insert(qsl("started" ), this->started     );
+    v.insert(qsl("received"), this->received    );
+    v.insert(qsl("success" ), this->success     );
+    v.insert(qsl("error"   ), this->error       );
+    v.insert(qsl("discated"), this->discated    );
+    v.insert(qsl("canceled"), this->canceled    );
     return v;
 
 }
@@ -95,16 +91,16 @@ ServiceThread::ServiceThread(QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
     this->p = new ServiceThreadPvt{this};
-    dPvt();
-    p.service=this;
+
+    p->service=this;
 }
 
 ServiceThread::ServiceThread(const QString &serviceName, QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
     this->p = new ServiceThreadPvt{this};
-    dPvt();
-    p.service=this;
+
+    p->service=this;
     this->setServiceName(serviceName);
 }
 
@@ -112,73 +108,73 @@ ServiceThread::ServiceThread(const ServiceManager &manager, QObject *parent) : Q
 {
     Q_UNUSED(parent)
     this->p = new ServiceThreadPvt{this};
-    dPvt();
-    p.service=this;
-    p.setManager(manager);
+
+    p->service=this;
+    p->setManager(manager);
 }
 
 ServiceThread::ServiceThread(const ServiceManager &manager, const QString &serviceName, QObject *parent) : QThread{nullptr}
 {
     Q_UNUSED(parent)
     this->p = new ServiceThreadPvt{this};
-    dPvt();
-    p.service=this;
-    p.setManager(manager);
+
+    p->service=this;
+    p->setManager(manager);
     this->setServiceName(serviceName);
 }
 
 ServiceThread::~ServiceThread()
 {
-    dPvt();
+
     delete&p;
 }
 
 QRpc::ServiceSetting&ServiceThread::setting()
 {
-    dPvt();
-    if(!p.setting.isValid()){
-        p.setting=p.manager.setting(p.serviceName);
+
+    if(!p->setting.isValid()){
+        p->setting=p->manager.setting(p->serviceName);
     }
-    return p.setting;
+    return p->setting;
 }
 
 ServiceManager &ServiceThread::manager()
 {
-    dPvt();
-    return p.manager;
+
+    return p->manager;
 }
 
 void ServiceThread::run()
 {
-    dPvt();
-    p.serviceStarted=QDateTime::currentDateTime();
 
-    QObject::connect(this, &ServiceThread::request_send    , &p, &ServiceThreadPvt::onRequestReceived );
-    QObject::connect(this, &ServiceThread::request_success , &p, &ServiceThreadPvt::onRequestSuccess  );
-    QObject::connect(this, &ServiceThread::request_error   , &p, &ServiceThreadPvt::onRequestError    );
-    QObject::connect(this, &ServiceThread::request_discated, &p, &ServiceThreadPvt::onRequestDiscarted );
-    QObject::connect(this, &ServiceThread::request_canceled, &p, &ServiceThreadPvt::onRequestCanceled );
+    p->serviceStarted=QDateTime::currentDateTime();
+
+    QObject::connect(this, &ServiceThread::request_send    , this->p, &ServiceThreadPvt::onRequestReceived );
+    QObject::connect(this, &ServiceThread::request_success , this->p, &ServiceThreadPvt::onRequestSuccess  );
+    QObject::connect(this, &ServiceThread::request_error   , this->p, &ServiceThreadPvt::onRequestError    );
+    QObject::connect(this, &ServiceThread::request_discated, this->p, &ServiceThreadPvt::onRequestDiscarted );
+    QObject::connect(this, &ServiceThread::request_canceled, this->p, &ServiceThreadPvt::onRequestCanceled );
 
     QTimer::singleShot(5,this,[this](){emit ServiceThread::service_started(this);});
     this->exec();
 
-    QObject::disconnect(this, &ServiceThread::request_received, &p, &ServiceThreadPvt::onRequestReceived );
-    QObject::disconnect(this, &ServiceThread::request_success , &p, &ServiceThreadPvt::onRequestSuccess  );
-    QObject::disconnect(this, &ServiceThread::request_error   , &p, &ServiceThreadPvt::onRequestError    );
-    QObject::disconnect(this, &ServiceThread::request_discated, &p, &ServiceThreadPvt::onRequestDiscarted );
-    QObject::disconnect(this, &ServiceThread::request_canceled, &p, &ServiceThreadPvt::onRequestCanceled );
+    QObject::disconnect(this, &ServiceThread::request_received, this->p, &ServiceThreadPvt::onRequestReceived );
+    QObject::disconnect(this, &ServiceThread::request_success , this->p, &ServiceThreadPvt::onRequestSuccess  );
+    QObject::disconnect(this, &ServiceThread::request_error   , this->p, &ServiceThreadPvt::onRequestError    );
+    QObject::disconnect(this, &ServiceThread::request_discated, this->p, &ServiceThreadPvt::onRequestDiscarted );
+    QObject::disconnect(this, &ServiceThread::request_canceled, this->p, &ServiceThreadPvt::onRequestCanceled );
 
     emit this->service_terminate(this);
 }
 
 bool ServiceThread::start()
 {
-    dPvt();
+
     if(!this->isRunning()){
         auto objectName=this->objectName().trimmed();
 
         if(objectName.isEmpty()){
-            objectName=p.serviceName.trimmed();
+            objectName=p->serviceName.trimmed();
 
             if(objectName.isEmpty())
                 objectName=QThread::currentThread()->objectName().trimmed();
@@ -188,7 +184,7 @@ bool ServiceThread::start()
 
             objectName=qsl("%1_%2").arg(objectName).arg(++serviceThreadCount);
         }
-        p.manager.clear();
+        p->manager.clear();
         QThread::start();
         while(QThread::eventDispatcher()!=nullptr)
             QThread::msleep(1);
@@ -198,12 +194,12 @@ bool ServiceThread::start()
 
 bool ServiceThread::start(const ServiceManager&manager)
 {
-    dPvt();
+
     if(!this->isRunning()){
         auto objectName=this->objectName().trimmed();
 
         if(objectName.isEmpty()){
-            objectName=p.serviceName.trimmed();
+            objectName=p->serviceName.trimmed();
 
             if(objectName.isEmpty())
                 objectName=QThread::currentThread()->objectName().trimmed();
@@ -213,7 +209,7 @@ bool ServiceThread::start(const ServiceManager&manager)
 
             objectName=qsl("%1_%2").arg(objectName).arg(++serviceThreadCount);
         }
-        p.setManager(manager);
+        p->setManager(manager);
         QThread::start();
         while(QThread::eventDispatcher()!=nullptr)
             QThread::msleep(1);
@@ -232,8 +228,8 @@ bool ServiceThread::stop()
 
 ServiceThread::Stats&ServiceThread::stats() const
 {
-    dPvt();
-    return p.stats;
+
+    return p->stats;
 }
 
 void ServiceThread::received(const QUuid &uuid, const QVariant &v)
@@ -245,31 +241,31 @@ void ServiceThread::received(const QUuid &uuid, const QVariant &v)
 
 void ServiceThread::dispatcher(const QUuid &uuid, const QVariant &v)
 {
-    dPvt();
-    QMutexLOCKER locker(&p.mutex);
-    ++p.stats.queue;
+
+    QMutexLOCKER locker(&p->mutex);
+    ++p->stats.queue;
     emit this->request_send(uuid, v);
 }
 
 QVariantHash ServiceThread::toMap() const
 {
-    dPvt();
+
     QVariantHash v;
     v.insert(qsl("service"), this->objectName());
-    v.insert(qsl("stats"  ), p.stats.toHash()   );
+    v.insert(qsl("stats"  ), p->stats.toHash()   );
     return v;
 }
 
 QString ServiceThread::serviceName() const
 {
-    dPvt();
-    return p.serviceName;
+
+    return p->serviceName;
 }
 
 void ServiceThread::setServiceName(const QString &value)
 {
-    dPvt();
-    p.serviceName = value.trimmed();
+
+    p->serviceName = value.trimmed();
 }
 
 }

@@ -7,7 +7,7 @@
 #include <QVariantHash>
 
 namespace QRpc {
-
+class TokenPoolPvt;
 typedef std::function<void(const bool isValid, const QVariantHash &vToken)> TokenPoolCallBack;
 class Q_RPC_EXPORT TokenPool : public QThread
 {
@@ -33,7 +33,7 @@ signals:
     void tokenCharger();
 
 private:
-    void *p = nullptr;
+    TokenPoolPvt *p = nullptr;
 };
 
 } // namespace QRpc

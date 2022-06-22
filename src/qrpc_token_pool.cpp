@@ -4,8 +4,6 @@
 
 namespace QRpc {
 
-#define dPvt() auto &p = *reinterpret_cast<TokenPoolPvt *>(this->p)
-
 class TokenPoolPvt : public QObject
 {
 public:
@@ -19,8 +17,7 @@ public:
 public:
     bool tokenCheck(const QByteArray &md5)
     {
-        auto &p = *this;
-        auto vToken = p.tokenMap.value(md5);
+        auto vToken = tokenMap.value(md5);
         return !vToken.isEmpty();
     }
 };
@@ -34,15 +31,14 @@ TokenPool::TokenPool(QObject *parent) : QThread{nullptr}
 
 QRpc::TokenPool::~TokenPool()
 {
-    dPvt();
-    delete &p;
+    delete p;
 }
 
 QVariantHash TokenPool::token(const QByteArray &md5) const
 {
-    dPvt();
-    QMutexLOCKER locker(&p.mutex);
-    return p.tokenMap.value(md5);
+
+    QMutexLOCKER locker(&p->mutex);
+    return p->tokenMap.value(md5);
 }
 
 void TokenPool::run()
@@ -53,39 +49,39 @@ void TokenPool::run()
 
 bool TokenPool::tokenCheck(const QByteArray &md5)
 {
-    dPvt();
-    return p.tokenCheck(md5);
+
+    return p->tokenCheck(md5);
 }
 
 void TokenPool::tokenCheck(const QByteArray &md5, TokenPoolCallBack callback)
 {
-    dPvt();
-    p.mutex.lock();
-    auto isValid = p.tokenCheck(md5);
-    auto vToken = p.tokenMap.value(md5);
-    p.mutex.unlock();
+
+    p->mutex.lock();
+    auto isValid = p->tokenCheck(md5);
+    auto vToken = p->tokenMap.value(md5);
+    p->mutex.unlock();
     QTimer::singleShot(1, this, [&isValid, &vToken, &callback]() { callback(isValid, vToken); });
 }
 
 void TokenPool::tokenInsert(const QByteArray &md5, QVariantHash &tokenPayload)
 {
-    dPvt();
-    QMutexLOCKER locker(&p.mutex);
-    p.tokenMap.insert(md5, tokenPayload);
+
+    QMutexLOCKER locker(&p->mutex);
+    p->tokenMap.insert(md5, tokenPayload);
 }
 
 void TokenPool::tokenRemove(const QByteArray &md5)
 {
-    dPvt();
-    QMutexLOCKER locker(&p.mutex);
-    p.tokenMap.remove(md5);
+
+    QMutexLOCKER locker(&p->mutex);
+    p->tokenMap.remove(md5);
 }
 
 void TokenPool::tokenClear()
 {
-    dPvt();
-    QMutexLOCKER locker(&p.mutex);
-    p.tokenMap.clear();
+
+    QMutexLOCKER locker(&p->mutex);
+    p->tokenMap.clear();
 }
 
 } // namespace QRpc
