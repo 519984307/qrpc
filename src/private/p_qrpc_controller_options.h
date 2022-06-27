@@ -15,9 +15,6 @@
 
 namespace QRpc {
 
-#define dPvt()\
-    auto &p = *reinterpret_cast<ControllerOptionsPrv*>(this->p)
-
 class ControllerOptionsPrv{
 public:
     QVariant settingsFileName;
@@ -28,7 +25,7 @@ public:
     ControllerOptions*parent=nullptr;
     QObject*parentParent=nullptr;
 
-    explicit ControllerOptionsPrv(ControllerOptions*parent);
+    explicit ControllerOptionsPrv(ControllerOptions *parent);
 
     virtual ~ControllerOptionsPrv();
 
@@ -42,7 +39,7 @@ public:
 
     QVariantHash toHash();
 
-    ControllerSetting&settingGetCheck(const QString &settingName);
+    ControllerSetting &settingGetCheck(const QString &settingName);
 
     ControllerOptions &insert(const QVariantHash &value);
 

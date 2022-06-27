@@ -29,6 +29,25 @@ class Q_RPC_EXPORT Controller : public QObject, public QRpcPrivate::NotationsExt
     Q_PROPERTY(QStringList basePath READ basePath NOTIFY basePathChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
 public:
+    struct MethodInfo{
+    public:
+        QMetaMethod method;
+        bool excluded=false;
+        QByteArray name;
+        QByteArray description;
+        QByteArray basePath;
+        QByteArray group;
+        QByteArray path;
+        QByteArray fullPath;
+        QVector<QByteArray> methods;
+        QVector<QByteArray> rules;
+        QNotation::Collection notations;
+    };
+
+    typedef QVector<MethodInfo> MethodInfoCollection;
+
+
+public:
     //!
     //! \brief Controller
     //! \param parent
@@ -41,10 +60,17 @@ public:
     ~Controller();
 
     //!
+    //! \brief invokableMethod
+    //! \return
+    //!
+    Controller::MethodInfoCollection invokableMethod()const;
+
+    //!
     //! \brief basePath
     //! \return
     //!
     virtual QStringList &basePath() const;
+
     //!
     //! \brief module
     //! \return

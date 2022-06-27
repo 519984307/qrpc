@@ -45,6 +45,11 @@ public:
     Q_NOTATION_DECLARE_FUNC(apiDescription, Information)
 
     //!
+    //! \brief apiGroup
+    //!
+    Q_NOTATION_DECLARE_FUNC(apiGroup, Information)
+
+    //!
     //! \brief apiModule
     //!
     Q_NOTATION_DECLARE_FUNC(apiModule, Information)
@@ -60,9 +65,18 @@ public:
     Q_NOTATION_DECLARE_FUNC(apiBasePath, Information)
 
     //!
+    //!
+    Q_NOTATION_DECLARE_FUNC(opName, Information)
+
+    //!
     //! \brief opDescription
     //!
-    Q_NOTATION_DECLARE(opDescription, Information)
+    Q_NOTATION_DECLARE_FUNC(opDescription, Information)
+
+    //!
+    //! \brief opGroup
+    //!
+    Q_NOTATION_DECLARE_FUNC(opGroup, Information)
 
     //!
     //! \brief opPath
@@ -115,6 +129,11 @@ public:
     //! \brief opDelete
     //!
     Q_NOTATION_DECLARE(opDelete, ApiOperation)
+
+    //!
+    //! \brief opRules
+    //!
+    Q_NOTATION_DECLARE_FUNC(opRules, Security)
 
     //!
     //! \brief rqExcludePath

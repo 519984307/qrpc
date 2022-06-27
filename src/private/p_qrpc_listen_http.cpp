@@ -57,7 +57,8 @@ public:
 class HttpServer3rdparty : public stefanfrings::HttpRequestHandler
 {
 public:
-    QList<HttpListeners3drparty *> listenersPort;
+    QList<HttpListeners3drparty *> listeners;
+    QHash<QObject*, int> listenersPort;
     QMutex lock;
     bool realMessageOnException = false;
 
@@ -75,14 +76,17 @@ public:
             if (!this->realMessageOnException)
                 this->realMessageOnException = option.realMessageOnException();
             settings->setValue(qsl("port"), port);
-            this->listenersPort << HttpListeners3drparty::make(this, settings);
+
+            auto listener=HttpListeners3drparty::make(this, settings);
+            listenersPort.insert(listener->listener, port);
+            this->listeners.append(listener);
         }
     }
 
     bool isListening()
     {
         QMutexLOCKER locker(&this->lock);
-        for (auto &h : this->listenersPort) {
+        for (auto &h : this->listeners) {
             if (!h->listener->isListening())
                 continue;
             return true;
@@ -93,8 +97,8 @@ public:
     virtual ~HttpServer3rdparty()
     {
         QMutexLOCKER locker(&this->lock);
-        auto aux = this->listenersPort;
-        this->listenersPort.clear();
+        auto aux = this->listeners;
+        this->listeners.clear();
         qDeleteAll(aux);
     }
 
@@ -152,6 +156,7 @@ public:
         auto requestPath = QString(req.getPath());
         auto requestBody = QString(req.getBody()).trimmed();
         auto requestMethod = QString(req.getMethod()).toLower();
+        auto requestPort = this->listenersPort.value(this->parent());
 
         if (!requestPath.isEmpty()) {
             auto c = requestPath.at(requestPath.length() - 1);
@@ -160,6 +165,7 @@ public:
         }
 
         request.setRequestProtocol(QRpc::Http);
+        request.setRequestPort(requestPort);
         request.setRequestPath(requestPath.toUtf8());
         request.setRequestHeader(requestHeaders);
         request.setRequestParameter(requestParameters);

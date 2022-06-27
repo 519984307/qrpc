@@ -4,6 +4,8 @@
 #include <QStm>
 #include <QThread>
 
+#define QRPC_METHOD_BACK_LIST {"destroyed", "objectnamechanged", "deletelater", "_q_reregistertimers", "basepathchanged", "enabledchanged", "connection", "connectionid", "connectionclose","connectionclear","connectionfinish"}
+
 #define QRPC_METHOD_CHECK_GET() \
     if (!this->rq().canMethodGet()) { \
         this->rq().co().setNotFound(); \

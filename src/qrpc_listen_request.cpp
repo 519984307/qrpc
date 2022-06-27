@@ -58,6 +58,7 @@ public:
     ContentType _requestContentType=QRpc::AppNone;
     QUuid _requestUuid;
     QByteArray _requestProtocol;
+    int _requestPort=-1;
     QByteArray _requestPath;
     QByteArray _requestMethod;
     QVariantHash _requestHeader;
@@ -903,6 +904,19 @@ void ListenRequest::setRequestProtocol(const QVariant &value)
         else
             p._requestProtocol = name;
     }
+}
+
+int ListenRequest::requestPort() const
+{
+    dPvt();
+    return p._requestPort;
+}
+
+void ListenRequest::setRequestPort(int value)
+{
+    dPvt();
+    p._requestPort=value;
+    emit requestPortChanged();
 }
 
 QByteArray &ListenRequest::requestPath() const

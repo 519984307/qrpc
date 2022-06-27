@@ -60,6 +60,112 @@ Controller::~Controller()
     delete &p;
 }
 
+Controller::MethodInfoCollection Controller::invokableMethod() const
+{
+    static QHash<QByteArray, MethodInfoCollection> controllerMethods;
+
+    auto metaObject=this->metaObject();
+    auto className = QByteArray(metaObject->className()).toLower().trimmed();
+
+    MethodInfoCollection __return = controllerMethods.value(className);
+    if (!__return.isEmpty())
+        return __return;
+
+    auto controller=this;
+    auto&n=this->notation();
+
+    if (n.contains(controller->apiRedirect))
+        return {};
+
+    static auto nottionExcludeMethod=QVariantList{controller->rqRedirect, controller->rqExcludePath};
+    const auto &vBasePathList = controller->basePath();
+    if (vBasePathList.isEmpty())
+        return {};
+
+    auto nApiGroup=n.find(apiGroup()).toValueByteArray();
+
+
+    static QStm::Network network;
+    static ByteArrayVector methodBlackList=QRPC_METHOD_BACK_LIST;
+    for(auto basePath:vBasePathList){
+        basePath=qsl("/")+basePath+qsl("/");
+        while(basePath.contains(qsl("//")))
+            basePath=basePath.replace(qsl("//"),qsl("/"));
+        for (auto i = 0; i < metaObject->methodCount(); ++i) {
+            auto method = metaObject->method(i);
+            MethodInfo info;
+
+            if (method.methodType() != method.Method)
+                continue;
+
+            if (method.parameterCount() > 0)
+                continue;
+
+            info.method = method;
+            info.name = method.name().toLower();
+
+            if (methodBlackList.contains(info.name))
+                continue;
+
+            if (info.name.startsWith(qbl("_"))) //ignore methods with [_] in start name
+                continue;
+
+            info.notations=QNotation::Collection{controller->notation(info.method)};
+            info.excluded=info.notations.contains(nottionExcludeMethod);
+            if(info.excluded)
+                continue;
+
+            if(info.notations.contains(opGet))
+                info.methods.append(network.METHOD_GET);
+
+            if(info.notations.contains(opPost))
+                info.methods.append(network.METHOD_POST);
+
+            if(info.notations.contains(opPut))
+                info.methods.append(network.METHOD_PUT);
+
+            if(info.notations.contains(opDelete))
+                info.methods.append(network.METHOD_DELETE);
+
+            if(info.notations.contains(opHead))
+                info.methods.append(network.METHOD_HEAD);
+
+            if(info.notations.contains(opOptions))
+                info.methods.append(network.METHOD_OPTIONS);
+
+            if(info.notations.contains(opTrace))
+                info.methods.append(network.METHOD_TRACE);
+
+            if(info.notations.contains(opPatch))
+                info.methods.append(network.METHOD_PATCH);
+
+            info.rules=info.notations.find(opRules()).toValueStringVector();
+            info.basePath=basePath.toUtf8();
+            info.path=info.notations.find(opPath()).toValueByteArray();
+            if(info.path.isEmpty())
+                info.path=info.name;
+
+            if(info.path.isEmpty())
+                info.path=info.path;
+
+            info.description=info.notations.find(opDescription()).toValueByteArray();
+            if(info.description.isEmpty())
+                info.description=info.name;
+
+            info.group=info.notations.find(opGroup()).toValueByteArray();
+            if(info.group.isEmpty())
+                info.group=nApiGroup;
+
+            auto fullPath=qsl("%1/%2").arg(info.basePath, info.path);
+            while(fullPath.contains(qsl("//")))
+                fullPath=fullPath.replace(qsl("//"),qsl("/"));
+            info.fullPath=fullPath.toUtf8();
+            __return.append(info);
+        }
+    }
+    return __return;
+}
+
 QStringList &Controller::basePath() const
 {
     dPvt();

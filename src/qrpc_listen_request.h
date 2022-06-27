@@ -30,6 +30,7 @@ public:
     Q_PROPERTY(int requestContentType READ requestContentType WRITE setRequestContentType NOTIFY requestContentTypeChanged )
     Q_PROPERTY(QUuid requestUuid READ requestUuid WRITE setRequestUuid NOTIFY requestUuidChanged )
     Q_PROPERTY(QByteArray requestProtocol READ requestProtocol WRITE setRequestProtocol NOTIFY requestProtocolChanged )
+    Q_PROPERTY(int requestPort READ requestPort WRITE setRequestPort NOTIFY requestPortChanged )
     Q_PROPERTY(QByteArray requestPath READ requestPath WRITE setRequestPath NOTIFY requestPathChanged )
     Q_PROPERTY(QByteArray requestMethod READ requestMethod WRITE setRequestMethod NOTIFY requestMethodChanged )
     Q_PROPERTY(QVariantHash requestHeader READ requestHeader WRITE setRequestHeader NOTIFY requestHeaderChanged )
@@ -185,14 +186,14 @@ public:
     //! \brief codeOption
     //! \return
     //!
-    ListenRequestCode&codeOption();
+    ListenRequestCode &codeOption();
 
     //!
     //! \brief co
     //! \return
     //!
-    ListenRequestCode&co();
-    ListenRequestCode&co(const QVariant &v);
+    ListenRequestCode &co();
+    ListenRequestCode &co(const QVariant &v);
 
     //!
     //! \brief hash
@@ -271,7 +272,7 @@ public:
     //! \param bytes
     //! \return
     //!
-    bool fromJson(const QByteArray&bytes);
+    bool fromJson(const QByteArray &bytes);
 
     //!
     //! \brief toJson
@@ -300,7 +301,7 @@ public:
     //! \brief listenUuid
     //! \return
     //!
-    QUuid&listenUuid() const;
+    QUuid &listenUuid() const;
 
     //!
     //! \brief setListenUuid
@@ -312,7 +313,7 @@ public:
     //! \brief requestUuid
     //! \return
     //!
-    QUuid&requestUuid() const;
+    QUuid &requestUuid() const;
 
     //!
     //! \brief setRequestUuid
@@ -324,7 +325,7 @@ public:
     //! \brief requestProtocol
     //! \return
     //!
-    QByteArray&requestProtocol() const;
+    QByteArray &requestProtocol() const;
 
     //!
     //! \brief setRequestProtocol
@@ -333,10 +334,22 @@ public:
     void setRequestProtocol(const QVariant &value);
 
     //!
+    //! \brief requestPort
+    //! \return
+    //!
+    int requestPort() const;
+
+    //!
+    //! \brief setRequestPort
+    //! \param value
+    //!
+    void setRequestPort(int value);
+
+    //!
     //! \brief requestPath
     //! \return
     //!
-    QByteArray&requestPath() const;
+    QByteArray &requestPath() const;
 
     //!
     //! \brief setRequestPath
@@ -348,7 +361,7 @@ public:
     //! \brief requestMethod
     //! \return
     //!
-    QByteArray&requestMethod() const;
+    QByteArray &requestMethod() const;
 
     //!
     //! \brief setRequestMethod
@@ -360,7 +373,7 @@ public:
     //! \brief requestHeader
     //! \return
     //!
-    QVariantHash&requestHeader() const;
+    QVariantHash &requestHeader() const;
 
     //!
     //! \brief setRequestHeader
@@ -372,7 +385,7 @@ public:
     //! \brief requestParameter
     //! \return
     //!
-    QVariantHash&requestParameter() const;
+    QVariantHash &requestParameter() const;
 
     //!
     //! \brief setRequestParameter
@@ -384,7 +397,7 @@ public:
     //! \brief requestBody
     //! \return
     //!
-    QVariant&requestBody() const;
+    QVariant &requestBody() const;
 
     //!
     //! \brief requestBodyMap
@@ -404,7 +417,7 @@ public:
     //!
     bool requestParserBodyMap();
     bool requestParserBodyMap(const QVariant &property);
-    bool requestParserBodyMap(const QVariant &property, QVariantMap&body)const;
+    bool requestParserBodyMap(const QVariant &property, QVariantMap &body)const;
 
     //!
     //! \brief requestParserBodyHash
@@ -415,7 +428,7 @@ public:
     //!
     bool requestParserBodyHash();
     bool requestParserBodyHash(const QVariant &property);
-    bool requestParserBodyHash(const QVariant &property, QVariantHash&body)const;
+    bool requestParserBodyHash(const QVariant &property, QVariantHash &body)const;
 
     //!
     //! \brief requestParserProperty
@@ -428,7 +441,7 @@ public:
     //! \param key
     //! \return
     //!
-    QVariant requestParamMap(const QByteArray&key) const;
+    QVariant requestParamMap(const QByteArray &key) const;
 
     //!
     //! \brief requestParamMap
@@ -441,7 +454,7 @@ public:
     //! \param key
     //! \return
     //!
-    QVariant requestParamHash(const QByteArray&key) const;
+    QVariant requestParamHash(const QByteArray &key) const;
 
     //!
     //! \brief requestParamHash
@@ -489,7 +502,7 @@ public:
     //! \brief uploadedFiles
     //! \return
     //!
-    QHash<QString, QFile *>&uploadedFiles() const;
+    QHash<QString, QFile *> &uploadedFiles() const;
 private:
     //!
     //! \brief setUploadedFiles
@@ -509,7 +522,7 @@ public:
     //! \brief responseHeader
     //! \return
     //!
-    QVariantHash&responseHeader() const;
+    QVariantHash &responseHeader() const;
     void setResponseHeader(const QVariantHash &value);
     void setResponseHeader(const HttpHeaders &value);
 
@@ -517,7 +530,7 @@ public:
     //! \brief responseCallback
     //! \return
     //!
-    QVariantHash&responseCallback() const;
+    QVariantHash &responseCallback() const;
     void setResponseCallback(const QVariantHash &value);
 
     //!
@@ -561,7 +574,7 @@ public:
     //! \brief setControllerSetting
     //! \param setting
     //!
-    void setControllerSetting(const ControllerSetting&setting);
+    void setControllerSetting(const ControllerSetting &setting);
 
     //!
     //! \brief makeUuid
@@ -578,6 +591,7 @@ signals:
     void requestContentTypeChanged();
     void requestUuidChanged();
     void requestProtocolChanged();
+    void requestPortChanged();
     void requestPathChanged();
     void requestMethodChanged();
     void requestHeaderChanged();

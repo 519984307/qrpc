@@ -13,19 +13,6 @@ namespace QRpc {
 
 #define dPvt() auto &p = *reinterpret_cast<ListenQRPCPvt *>(this->p)
 
-Q_GLOBAL_STATIC_WITH_ARGS(ByteArrayVector,
-                          staticControllerMethodBlackList,
-                          ({"destroyed",
-                            "objectnamechanged",
-                            "deletelater",
-                            "_q_reregistertimers",
-                            "basepathchanged",
-                            "enabledchanged",
-                            "connection",
-                            "connectionid",
-                            "connectionclose","connectionclear","connectionfinish"}
-                           ));
-
 class ListenQRPCPvt : public QObject
 {
 public:
@@ -137,7 +124,7 @@ public:
 #endif
 
         static auto nottionExcludeMethod=QVariantList{controller->rqRedirect, controller->rqExcludePath};
-        const auto &methodBlackList = *staticControllerMethodBlackList;
+        static ByteArrayVector methodBlackList=QRPC_METHOD_BACK_LIST;
         const auto &vBasePathList = controller->basePath();
         if (vBasePathList.isEmpty())
             return;
@@ -296,67 +283,66 @@ ListenQRPC::ListenQRPC(QObject *parent) : Listen(nullptr)
 
 ListenQRPC::~ListenQRPC()
 {
-    dPvt();
-    QMutexLOCKER(&p.mutexLockerRunning);
-    delete &p;
+    p->mutexLockerRunning.tryLock(5000);//wait finish threads
+    p->mutexLockerRunning.unlock();
 }
 
 void ListenQRPC::run()
 {
-    dPvt();
-    p.mutexLockerRunning.lock();
 
-    p.listenerFree();
+    p->mutexLockerRunning.lock();
+
+    p->listenerFree();
 
     Listen::run();
 
-    p.listenerFree();
+    p->listenerFree();
 
-    p.mutexLockerRunning.unlock();
+    p->mutexLockerRunning.unlock();
 }
 
 bool ListenQRPC::start()
 {
-    dPvt();
-    p.apiMakeBasePathParser();
-    p.apiMakeBasePath();
+
+    p->apiMakeBasePathParser();
+    p->apiMakeBasePath();
     return Listen::start();
 }
 
 QHash<QByteArray, const QMetaObject *> &ListenQRPC::controllers()
 {
-    dPvt();
-    return p.controller;
+
+    return p->controller;
 }
 
 QHash<QByteArray, const QMetaObject *> &ListenQRPC::controllerParsers()
 {
-    dPvt();
-    return p.controllerParsers;
+
+    return p->controllerParsers;
 }
 
 ControllerMethodCollection &ListenQRPC::controllerMethods()
 {
-    dPvt();
-    return p.controllerMethods;
+
+    return p->controllerMethods;
 }
 
 MultStringList &ListenQRPC::controllerRedirect()
 {
-    dPvt();
-    return p.controllerRedirect;
+
+    return p->controllerRedirect;
 }
 
 void ListenQRPC::registerListen(Listen *listen)
 {
-    dPvt();
-    p.listenRegister(listen);
+
+    p->listenRegister(listen);
 }
 
 Listen *ListenQRPC::childrenListen(QUuid uuid)
 {
-    dPvt();
-    auto listen = p.listens.value(uuid);
+
+    auto listen = p->listens.value(uuid);
     return listen;
 }
 

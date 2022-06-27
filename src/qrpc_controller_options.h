@@ -5,7 +5,7 @@
 #include <QSettings>
 
 namespace QRpc {
-
+class ControllerOptionsPrv;
 //!
 //! \brief The ControllerOptions class
 //!
@@ -32,8 +32,8 @@ public:
     //! \param value
     //! \return
     //!
-    virtual ControllerOptions&insert(ControllerSetting &value);
-    virtual ControllerOptions&insert(const QVariantHash &value);
+    virtual ControllerOptions &insert(ControllerSetting &value);
+    virtual ControllerOptions &insert(const QVariantHash &value);
 
     //!
     //! \brief setting
@@ -63,7 +63,7 @@ public:
     //! \param value
     //! \return
     //!
-    ControllerOptions&operator<<(ControllerSetting&value);
+    ControllerOptions &operator<<(ControllerSetting&value);
 
     //!
     //! \brief settingBody
@@ -93,7 +93,7 @@ public:
     virtual QVariantHash toHash() const;
 
 private:
-    void*p=nullptr;
+    ControllerOptionsPrv *p=nullptr;
 };
 
 }

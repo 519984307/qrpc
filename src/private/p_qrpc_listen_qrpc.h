@@ -3,7 +3,7 @@
 #include "../qrpc_listen.h"
 
 namespace QRpc {
-
+class ListenQRPCPvt;
 //!
 //! \brief The ListenQRPC class
 //!
@@ -74,7 +74,7 @@ protected:
     virtual Listen *childrenListen(QUuid uuid);
 
 private:
-    void *p = nullptr;
+    ListenQRPCPvt *p = nullptr;
 };
 
 QRPC_LISTTEN_AUTO_REGISTER(0, ListenQRPC)
