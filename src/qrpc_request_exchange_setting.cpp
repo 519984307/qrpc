@@ -200,8 +200,7 @@ void RequestExchangeSetting::setMethod(const QString &value)
 QString RequestExchangeSetting::methodName() const
 {
     dPvt();
-    auto name=RequestMethodName[p.method];
-    return name;
+    return RequestMethodName[p.method];
 }
 
 Protocol RequestExchangeSetting::protocol() const
@@ -246,7 +245,7 @@ void RequestExchangeSetting::setProtocol(const QVariant &value)
 
 }
 
-QString RequestExchangeSetting::driver() const
+QString &RequestExchangeSetting::driver() const
 {
     dPvt();
     return p.driver;
@@ -258,7 +257,7 @@ void RequestExchangeSetting::setDriver(const QString &value)
     p.driver=value;
 }
 
-QString RequestExchangeSetting::hostName() const
+QString &RequestExchangeSetting::hostName() const
 {
     dPvt();
     return p.hostName;
@@ -270,7 +269,7 @@ void RequestExchangeSetting::setHostName(const QString &value)
     p.hostName=value;
 }
 
-QString RequestExchangeSetting::vHost() const
+QString &RequestExchangeSetting::vHost() const
 {
     dPvt();
     return p.vHost;
@@ -282,7 +281,7 @@ void RequestExchangeSetting::setVHost(const QString &value)
     p.vHost=value;
 }
 
-QString RequestExchangeSetting::userName() const
+QString &RequestExchangeSetting::userName() const
 {
     dPvt();
     return p.userName;
@@ -294,7 +293,7 @@ void RequestExchangeSetting::setUserName(const QString &value)
     p.userName=value;
 }
 
-QString RequestExchangeSetting::passWord() const
+QString &RequestExchangeSetting::passWord() const
 {
     dPvt();
     return p.passWord;
@@ -329,7 +328,7 @@ void RequestExchangeSetting::setRoute(const QVariant &value)
         p.route=p.route.left(p.route.length()-1);
 }
 
-QString RequestExchangeSetting::topic() const
+QString &RequestExchangeSetting::topic() const
 {
     dPvt();
     return p.topic;
@@ -367,7 +366,7 @@ void RequestExchangeSetting::setActivityLimit(const QVariant &value)
     p.activityLimit=value;
 }
 
-QVariantHash RequestExchangeSetting::parameter() const
+QVariantHash &RequestExchangeSetting::parameter() const
 {
     dPvt();
     return p.parameter;

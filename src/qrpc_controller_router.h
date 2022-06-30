@@ -12,6 +12,7 @@
 
 namespace QRpc {
 class ListenRequest;
+class ControllerRouterPvt;
 //!
 //! \brief The ControllerRouter class
 //!
@@ -53,6 +54,6 @@ public:
     static ControllerRouter *newRouter(QObject *parent);
 
 private:
-    void *p = nullptr;
+    ControllerRouterPvt *p = nullptr;
 };
 } // namespace QRpc

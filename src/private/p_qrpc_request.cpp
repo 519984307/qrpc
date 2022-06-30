@@ -3,7 +3,7 @@
 namespace QRpc {
 
 static bool static_log_register=false;
-static QString static_log_dir;
+Q_GLOBAL_STATIC(QString, static_log_dir)
 
 static void static_log_dir_clear(const QString &ormLogDir)
 {
@@ -46,22 +46,22 @@ static void static_log_dir_clear(const QString &ormLogDir)
 
 static void static_log_init_dir()
 {
-    auto env = QString(getenv(qbl("Q_LOG_ENABLED"))).trimmed();
+    auto env = QString{getenv(qbl("Q_LOG_ENABLED"))}.trimmed();
 #ifdef QT_DEBUG
-    static_log_register = env.isEmpty()?true :QVariant(env).toBool();
+    static_log_register = env.isEmpty()?true :QVariant{env}.toBool();
 #else
-    static_log_register = env.isEmpty()?false:QVariant(env).toBool();
+    static_log_register = env.isEmpty()?false:QVariant{env}.toBool();
 #endif
     if(!static_log_register)
         return;
 
-    static const auto log_local_name=QString(__PRETTY_FUNCTION__).split(qsl("::")).first().replace(qsl("void "),qsl_null).split(qsl_space).last();
-    static_log_dir=qsl("%1/%2/%3").arg(QDir::homePath(), log_local_name, qApp->applicationName());
-    QDir dir(static_log_dir);
-    if(!dir.exists(static_log_dir))
-        dir.mkpath(static_log_dir);
-    if(dir.exists(static_log_dir))
-        static_log_dir_clear(static_log_dir);
+    static const auto log_local_name=QString{__PRETTY_FUNCTION__}.split(qsl("::")).first().replace(qsl("void "),qsl_null).split(qsl_space).last();
+    *static_log_dir=qsl("%1/%2/%3").arg(QDir::homePath(), log_local_name, qApp->applicationName());
+    QDir dir(*static_log_dir);
+    if(!dir.exists(*static_log_dir))
+        dir.mkpath(*static_log_dir);
+    if(dir.exists(*static_log_dir))
+        static_log_dir_clear(*static_log_dir);
 }
 
 Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir)
@@ -69,18 +69,18 @@ Q_COREAPP_STARTUP_FUNCTION(static_log_init_dir)
 
 RequestPvt::RequestPvt(Request *parent):
     QObject{parent},
-    exchange(parent),
-    qrpcHeader(parent),
-    qrpcBody(parent),
-    qrpcResponse(parent),
-    qrpcLastError(parent),
+    exchange{parent},
+    qrpcHeader{parent},
+    qrpcBody{parent},
+    qrpcResponse{parent},
+    qrpcLastError{parent},
     sslConfiguration(QSslConfiguration::defaultConfiguration())
 {
     auto currentName=QThread::currentThread()->objectName().trimmed();
     if(currentName.isEmpty())
         currentName=QString::number(qlonglong(QThread::currentThreadId()),16);
     if(static_log_register)
-        this->fileLog=qsl("%1/%2.json").arg(static_log_dir, QString::number(qlonglong(QThread::currentThreadId()),16));
+        this->fileLog=qsl("%1/%2.json").arg(*static_log_dir, QString::number(qlonglong(QThread::currentThreadId()),16));
     this->parent=parent;
     this->qrpcBody.p=this;
 }
@@ -178,7 +178,7 @@ HttpResponse &RequestPvt::upload(const QString &route, const QString &fileName)
         while(request_url.contains(qsl("//")))
             request_url=request_url.replace(qsl("//"), qsl("/"));
         request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url.simplified());
-        this->request_url=QUrl(request_url).toString();
+        this->request_url=QUrl{request_url}.toString();
         break;
     }
     default:
@@ -186,7 +186,7 @@ HttpResponse &RequestPvt::upload(const QString &route, const QString &fileName)
         request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url.simplified());
         while(request_url.contains(qsl("//")))
             request_url=request_url.replace(qsl("//"), qsl("/"));
-        this->request_url=QUrl(request_url);
+        this->request_url=QUrl{request_url};
     }
 
     auto job = RequestJob::newJob(Request::acUpload);
@@ -270,7 +270,7 @@ HttpResponse &RequestPvt::download(const QString &route, const QString &fileName
                 const auto v=Util::parseQueryItem(i.value());
                 url_query.addQueryItem(k, v);
             }
-            QUrl url(request_url);
+            QUrl url{request_url};
             url.setQuery(url_query);
             this->request_url=url;
         }
@@ -278,9 +278,8 @@ HttpResponse &RequestPvt::download(const QString &route, const QString &fileName
     }
     default:
         auto request_url = qsl("%1:%2").arg(e.hostName()).arg(e.port()).replace(qsl("\""),qsl_null).replace(qsl("//"), qsl("/"));
-        auto request_url_part = request_url.split(qsl("/"));
         request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url);
-        this->request_url=QUrl(request_url);
+        this->request_url=QUrl{request_url};
     }
 
     auto job = RequestJob::newJob(Request::acDownload, fileName);
@@ -346,7 +345,7 @@ HttpResponse &RequestPvt::call(const RequestMethod &method, const QVariant &vRou
             request_url_str+=line;
         }
         request_url_str=qsl("%1://%2").arg(e.protocolUrlName(), request_url_str);
-        this->request_url=QUrl(request_url_str);
+        this->request_url=QUrl{request_url_str};
         if(!paramsGet.isEmpty()){
             QUrlQuery url_query;
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
@@ -358,7 +357,7 @@ HttpResponse &RequestPvt::call(const RequestMethod &method, const QVariant &vRou
                 i.next();
                 url_query.addQueryItem(i.key(), i.value().toString());
             }
-            QUrl url(request_url);
+            QUrl url{request_url};
             url.setQuery(url_query);
             this->request_url=url;
         }
@@ -377,9 +376,8 @@ HttpResponse &RequestPvt::call(const RequestMethod &method, const QVariant &vRou
     }
     default:
         auto request_url = qsl("%1:%2").arg(e.hostName()).arg(e.port()).replace(qsl("\""), qsl_null).replace(qsl("//"),qsl("/"));
-        auto request_url_part = request_url.split(qbl("/"));
         request_url = qsl("%1://%2").arg(e.protocolUrlName(), request_url);
-        this->request_url=QUrl(request_url);
+        this->request_url=QUrl{request_url};
     }
 
     switch (e.protocol()) {

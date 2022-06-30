@@ -33,8 +33,8 @@ bool LastError::isValid() const
 
 void LastError::clear()
 {
-    this->setProperty(__nativeErrorCode, QVariant());
-    this->setProperty(__nativeErrorText, QVariant());
+    this->setProperty(__nativeErrorCode, {});
+    this->setProperty(__nativeErrorText, {});
 }
 
 } // namespace QRpc

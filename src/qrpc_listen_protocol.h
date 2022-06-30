@@ -9,7 +9,7 @@ class QSettings;
 
 namespace QRpc {
 class Listen;
-
+class ListenProtocolPvt;
 //!
 //! \brief The ListenProtocol class
 //!
@@ -353,7 +353,7 @@ public:
     virtual void setRealMessageOnException(bool value);
 
 private:
-    QObject *p = nullptr;
+    ListenProtocolPvt *p = nullptr;
 signals:
     void protocolChanged();
     void protocolNameChanged();

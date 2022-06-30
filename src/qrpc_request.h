@@ -52,6 +52,7 @@ public:\
         return QByteArrayLiteral(#v1).replace(QByteArrayLiteral("\""), QByteArrayLiteral(""));\
     }\
 
+class RequestPvt;
 class ListenRequest;
 
 //!
@@ -127,9 +128,9 @@ public:
         //! \brief rq
         //! \return
         //!
-        Request&rq();
+        Request &rq();
     private:
-        void*p = nullptr;
+        RequestPvt *p = nullptr;
     };
 
 public:
@@ -165,8 +166,8 @@ public:
     //! \param setting
     //! \return
     //!
-    virtual Request&setSettings(const ServiceSetting&setting);
-    virtual Request&setSettings(const QVariantHash&setting);
+    virtual Request &setSettings(const ServiceSetting &setting);
+    virtual Request &setSettings(const QVariantHash &setting);
 
     //!
     //! \brief url
@@ -181,90 +182,90 @@ public:
     //!
     virtual Protocol protocol() const;
     virtual QString protocolName() const;
-    virtual Request&setProtocol(const QVariant &value);
+    virtual Request &setProtocol(const QVariant &value);
 
     //!
     //! \brief method
     //! \return
     //!
     virtual RequestMethod method() const;
-    virtual Request&setMethod(const QString &value);
-    virtual Request&setMethod(const QByteArray &value);
-    virtual Request&setMethod(const int &value);
+    virtual Request &setMethod(const QString &value);
+    virtual Request &setMethod(const QByteArray &value);
+    virtual Request &setMethod(const int &value);
 
     //!
     //! \brief driver
     //! \return
     //!
     virtual QString driver() const;
-    virtual Request&setDriver(const QString &value);
+    virtual Request &setDriver(const QString &value);
 
     //!
     //! \brief hostName
     //! \return
     //!
     virtual QString hostName() const;
-    virtual Request&setHostName(const QString &value);
+    virtual Request &setHostName(const QString &value);
 
     //!
     //! \brief userName
     //! \return
     //!
     virtual QString userName() const;
-    virtual Request&setUserName(const QString &value);
+    virtual Request &setUserName(const QString &value);
 
     //!
     //! \brief password
     //! \return
     //!
     virtual QString password() const;
-    virtual Request&setPassword(const QString &value);
+    virtual Request &setPassword(const QString &value);
 
     //!
     //! \brief route
     //! \return
     //!
     virtual QString &route() const;
-    virtual Request&setRoute(const QVariant &value);
+    virtual Request &setRoute(const QVariant &value);
 
     //!
     //! \brief body
     //! \return
     //!
     virtual QVariant body() const;
-    virtual Request&setBody(const QVariant &value);
+    virtual Request &setBody(const QVariant &value);
 
     //!
     //! \brief port
     //! \return
     //!
     virtual QVariant port() const;
-    virtual Request&setPort(const QVariant &value);
+    virtual Request &setPort(const QVariant &value);
 
     //!
     //! \brief activityLimit
     //! \return
     //!
     virtual qlonglong activityLimit() const;
-    virtual Request&setActivityLimit(const QVariant &value);
+    virtual Request &setActivityLimit(const QVariant &value);
 
     //!
     //! \brief exchange
     //! \return
     //!
-    virtual RequestExchange&exchange();
+    virtual RequestExchange &exchange();
 
     //!
     //! \brief header
     //! \return
     //!
-    virtual HttpHeaders&header();
+    virtual HttpHeaders &header();
 
     //!
     //! \brief body
     //! \return
     //!
-    virtual Request::Body&body();
+    virtual Request::Body &body();
 
     //!
     //! \brief response
@@ -284,34 +285,34 @@ public:
     //! \param repeatCount
     //! \return
     //! re-run request on response specific status code
-    virtual Request&setRequestRecovery(int statusCode);
-    virtual Request&setRequestRecovery(int statusCode, int repeatCount=1);
+    virtual Request &setRequestRecovery(int statusCode);
+    virtual Request &setRequestRecovery(int statusCode, int repeatCount=1);
 
     //!
     //! \brief setRequestRecoveryOnBadGateway
     //! \param repeatCount
     //! \return
     //! re-run request on response status code 502 ou message BadRequest
-    virtual Request&setRequestRecoveryOnBadGateway(int repeatCount=1);
+    virtual Request &setRequestRecoveryOnBadGateway(int repeatCount=1);
 
     //!
     //! \brief lastError
     //! \return
     //!
-    virtual LastError&lastError();
+    virtual LastError &lastError();
 
     //!
     //! \brief call
     //! \return
     //!
-    virtual HttpResponse&call();
+    virtual HttpResponse &call();
 
     //!
     //! \brief call
     //! \param route
     //! \return
     //!
-    virtual HttpResponse&call(const QVariant &route);
+    virtual HttpResponse &call(const QVariant &route);
 
     //!
     //! \brief call
@@ -319,7 +320,7 @@ public:
     //! \param body
     //! \return
     //!
-    virtual HttpResponse&call(const QVariant &route, const QVariant&body);
+    virtual HttpResponse &call(const QVariant &route, const QVariant &body);
 
     //!
     //! \brief call
@@ -328,14 +329,14 @@ public:
     //! \param body
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString &route, const QVariant&body);
+    virtual HttpResponse &call(const RequestMethod &method, const QString &route, const QVariant &body);
 
     //!
     //! \brief call
     //! \param method
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method);
+    virtual HttpResponse &call(const RequestMethod &method);
 
     //!
     //! \brief call
@@ -345,7 +346,7 @@ public:
     //! \param parameter
     //! \return
     //!
-    virtual HttpResponse&call(const QVariant &route, const QVariant&body, const QString &method, const QVariantHash parameter);
+    virtual HttpResponse &call(const QVariant &route, const QVariant &body, const QString &method, const QVariantHash parameter);
 
     //!
     //! \brief call
@@ -353,7 +354,7 @@ public:
     //! \param objectBody
     //! \return
     //!
-    virtual HttpResponse&call(const QVariant &route, const QObject&objectBody);
+    virtual HttpResponse &call(const QVariant &route, const QObject &objectBody);
 
     //!
     //! \brief call
@@ -362,7 +363,7 @@ public:
     //! \param objectBody
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString &route, const QObject&objectBody);
+    virtual HttpResponse &call(const RequestMethod &method, const QString &route, const QObject &objectBody);
 
     //!
     //! \brief call
@@ -370,7 +371,7 @@ public:
     //! \param ioDeviceBody
     //! \return
     //!
-    virtual HttpResponse&call(const QVariant &route, QIODevice&ioDeviceBody);
+    virtual HttpResponse &call(const QVariant &route, QIODevice &ioDeviceBody);
 
     //!
     //! \brief call
@@ -378,7 +379,7 @@ public:
     //! \param route
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString &route);
+    virtual HttpResponse &call(const RequestMethod &method, const QString &route);
 
     //!
     //! \brief call
@@ -387,21 +388,21 @@ public:
     //! \param ioDeviceBody
     //! \return
     //!
-    virtual HttpResponse&call(const RequestMethod&method, const QString &route, QIODevice&ioDeviceBody);
+    virtual HttpResponse &call(const RequestMethod &method, const QString &route, QIODevice &ioDeviceBody);
 
     //!
     //! \brief operator =
     //! \param value
     //! \return
     //!
-    Request&operator=(const ServiceSetting &value);
+    Request &operator=(const ServiceSetting &value);
 
     //!
     //! \brief upload
     //! \param file
     //! \return
     //!
-    virtual HttpResponse&upload(QFile &file);
+    virtual HttpResponse &upload(QFile &file);
 
     //!
     //! \brief upload
@@ -409,7 +410,7 @@ public:
     //! \param buffer
     //! \return
     //!
-    virtual HttpResponse&upload(const QVariant &route, const QByteArray &buffer);
+    virtual HttpResponse &upload(const QVariant &route, const QByteArray &buffer);
 
     //!
     //! \brief upload
@@ -417,7 +418,7 @@ public:
     //! \param file
     //! \return
     //!
-    virtual HttpResponse&upload(const QVariant &route, QFile &file);
+    virtual HttpResponse &upload(const QVariant &route, QFile &file);
 
     //!
     //! \brief upload
@@ -426,14 +427,14 @@ public:
     //! \param file
     //! \return
     //!
-    virtual HttpResponse&upload(const QVariant &route, QString&fileName, QFile &file);
+    virtual HttpResponse &upload(const QVariant &route, QString &fileName, QFile &file);
 
     //!
     //! \brief download
     //! \param fileName
     //! \return
     //!
-    virtual HttpResponse&download(QString &fileName);
+    virtual HttpResponse &download(QString &fileName);
 
     //!
     //! \brief download
@@ -441,7 +442,7 @@ public:
     //! \param fileName
     //! \return
     //!
-    virtual HttpResponse&download(const QVariant &route, QString&fileName);
+    virtual HttpResponse &download(const QVariant &route, QString &fileName);
 
     //!
     //! \brief download
@@ -450,13 +451,13 @@ public:
     //! \param parameter
     //! \return
     //!
-    virtual HttpResponse&download(const QVariant &route, QString&fileName, const QVariant &parameter);
+    virtual HttpResponse &download(const QVariant &route, QString &fileName, const QVariant &parameter);
 
     //!
     //! \brief autoSetCookie
     //! \return
     //!
-    virtual Request&autoSetCookie();
+    virtual Request &autoSetCookie();
 
     //!
     //! \brief toString
@@ -474,7 +475,7 @@ public:
     //! \brief sslConfiguration
     //! \return
     //!
-    virtual QSslConfiguration&sslConfiguration();
+    virtual QSslConfiguration &sslConfiguration();
     virtual Request &setSslConfiguration(const QSslConfiguration &value);
 
     //!
@@ -490,7 +491,7 @@ public:
     virtual QStringList printOut();
 
 private:
-    void*p = nullptr;
+    RequestPvt *p = nullptr;
 };
 
 QT_DEPRECATED_X("Use QRpc::Request")

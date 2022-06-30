@@ -140,7 +140,7 @@ public:
     //! \brief serverName
     //! \return
     //!
-    Q_INVOKABLE virtual QString serverName() const;
+    Q_INVOKABLE virtual QString &serverName() const;
 
     //!
     //! \brief setServerName

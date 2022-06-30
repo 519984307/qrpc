@@ -7,7 +7,7 @@
 #include <QMetaObject>
 
 namespace QRpc {
-
+class ListenRequestParserPvt;
 //!
 //! \brief The ListenRequestParser class
 //!
@@ -91,7 +91,7 @@ protected:
     virtual bool parse(const QMetaMethod &metaMethod);
 
 private:
-    void *p = nullptr;
+    ListenRequestParserPvt *p = nullptr;
 };
 
 } // namespace QRpc

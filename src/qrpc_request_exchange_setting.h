@@ -5,7 +5,7 @@
 #include "./qrpc_types.h"
 
 namespace QRpc {
-
+class RequestExchangeSettingPvt;
 //!
 //! \brief The RequestExchangeSetting class
 //!
@@ -37,7 +37,7 @@ public:
     //! \param e
     //! \param parent
     //!
-    explicit RequestExchangeSetting(RequestExchangeSetting&e, QObject *parent=nullptr);
+    explicit RequestExchangeSetting(RequestExchangeSetting &e, QObject *parent=nullptr);
     ~RequestExchangeSetting();
 
     //!
@@ -45,14 +45,14 @@ public:
     //! \param e
     //! \return
     //!
-    RequestExchangeSetting&operator=(const RequestExchangeSetting&e);
-    RequestExchangeSetting&operator=(const QVariantHash&e);
+    RequestExchangeSetting &operator=(const RequestExchangeSetting &e);
+    RequestExchangeSetting &operator=(const QVariantHash &e);
 
     //!
     //! \brief clear
     //! \return
     //!
-    virtual RequestExchangeSetting&clear();
+    virtual RequestExchangeSetting &clear();
 
     //!
     //! \brief toMap
@@ -83,7 +83,7 @@ public:
     //! \param output
     //! \return
     //!
-    virtual RequestExchangeSetting&print(const QString &output=QString());
+    virtual RequestExchangeSetting &print(const QString &output=QString());
 
     //!
     //! \brief printOut
@@ -97,7 +97,7 @@ public:
     //! \return
     //!
     virtual RequestMethod method() const;
-    virtual void setMethod(const int&value);
+    virtual void setMethod(const int &value);
     virtual void setMethod(const QString &value);
 
     //!
@@ -120,35 +120,35 @@ public:
     //! \brief driver
     //! \return
     //!
-    virtual QString driver() const;
+    virtual QString &driver() const;
     virtual void setDriver(const QString &value);
 
     //!
     //! \brief hostName
     //! \return
     //!
-    virtual QString hostName() const;
+    virtual QString &hostName() const;
     virtual void setHostName(const QString &value);
 
     //!
     //! \brief vHost
     //! \return
     //!
-    virtual QString vHost() const;
+    virtual QString &vHost() const;
     virtual void setVHost(const QString &value);
 
     //!
     //! \brief userName
     //! \return
     //!
-    virtual QString userName() const;
+    virtual QString &userName() const;
     virtual void setUserName(const QString &value);
 
     //!
     //! \brief passWord
     //! \return
     //!
-    virtual QString passWord() const;
+    virtual QString &passWord() const;
     virtual void setPassWord(const QString &value);
 
     //!
@@ -162,7 +162,7 @@ public:
     //! \brief topic
     //! \return
     //!
-    virtual QString topic() const;
+    virtual QString &topic() const;
     virtual void setTopic(const QString &value);
 
     //!
@@ -183,7 +183,7 @@ public:
     //! \brief parameter
     //! \return
     //!
-    virtual QVariantHash parameter() const;
+    virtual QVariantHash &parameter() const;
     virtual void setParameter(const QVariantHash &parameter);
 
 signals:
@@ -201,7 +201,7 @@ signals:
     void activityLimitChanged();
 
 private:
-    void*p = nullptr;
+    RequestExchangeSettingPvt *p = nullptr;
     int ___method() const{ return this->method();}
 };
 

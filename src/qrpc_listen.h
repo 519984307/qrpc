@@ -11,7 +11,7 @@ class Server;
 class ListenQRPC;
 class ListenColletions;
 class ListenRequestCache;
-
+class ListenPvt;
 //!
 //! \brief The Listen class
 //!
@@ -145,7 +145,7 @@ protected:
     void setColletions(ListenColletions *colletions);
 
 private:
-    void *p = nullptr;
+    ListenPvt *p = nullptr;
 };
 
 } // namespace QRpc

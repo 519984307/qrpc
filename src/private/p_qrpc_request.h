@@ -26,10 +26,6 @@
 
 namespace QRpc {
 
-
-#define dPvt()\
-    auto &p =*reinterpret_cast<RequestPvt*>(this->p)
-
 class RequestPvt:public QObject{
     Q_OBJECT
 public:

@@ -13,6 +13,7 @@ class ListenProtocol;
 class ListenQRPC;
 class Server;
 class Listen;
+class ListenColletionsPvt;
 
 //!
 //! \brief ListenProtocols
@@ -117,7 +118,7 @@ public slots:
     virtual bool quit();
 
 private:
-    QObject *p = nullptr;
+    ListenColletionsPvt *p = nullptr;
 signals:
 };
 } // namespace QRpc

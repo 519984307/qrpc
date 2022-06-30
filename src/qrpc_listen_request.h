@@ -4,7 +4,6 @@
 #include "./private/p_qrpc_http_headers.h"
 #include "./private/p_qrpc_listen_request_code.h"
 #include "./qrpc_controller_setting.h"
-#include <QStm>
 #include <QThread>
 #include <QTemporaryFile>
 #include <QVariantHash>
@@ -12,7 +11,7 @@
 #include <QUuid>
 
 namespace QRpc {
-
+class ListenRequestPvt;
 class Request;
 //!
 //! \brief The ListenRequest class
@@ -68,9 +67,12 @@ public:
 
     ~ListenRequest();
 public:
+
     //!
-    Q_DECLARE_VU;
-public:
+    //! \brief authorizationHeaders
+    //! \return
+    //!
+    QVariantHash authorizationHeaders() const;
     //!
     //! \brief authorizationBasic
     //! \return
@@ -174,13 +176,6 @@ public:
     //! \brief start
     //!
     virtual void start();
-
-    //!
-    //! \brief data
-    //! \return
-    //!
-    virtual void *data() const;
-    virtual void setData(void *data);
 
     //!
     //! \brief codeOption
@@ -583,7 +578,7 @@ public:
     const QUuid makeUuid();
 
 private:
-    void*p=nullptr;
+    ListenRequestPvt *p=nullptr;
 signals:
     void finish();
 

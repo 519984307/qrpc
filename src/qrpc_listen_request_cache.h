@@ -7,6 +7,7 @@ namespace QRpc {
 
 class Listen;
 class ListenRequest;
+class ListenRequestCachePvt;
 //!
 //! \brief The ListenRequestCache class
 //!
@@ -51,7 +52,7 @@ public:
     ListenRequest &createRequest(const QVariant &vRequest);
 
 private:
-    void *p = nullptr;
+    ListenRequestCachePvt *p = nullptr;
 };
 
 } // namespace QRpc

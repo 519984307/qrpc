@@ -15,43 +15,28 @@
 
 namespace QRpc {
 
-class HttpListeners3drparty
+class HttpListeners3drparty:public QObject
 {
 public:
-    explicit HttpListeners3drparty() {}
-
-    virtual ~HttpListeners3drparty() { this->free(); }
+    explicit HttpListeners3drparty(QObject *parent):QObject{parent}{}
 
     QSettings *settings = nullptr;
     stefanfrings::HttpSessionStore *sessionStore = nullptr;
     stefanfrings::StaticFileController *fileController = nullptr;
     stefanfrings::HttpListener *listener = nullptr;
 
-    static HttpListeners3drparty *make(stefanfrings::HttpRequestHandler *requestHandler,
-                                       QSettings *settings)
+    static HttpListeners3drparty *make(stefanfrings::HttpRequestHandler *requestHandler, QSettings *settings)
     {
-        auto __return = new HttpListeners3drparty();
+        auto __return = new HttpListeners3drparty{requestHandler};
         __return->settings = settings;
-        __return->listener = new stefanfrings::HttpListener(settings,
-                                                            requestHandler,
-                                                            requestHandler);
-        __return->fileController = new stefanfrings::StaticFileController(settings,
-                                                                          __return->listener);
+        settings->setParent(requestHandler);
+        __return->listener = new stefanfrings::HttpListener{settings, requestHandler, requestHandler};
+        __return->fileController = new stefanfrings::StaticFileController{settings, __return->listener};
         __return->sessionStore = new stefanfrings::HttpSessionStore(settings, __return->listener);
         QThread::msleep(100);
         return __return;
     };
 
-    void free()
-    {
-        this->listener->close();
-        this->listener->deleteLater();
-        this->settings->deleteLater();
-
-        this->settings = nullptr;
-        this->listener = nullptr;
-        this->listener = nullptr;
-    }
 };
 
 class HttpServer3rdparty : public stefanfrings::HttpRequestHandler
@@ -69,6 +54,12 @@ public:
         this->port=settings->value(qsl("port")).toInt();
         this->listen=listen;
         this->listener=HttpListeners3drparty::make(this, settings);
+        QObject::connect(listen, &Listen::rpcResponse, this, &HttpServer3rdparty::onRpcResponse);
+    }
+
+    ~HttpServer3rdparty()
+    {
+        QObject::disconnect(listen, &Listen::rpcResponse, this, &HttpServer3rdparty::onRpcResponse);
     }
 
     void service(stefanfrings::HttpRequest &req, stefanfrings::HttpResponse &ret)
@@ -293,7 +284,7 @@ public slots:
 class ListenHTTPPvt : public QObject
 {
 public:
-    QMutex lock;
+    QMutex lock, started;
     QList<HttpServer3rdparty *> listens;
     ListenHTTP *parent = nullptr;
 
@@ -305,6 +296,10 @@ public:
     {
         {
             QMutexLocker locker(&this->lock);
+
+            if(!this->started.tryLock())
+                return {};
+
             auto colletions = this->parent->colletions();
             auto &option = colletions->protocol(Protocol::Http);
             for (auto &v : option.port()) {
@@ -313,17 +308,19 @@ public:
                     continue;
                 auto settings = option.makeSettings();
                 settings->setValue(qsl("port"), port);
-                auto listenServer = new HttpServer3rdparty{settings, this->parent};
-                listenServer->realMessageOnException = option.realMessageOnException();
-                QObject::connect(this->parent,
-                                 &Listen::rpcResponse,
-                                 listenServer,
-                                 &HttpServer3rdparty::onRpcResponse);
-                listens.append(listenServer);
+                auto listen = new HttpServer3rdparty{settings, this->parent};
+                listen->realMessageOnException = option.realMessageOnException();
+                listens.append(listen);
             }
         }
 
-        return this->isListening();
+        if(!this->isListening()){
+            this->stop();
+            return {};
+        }
+
+
+        return true;
     }
 
     bool isListening()
@@ -339,14 +336,13 @@ public:
 
     bool stop()
     {
-        QMutexLocker locker(&this->lock);
-        auto aux=this->listens;
-        this->listens.clear();
-        for(auto&listen:aux){
-            QObject::disconnect(this->parent, &Listen::rpcResponse, listen, &HttpServer3rdparty::onRpcResponse);
-            delete listen;
+        if(!this->started.tryLock(1)){
+            QMutexLocker locker(&this->lock);
+            auto aux=this->listens;
+            this->listens.clear();
+            qDeleteAll(aux);
+            this->started.unlock();
         }
-        this->listens.clear();
         return true;
     }
 };

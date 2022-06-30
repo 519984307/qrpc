@@ -14,7 +14,7 @@ namespace QRpc {
 class ListenRequest;
 class ListenRequestParser;
 class Server;
-
+class ControllerPvt;
 //!
 //! \brief The Controller class
 //!
@@ -240,7 +240,7 @@ signals:
     void enabledChanged();
 
 private:
-    void *p = nullptr;
+    ControllerPvt *p = nullptr;
     Protocol acceptedProtocols;
 };
 

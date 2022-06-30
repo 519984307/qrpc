@@ -130,10 +130,10 @@ bool Server::authorizationRequest(const ListenRequest &request) const
     return true;
 }
 
-QString Server::serverName() const
+QString &Server::serverName() const
 {
 
-    return p->serverName.isEmpty() ? "Undef" : p->serverName;
+    return p->serverName;
 }
 
 void Server::setServerName(const QString &value)
