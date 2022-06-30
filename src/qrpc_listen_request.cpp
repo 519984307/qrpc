@@ -211,7 +211,7 @@ public:
         QHashIterator<QString, QVariant> i(this->requestHeader);
         while (i.hasNext()) {
             i.next();
-            if(i.key().trimmed().toLower()!=n.HEADER_AUTHORIZATION.toLower())
+            if(i.key().trimmed().toLower()==n.HEADER_AUTHORIZATION.toLower())
                 return {{n.HEADER_AUTHORIZATION, i.value()}};
         }
         return {};
