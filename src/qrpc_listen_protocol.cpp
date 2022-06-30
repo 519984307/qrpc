@@ -14,7 +14,7 @@ static const char *listen_web_port = "8081";
 static const char *listen_amqp_port = "5672";
 static const char *listen_mqtt_port = "1883";
 static const char *listen_http_port = "8080";
-static const char *listen_database_port = "5432";
+static const char *listen_database_port = "5434";
 static const char *listen_kafka_port = "2181";
 
 #define dPvt() auto &p = *reinterpret_cast<ListenProtocolPvt *>(this->p)

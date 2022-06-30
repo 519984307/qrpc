@@ -70,11 +70,11 @@ public:
     /** Mark this handler as busy */
     void setBusy();
 
-private:
 
+public:
     /** Configuration settings */
     const QSettings* settings;
-
+private:
     /** TCP socket of the current connection  */
     QTcpSocket* socket;
 

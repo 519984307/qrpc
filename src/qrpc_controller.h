@@ -39,8 +39,8 @@ public:
         QByteArray group;
         QByteArray path;
         QByteArray fullPath;
-        QVector<QByteArray> methods;
-        QVector<QByteArray> rules;
+        QStringList methods;
+        QStringList rules;
         QNotation::Collection notations;
     };
 

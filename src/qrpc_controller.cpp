@@ -82,7 +82,7 @@ Controller::MethodInfoCollection Controller::invokableMethod() const
     if (vBasePathList.isEmpty())
         return {};
 
-    auto nApiGroup=n.find(apiGroup()).toValueByteArray();
+
 
 
     static QStm::Network network;
@@ -115,23 +115,34 @@ Controller::MethodInfoCollection Controller::invokableMethod() const
             if(info.excluded)
                 continue;
 
-            if(info.notations.contains(opGet))
+
+            if(info.notations.contains(opCrud)){
                 info.methods.append(network.METHOD_GET);
-
-            if(info.notations.contains(opPost))
                 info.methods.append(network.METHOD_POST);
-
-            if(info.notations.contains(opPut))
                 info.methods.append(network.METHOD_PUT);
-
-            if(info.notations.contains(opDelete))
                 info.methods.append(network.METHOD_DELETE);
-
-            if(info.notations.contains(opHead))
                 info.methods.append(network.METHOD_HEAD);
-
-            if(info.notations.contains(opOptions))
                 info.methods.append(network.METHOD_OPTIONS);
+            }
+            else{
+                if(info.notations.contains(opGet))
+                    info.methods.append(network.METHOD_GET);
+
+                if(info.notations.contains(opPost))
+                    info.methods.append(network.METHOD_POST);
+
+                if(info.notations.contains(opPut))
+                    info.methods.append(network.METHOD_PUT);
+
+                if(info.notations.contains(opDelete))
+                    info.methods.append(network.METHOD_DELETE);
+
+                if(info.notations.contains(opHead))
+                    info.methods.append(network.METHOD_HEAD);
+
+                if(info.notations.contains(opOptions))
+                    info.methods.append(network.METHOD_OPTIONS);
+            }
 
             if(info.notations.contains(opTrace))
                 info.methods.append(network.METHOD_TRACE);
@@ -139,12 +150,13 @@ Controller::MethodInfoCollection Controller::invokableMethod() const
             if(info.notations.contains(opPatch))
                 info.methods.append(network.METHOD_PATCH);
 
-            info.rules=info.notations.find(opRules()).toValueStringVector();
+            info.rules=info.notations.find(opRules()).toVariant().toStringList();
             info.basePath=basePath.toUtf8();
             info.path=info.notations.find(opPath()).toValueByteArray();
             if(info.path.isEmpty())
                 info.path=info.name;
 
+            info.name=info.notations.find(opName()).toValueByteArray();
             if(info.path.isEmpty())
                 info.path=info.path;
 
@@ -154,7 +166,7 @@ Controller::MethodInfoCollection Controller::invokableMethod() const
 
             info.group=info.notations.find(opGroup()).toValueByteArray();
             if(info.group.isEmpty())
-                info.group=nApiGroup;
+                continue;
 
             auto fullPath=qsl("%1/%2").arg(info.basePath, info.path);
             while(fullPath.contains(qsl("//")))
